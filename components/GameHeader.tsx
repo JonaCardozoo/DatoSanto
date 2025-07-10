@@ -11,7 +11,7 @@ export default function GameHeader() {
         <div className="flex items-center justify-between">
           {/* Logo Section */}
           <Link href="/" className="flex items-center space-x-2 sm:space-x-3 group">
-            <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 hover:scale-110 transition-all duration-300 rounded-full bg-gradient-to-r from-red-600 to-red-600 group-hover:from-red-500 group-hover:to-red-500 flex items-center justify-center overflow-hidden">
+            <div className=" w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 hover:scale-110 transition-all duration-300 rounded-full bg-gradient-to-r from-red-600 to-red-600 group-hover:from-red-500 group-hover:to-red-500 flex items-center justify-center overflow-hidden">
               <img 
                 src="/DATOSANTO.png" 
                 alt="Logo de tu aplicación" 
