@@ -92,7 +92,7 @@ export default function AuthPage() {
       <Card className="w-full max-w-md bg-gray-900 border-gray-800">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold text-red-600 flex justify-center items-center">
-            <Image src="/datosanto.png" width={100} height={100} alt="Logo" />
+            <Image src="https://i.imgur.com/vQC1enL.png" width={100} height={100} alt="Logo" />
           </CardTitle>
         </CardHeader>
         <CardContent>
