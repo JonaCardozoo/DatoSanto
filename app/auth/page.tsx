@@ -11,7 +11,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { signInWithJWT, signUpWithJWT } from "@/utils/supabase-browser"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { ArrowLeft } from "lucide-react"
+import { ArrowLeft, Eye, EyeOff } from "lucide-react"
 import Image from "next/image"
 
 export default function AuthPage() {
@@ -21,6 +21,7 @@ export default function AuthPage() {
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState("")
   const [error, setError] = useState("")
+  const [showPassword, setShowPassword] = useState(false)
 
   const router = useRouter()
 
@@ -82,6 +83,10 @@ export default function AuthPage() {
     }
   }
 
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword)
+  }
+
   return (
     <div className="min-h-screen bg-black flex items-center justify-center p-4">
       <Card className="w-full max-w-md bg-gray-900 border-gray-800">
@@ -89,7 +94,6 @@ export default function AuthPage() {
           <CardTitle className="text-2xl font-bold text-red-600 flex justify-center items-center">
             <Image src="/datosanto.png" width={100} height={100} alt="Logo" />
           </CardTitle>
-
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="signin" className="space-y-4">
@@ -112,24 +116,38 @@ export default function AuthPage() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    className="bg-gray-800 border-gray-700 "
+                    className="bg-gray-800 border-gray-700 text-white"
                     placeholder="tu@email.com"
                   />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="signin-password" className="text-white">Contraseña</Label>
-                  <Input
-                    id="signin-password"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    className="bg-gray-800 border-gray-700 "
-                    placeholder="••••••••"
-                  />
+                  <div className="relative">
+                    <Input
+                      id="signin-password"
+                      type={showPassword ? "text" : "password"}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      className="bg-gray-800 border-gray-700 text-white pr-10"
+                      placeholder="••••••••"
+                    />
+                    <button
+                      type="button"
+                      onClick={togglePasswordVisibility}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                      aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                    >
+                      {showPassword ? (
+                        <EyeOff className="w-4 h-4" />
+                      ) : (
+                        <Eye className="w-4 h-4" />
+                      )}
+                    </button>
+                  </div>
                 </div>
                 <Button type="submit" className="w-full bg-red-600 hover:bg-red-700" disabled={loading}>
-                  {loading ? "Iniciando con JWT..." : "Iniciar Sesión JWT"}
+                  {loading ? "Iniciando cuenta..." : "Iniciar Sesión"}
                 </Button>
               </form>
             </TabsContent>
@@ -162,19 +180,33 @@ export default function AuthPage() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="signup-password" className="text-white">Contraseña</Label>
-                  <Input
-                    id="signup-password"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    className="bg-gray-800 border-gray-700 text-white"
-                    placeholder="••••••••"
-                    minLength={6}
-                  />
+                  <div className="relative">
+                    <Input
+                      id="signup-password"
+                      type={showPassword ? "text" : "password"}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      className="bg-gray-800 border-gray-700 text-white pr-10"
+                      placeholder="••••••••"
+                      minLength={6}
+                    />
+                    <button
+                      type="button"
+                      onClick={togglePasswordVisibility}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                      aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                    >
+                      {showPassword ? (
+                        <EyeOff className="w-4 h-4" />
+                      ) : (
+                        <Eye className="w-4 h-4" />
+                      )}
+                    </button>
+                  </div>
                 </div>
                 <Button type="submit" className="w-full bg-red-600 hover:bg-red-700" disabled={loading}>
-                  {loading ? "Registrando con JWT..." : "Registrarse JWT"}
+                  {loading ? "Registrando usuario..." : "Registrarse"}
                 </Button>
               </form>
             </TabsContent>
