@@ -2,12 +2,19 @@
 import GameHeader from "@/components/GameHeader"
 import GameCard from "@/components/GameCard"
 import { Brain, User, Trophy, Target } from "lucide-react"
+import { Poppins } from 'next/font/google'
+
+
+const poppins = Poppins({ 
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'] 
+})
 
 const games = [
   {
     id: "trivia",
     title: "Trivia del Día",
-    description: "Ponete a prueba con preguntas sobre fútbol argentino",
+    description: "Ponete a prueba con preguntas sobre Patronato",
     icon: Brain,
     color: "from-red-600 to-red-800",
     href: "/trivia",
@@ -46,18 +53,18 @@ const games = [
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className={`${poppins.className} min-h-screen bg-black text-white`}>
       <GameHeader />
 
       <main className="container mx-auto px-4 py-8 max-w-6xl">
         <div className="space-y-8">
           {/* Hero Section */}
           <div className="text-center space-y-4">
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
-              Elegí tu <span className="text-red-600">Desafío</span>
+            <h2 className={`${poppins.className} text-4xl md:text-5xl font-bold text-white mb-4`}>
+              ELEGI TU <span className="text-red-600">DESAFÍO</span>
             </h2>
             <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-              Demostrá tu conocimiento del fútbol argentino con nuestros juegos diarios
+              Demostrá tu conocimiento del más grande de Entre Ríos con nuestros juegos diarios
             </p>
           </div>
 

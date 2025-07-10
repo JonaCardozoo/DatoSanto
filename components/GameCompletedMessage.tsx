@@ -30,7 +30,7 @@ export default function GameCompletedMessage({
         <h3 className="text-2xl md:text-3xl font-bold">{isCorrect ? "¡Excelente!" : "¡Casi!"}</h3>
 
         <p className="text-lg">
-          {isCorrect ? "¡Sabés mucho de fútbol argentino!" : `La respuesta correcta era: ${correctAnswer}`}
+          {isCorrect ? "" : `La respuesta correcta era: ${correctAnswer}`}
         </p>
 
         {/* Mensaje de puntos */}

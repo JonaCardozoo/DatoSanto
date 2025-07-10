@@ -12,47 +12,42 @@ export const triviasDelDia: Trivia[] = [
     fecha: "2024-01-01",
     pregunta: "¿En qué año ascendió Patronato de Paraná a Primera División por primera vez?",
     opciones: ["2010", "2012", "2014", "2015"],
-    respuestaCorrecta: 1, // 2012
+    respuestaCorrecta: 3, 
   },
-  {
+{
     id: "2024-01-02",
     fecha: "2024-01-02",
-    pregunta: "¿Cuál es el apodo tradicional de Patronato de Paraná?",
-    opciones: ["El Santo", "El Patrón", "Los Rojinegros", "El Decano"],
-    respuestaCorrecta: 1, // El Patrón
+    pregunta: "¿Quién fue el arquero histórico de Patronato, símbolo del ascenso y la permanencia?",
+    opciones: ["Federico Costa", "Sebastián Bértoli", "Facundo Altamirano", "Matias Mansilla"],
+    respuestaCorrecta: 1 // Sebastián Bértoli
   },
   {
     id: "2024-01-03",
     fecha: "2024-01-03",
-    pregunta: "¿En qué provincia argentina se encuentra la ciudad de Paraná?",
-    opciones: ["Santa Fe", "Entre Ríos", "Corrientes", "Buenos Aires"],
-    respuestaCorrecta: 1, // Entre Ríos
+    pregunta: "¿Qué título ganó Patronato en 2022?",
+    opciones: ["Superliga", "Copa Argentina", "Primera Nacional", "Copa de la Liga"],
+    respuestaCorrecta: 1 // Copa Argentina
   },
   {
     id: "2024-01-04",
     fecha: "2024-01-04",
-    pregunta: "¿Cuál fue el primer equipo argentino en ganar la Copa Libertadores?",
-    opciones: ["River Plate", "Boca Juniors", "Independiente", "Racing Club"],
-    respuestaCorrecta: 2, // Independiente
+    pregunta: "¿Qué delantero fue clave en la B Nacional y luego pasó a Unión?",
+    opciones: ["Cristian Tarragona", "Diego Jara", "Gabriel Ávalos", "Axel Rodríguez"],
+    respuestaCorrecta: 1 // Diego Jara
   },
   {
     id: "2024-01-05",
     fecha: "2024-01-05",
-    pregunta: "¿En qué año se fundó la AFA (Asociación del Fútbol Argentino)?",
-    opciones: ["1893", "1901", "1905", "1910"],
-    respuestaCorrecta: 0, // 1893
+    pregunta: "¿Qué equipo eliminó Patronato en semifinales de la Copa Argentina 2022?",
+    opciones: ["Boca Juniors", "Racing Club", "San Lorenzo", "River Plate"],
+    respuestaCorrecta: 0 // Boca Juniors
   },
   {
     id: "2024-01-06",
-    fecha: "2024-01-06",
-    pregunta: "¿Cuál es el estadio donde juega de local Patronato de Paraná?",
-    opciones: [
-      "Estadio Presbítero Bartolomé Grella",
-      "Estadio Tomás Ducó",
-      "Estadio José María Minella",
-      "Estadio Ciudad de Paraná",
-    ],
-    respuestaCorrecta: 0, // Estadio Presbítero Bartolomé Grella
+    fecha: "2024-01-09",
+    pregunta: "¿Quién es el jugador con más partidos disputados en la historia de Patronato?",
+    opciones: ["Walter Andrade", "Sebastián Bértoli", "César Carignano", "Marcelo Guzmán"],
+    respuestaCorrecta: 1 // Sebastián Bértoli
   },
   {
     id: "2024-01-07",
@@ -62,11 +57,11 @@ export const triviasDelDia: Trivia[] = [
     respuestaCorrecta: 1, // Lionel Messi
   },
   {
-    id: "2024-01-08",
-    fecha: "2024-01-08",
-    pregunta: "¿En qué Mundial Argentina ganó su primera Copa del Mundo?",
-    opciones: ["México 1970", "Argentina 1978", "España 1982", "México 1986"],
-    respuestaCorrecta: 1, // Argentina 1978
+    id: "2024-01-8",
+    fecha: "2024-01-8",
+    pregunta: "¿Qué delantero paraguayo jugó en Patronato y luego pasó a Argentinos Juniors?",
+    opciones: ["Gabriel Ávalos", "Diego Jara", "Cristian Tarragona", "Tiago Banega"],
+    respuestaCorrecta: 0 // Gabriel Ávalos
   },
   {
     id: "2024-01-09",
@@ -86,6 +81,13 @@ export const triviasDelDia: Trivia[] = [
     pregunta: "¿Cuántas Copas América ha ganado la Selección Argentina?",
     opciones: ["14", "15", "16", "17"],
     respuestaCorrecta: 1, // 15
+  },
+    {
+    id: "2024-01-11",
+    fecha: "2024-01-11",
+    pregunta: "¿Qué jugador de Patronato usó la camiseta número 10 durante la Copa Libertadores?",
+    opciones: ["Jorge Valdez Chamorro", "Nazareno Solís", "Tiago Banega", "Juan Cruz Esquivel"],
+    respuestaCorrecta: 0 // Jorge Valdez Chamorro
   },
 ]
 
