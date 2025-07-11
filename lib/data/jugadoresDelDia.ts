@@ -12,7 +12,7 @@ export const jugadoresDelDia: Player[] = [
     id: "2024-01-01",
     fecha: "2024-01-01",
     nombre: "Sebastián",
-    apellido: "BÉRTOLI",
+    apellido: "BERTOLI",
     equipo: "Patronato",
     posicion: "Arquero"
   },
@@ -28,7 +28,7 @@ export const jugadoresDelDia: Player[] = [
     id: "2024-01-03",
     fecha: "2024-01-03",
     nombre: "Marcelo",
-    apellido: "GUZMÁN",
+    apellido: "GUZMAN",
     equipo: "Patronato",
     posicion: "Volante"
   },
@@ -92,7 +92,7 @@ export const jugadoresDelDia: Player[] = [
     id: "2024-01-11",
     fecha: "2024-01-11",
     nombre: "Nazareno",
-    apellido: "SOLÍS",
+    apellido: "SOLIS",
     equipo: "Patronato",
     posicion: "Delantero"
   },
@@ -148,7 +148,7 @@ export const jugadoresDelDia: Player[] = [
     id: "2024-01-20",
     fecha: "2024-01-20",
     nombre: "Axel",
-    apellido: "RODRÍGUEZ",
+    apellido: "RODRIGUEZ",
     equipo: "Patronato",
     posicion: "Delantero"
   },

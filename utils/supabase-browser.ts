@@ -11,9 +11,9 @@ export function getSupabaseClient() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-  console.log("🔧 Verificando variables de entorno de Supabase:")
-  console.log("NEXT_PUBLIC_SUPABASE_URL:", supabaseUrl ? "✅ Configurada" : "❌ Faltante")
-  console.log("NEXT_PUBLIC_SUPABASE_ANON_KEY:", supabaseAnonKey ? "✅ Configurada" : "❌ Faltante")
+  
+  
+  
 
   if (!supabaseUrl || !supabaseAnonKey) {
     console.warn("⚠️ Supabase no configurado - variables de entorno faltantes")
@@ -77,7 +77,7 @@ export function getSupabaseClient() {
       },
     })
 
-    console.log("✅ Cliente Supabase creado con persistencia JWT manual")
+    
     return supabaseInstance
   } catch (error) {
     console.error("❌ Error creando cliente de Supabase:", error)
@@ -92,16 +92,16 @@ export async function restoreSessionFromJWT() {
 
   const stored = getStoredAuth()
   if (!stored) {
-    console.log("📭 No hay sesión JWT para restaurar")
+    
     return null
   }
 
   try {
-    console.log("🔄 Restaurando sesión desde JWT...")
+    
 
     // Verificar si necesita refresh
     if (shouldRefreshToken()) {
-      console.log("🔄 Token necesita refresh...")
+      
       const { data, error } = await supabase.auth.refreshSession({
         refresh_token: stored.refreshToken,
       })
@@ -113,7 +113,7 @@ export async function restoreSessionFromJWT() {
       }
 
       if (data.session) {
-        console.log("✅ Token refrescado exitosamente")
+        
         storeAuth(data.session)
         return data.session
       }
@@ -131,10 +131,6 @@ export async function restoreSessionFromJWT() {
       return null
     }
 
-    console.log("✅ Sesión JWT restaurada:", {
-      userId: data.session?.user?.id,
-      email: data.session?.user?.email,
-    })
 
     return data.session
   } catch (error) {
@@ -150,7 +146,7 @@ export async function signInWithJWT(email: string, password: string) {
   if (!supabase) return { data: null, error: { message: "Supabase no configurado" } }
 
   try {
-    console.log("🔐 Iniciando sesión con JWT...")
+    
 
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
@@ -163,7 +159,7 @@ export async function signInWithJWT(email: string, password: string) {
     }
 
     if (data.session) {
-      console.log("✅ Login exitoso, guardando JWT...")
+      
       storeAuth(data.session)
     }
 
@@ -180,7 +176,7 @@ export async function signUpWithJWT(email: string, password: string, username: s
   if (!supabase) return { data: null, error: { message: "Supabase no configurado" } }
 
   try {
-    console.log("📝 Registrando usuario con JWT...")
+    
 
     const { data, error } = await supabase.auth.signUp({
       email,
@@ -198,7 +194,7 @@ export async function signUpWithJWT(email: string, password: string, username: s
     }
 
     if (data.session) {
-      console.log("✅ Registro exitoso, guardando JWT...")
+      
       storeAuth(data.session)
     }
 
@@ -214,7 +210,7 @@ export async function signOutWithJWT() {
   const supabase = getSupabaseClient()
 
   try {
-    console.log("🚪 Cerrando sesión y limpiando JWT...")
+    
 
     // Limpiar JWT primero
     clearStoredAuth()
@@ -227,7 +223,7 @@ export async function signOutWithJWT() {
     // Limpiar todo el localStorage
     localStorage.clear()
 
-    console.log("✅ Sesión cerrada completamente")
+    
     return { error: null }
   } catch (error) {
     console.error("💥 Error en logout:", error)

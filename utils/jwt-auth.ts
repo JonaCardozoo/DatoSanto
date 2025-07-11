@@ -75,11 +75,7 @@ export function storeAuth(session: any): void {
 
   try {
     localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(authData))
-    console.log("✅ Auth JWT guardado:", {
-      userId: session.user.id,
-      email: session.user.email,
-      expiresAt: new Date(authData.expiresAt).toLocaleString(),
-    })
+
   } catch (error) {
     console.error("❌ Error guardando auth:", error)
   }
@@ -90,7 +86,7 @@ export function getStoredAuth(): StoredAuth | null {
   try {
     const stored = localStorage.getItem(AUTH_STORAGE_KEY)
     if (!stored) {
-      console.log("📭 No hay auth guardado")
+      
       return null
     }
 
@@ -98,17 +94,12 @@ export function getStoredAuth(): StoredAuth | null {
 
     // Verificar si el token está expirado
     if (isTokenExpired(authData.accessToken)) {
-      console.log("⏰ Token expirado, limpiando...")
+      
       clearStoredAuth()
       return null
     }
 
-    console.log("✅ Auth JWT recuperado:", {
-      userId: authData.user.id,
-      email: authData.user.email,
-      expiresAt: new Date(authData.expiresAt).toLocaleString(),
-      needsRefresh: needsRefresh(authData.accessToken),
-    })
+
 
     return authData
   } catch (error) {
@@ -122,7 +113,7 @@ export function getStoredAuth(): StoredAuth | null {
 export function clearStoredAuth(): void {
   try {
     localStorage.removeItem(AUTH_STORAGE_KEY)
-    console.log("🗑️ Auth JWT limpiado")
+    
   } catch (error) {
     console.error("❌ Error limpiando auth:", error)
   }

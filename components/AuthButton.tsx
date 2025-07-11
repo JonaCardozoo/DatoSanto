@@ -17,7 +17,6 @@ export default function AuthButton() {
 
   useEffect(() => {
     if (!supabase) {
-      console.log("🚫 Supabase no configurado")
       setLoading(false)
       return
     }
@@ -26,12 +25,10 @@ export default function AuthButton() {
 
     const initializeAuth = async () => {
       try {
-        console.log("🚀 INICIANDO AUTH CON JWT MANUAL...")
 
         // Paso 1: Verificar JWT guardado
         const storedUser = getCurrentUser()
         if (storedUser) {
-          console.log("✅ Usuario encontrado en JWT:", storedUser.email)
           setUser(storedUser)
 
           // Restaurar sesión en Supabase
@@ -43,7 +40,6 @@ export default function AuthButton() {
             await loadUserProfile(storedUser)
           }
         } else {
-          console.log("❌ No hay JWT guardado")
           if (mounted) {
             setLoading(false)
           }
@@ -51,14 +47,12 @@ export default function AuthButton() {
 
         // Paso 2: Configurar listener de Supabase
         const { data } = supabase.auth.onAuthStateChange(async (event, session) => {
-          console.log(`🔄 AUTH EVENT: ${event}`)
 
           if (!mounted) return
 
           switch (event) {
             case "SIGNED_IN":
               if (session?.user) {
-                console.log("✅ Sesión establecida:", session.user.email)
                 setUser(session.user)
                 setError(null)
                 await loadUserProfile(session.user)
@@ -66,7 +60,6 @@ export default function AuthButton() {
               break
 
             case "SIGNED_OUT":
-              console.log("🚪 Sesión cerrada")
               setUser(null)
               setProfile(null)
               setError(null)
@@ -74,7 +67,6 @@ export default function AuthButton() {
               break
 
             case "TOKEN_REFRESHED":
-              console.log("🔄 Token JWT refrescado")
               if (session?.user) {
                 setUser(session.user)
               }
@@ -82,7 +74,6 @@ export default function AuthButton() {
           }
         })
 
-        console.log("✅ Auth JWT inicializado")
       } catch (error) {
         console.error("💥 Error inicializando auth JWT:", error)
         if (mounted) {
@@ -94,7 +85,6 @@ export default function AuthButton() {
 
     const loadUserProfile = async (currentUser: any) => {
       try {
-        console.log("👤 Cargando perfil para:", currentUser.email)
 
         const { data, error } = await supabase.from("profiles").select("*").eq("id", currentUser.id).maybeSingle()
 
@@ -107,11 +97,9 @@ export default function AuthButton() {
         }
 
         if (data) {
-          console.log("✅ Perfil cargado:", data)
           setProfile(data)
           setError(null)
         } else {
-          console.log("🆕 Creando perfil nuevo...")
           await createNewProfile(currentUser)
         }
       } catch (error) {
@@ -152,7 +140,6 @@ export default function AuthButton() {
           return
         }
 
-        console.log("✅ Perfil creado:", data)
         setProfile(data)
         setError(null)
       } catch (error) {
@@ -174,7 +161,6 @@ export default function AuthButton() {
         games_won: 0,
       }
 
-      console.log("🔧 Usando perfil fallback:", fallback)
       setProfile(fallback)
       setError("Modo offline")
     }
@@ -188,7 +174,6 @@ export default function AuthButton() {
 
   const handleLogout = async () => {
     try {
-      console.log("🚪 Cerrando sesión JWT...")
       setLoading(true)
 
       await signOutWithJWT()

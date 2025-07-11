@@ -1,7 +1,7 @@
 "use client"
 import GameHeader from "@/components/GameHeader"
 import GameCard from "@/components/GameCard"
-import { Brain, User, Trophy, Target } from "lucide-react"
+import { Brain, User, Trophy, Target, Play } from "lucide-react"
 import { Poppins } from 'next/font/google'
 
 
@@ -29,6 +29,15 @@ const games = [
     href: "/jugador",
     difficulty: "Difícil",
   },
+  {
+    id: "video",
+    title: "Video del Día",
+    description: "Mirá el video y adiviná de qué se trata",
+    icon: Play,
+    color: "from-purple-600 to-purple-800",
+    href: "/video",
+    difficulty: "Fácil",
+  }, 
   {
     id: "proximo1",
     title: "Próximamente",

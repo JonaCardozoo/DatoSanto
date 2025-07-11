@@ -32,7 +32,6 @@ export default function AuthPage() {
     setMessage("")
 
     try {
-      console.log("📝 Registrando con JWT...")
       const { data, error } = await signUpWithJWT(email, password, username)
 
       if (error) {
@@ -61,7 +60,6 @@ export default function AuthPage() {
     setMessage("")
 
     try {
-      console.log("🔐 Iniciando sesión con JWT...")
       const { data, error } = await signInWithJWT(email, password)
 
       if (error) {

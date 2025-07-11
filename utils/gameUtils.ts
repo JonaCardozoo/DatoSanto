@@ -1,42 +1,82 @@
 import { getSupabaseClient } from "./supabase-browser"
+import { getCurrentUser as getAuthCurrentUser } from "./jwt-auth"
+import { getTodayAsString } from "./dateUtils" // Solo getTodayAsString
+import type { GameType } from "./dateUtils" // Importar GameType para tipado
 
-export async function awardPoints(gameType: "trivia" | "jugador") {
+// Función para marcar un juego como jugado hoy
+// Ahora esta función es la responsable de registrar la sesión en la BD y en localStorage
+export async function markAsPlayedToday(
+  gameType: GameType,
+  won: boolean,
+  attempts: number | null = null,
+): Promise<void> {
+  if (typeof window === "undefined") return // Asegurarse de que estamos en el cliente
+  const todayDateString = getTodayAsString()
+  const storageKey = `lastPlayed_${gameType}` // Clave consistente
+
+  // 1. Actualizar localStorage (siempre)
+  localStorage.setItem(storageKey, todayDateString)
+  
+
+  // 2. Registrar en la base de datos (si hay usuario logueado)
+  const user = getAuthCurrentUser()
+  
+
+  if (user) {
+    const supabase = getSupabaseClient()
+    if (!supabase) {
+      
+      return
+    }
+    try {
+      const sessionData = {
+        user_id: user.id,
+        game_type: gameType,
+        date: todayDateString,
+        completed: true,
+        won: won,
+        attempts: attempts, // Para juegos como Wordle
+        answer: null, // Si aplica, se podría guardar la respuesta aquí
+      }
+      
+
+      const { error } = await supabase.from("game_sessions").insert(sessionData)
+
+      if (error) {
+        console.error("❌ Error al guardar sesión de juego en 'game_sessions':", error)
+        // Log the full error object for more details
+        console.error("   - Supabase Error Details:", error.message, error.details, error.hint, error.code)
+      } else {
+        
+      }
+    } catch (error) {
+      console.error("💥 Error en markAsPlayedToday (BD):", error)
+    }
+  } else {
+    
+  }
+}
+
+export async function awardPoints(gameType: GameType) {
   const supabase = getSupabaseClient()
-
   if (!supabase) {
-    console.log("⚠️ Supabase no configurado - no se pueden otorgar puntos")
+    
     return false
   }
-
   try {
-    // Obtener usuario actual
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser()
-
-    if (userError || !user) {
-      console.log("❌ No hay usuario logueado para otorgar puntos")
+    const user = getAuthCurrentUser()
+    if (!user) {
+      
       return false
     }
 
-    const points = 10 // Siempre 10 puntos por juego ganado
-    console.log(`🎯 Intentando otorgar ${points} puntos para ${gameType} al usuario: ${user.email}`)
+    const points = 10
+    
 
-    // Verificar si ya jugó hoy este juego específico
-    const today = new Date().toISOString().split("T")[0]
-    const gameKey = `${gameType}_${today}`
+    // La verificación de si ya jugó hoy se hace antes de llamar a awardPoints
+    // en los componentes de página, usando hasPlayedGameToday.
+    // awardPoints solo se llama si el juego fue ganado y el usuario está logueado.
 
-    // Verificar en localStorage primero (más rápido)
-    if (typeof window !== "undefined") {
-      const alreadyPlayed = localStorage.getItem(gameKey)
-      if (alreadyPlayed === "completed") {
-        console.log("❌ Ya jugó este juego hoy (localStorage)")
-        return false
-      }
-    }
-
-    // Verificar si el perfil existe y obtener datos actuales
     const { data: existingProfile, error: profileError } = await supabase
       .from("profiles")
       .select("id, username, points, games_won")
@@ -49,12 +89,9 @@ export async function awardPoints(gameType: "trivia" | "jugador") {
     }
 
     let updatedProfile
-
     if (!existingProfile) {
-      console.log("🆕 Perfil no existe, creando uno nuevo...")
-      // Crear perfil nuevo con puntos
+      
       const username = user.user_metadata?.username || user.email?.split("@")[0] || `Usuario${user.id.slice(0, 8)}`
-
       const { data: newProfile, error: createError } = await supabase
         .from("profiles")
         .insert([
@@ -69,19 +106,15 @@ export async function awardPoints(gameType: "trivia" | "jugador") {
         ])
         .select("id, username, points, games_won")
         .single()
-
       if (createError) {
         console.error("❌ Error creando perfil:", createError)
         return false
       }
-
       updatedProfile = newProfile
-      console.log(`✅ Perfil creado con ${points} puntos:`, newProfile)
+      
     } else {
-      // Actualizar perfil existente
       const newPoints = (existingProfile.points || 0) + points
       const newGamesWon = (existingProfile.games_won || 0) + 1
-
       const { data: updated, error: updateError } = await supabase
         .from("profiles")
         .update({
@@ -92,27 +125,20 @@ export async function awardPoints(gameType: "trivia" | "jugador") {
         .eq("id", user.id)
         .select("id, username, points, games_won")
         .single()
-
       if (updateError) {
         console.error("❌ Error actualizando perfil:", updateError)
         return false
       }
-
       updatedProfile = updated
-      console.log(`✅ Puntos otorgados exitosamente: +${points} puntos por ${gameType}`)
-      console.log(`📊 Puntos totales: ${newPoints} | Juegos ganados: ${newGamesWon}`)
+      
+      
     }
 
-    // Marcar como jugado hoy en localStorage
-    if (typeof window !== "undefined") {
-      localStorage.setItem(gameKey, "completed")
-      console.log(`✅ Marcado como jugado en localStorage: ${gameKey}`)
-    }
+    // NO LLAMAR markAsPlayed aquí. markAsPlayedToday lo hará.
 
-    // Refrescar el perfil en el header con un pequeño delay
     setTimeout(() => {
       if (typeof window !== "undefined" && (window as any).refreshUserProfile) {
-        console.log("🔄 Refrescando perfil en header...")
+        
         ;(window as any).refreshUserProfile()
       }
     }, 1000)
@@ -124,93 +150,73 @@ export async function awardPoints(gameType: "trivia" | "jugador") {
   }
 }
 
-export function hasPlayedToday(gameType: "trivia" | "jugador"): boolean {
+// Esta función ahora es un alias para canPlayAgain negado, pero con la clave correcta
+// Es mejor usar directamente canPlayAgain para la lógica de "puede jugar de nuevo"
+// y hasPlayedGameToday para la verificación de si ya jugó hoy.
+// Para consistencia con el nombre, la mantendremos, pero su uso principal debería ser hasPlayedGameToday.
+export function hasPlayedToday(gameType: GameType): boolean {
   if (typeof window === "undefined") return false
-
-  const today = new Date().toISOString().split("T")[0]
-  const gameKey = `${gameType}_${today}`
-  const hasPlayed = localStorage.getItem(gameKey) === "completed"
-
-  console.log(`🎮 Verificando si jugó ${gameType} hoy: ${hasPlayed ? "Sí" : "No"}`)
-  return hasPlayed
-}
-
-export function markAsPlayedToday(gameType: "trivia" | "jugador"): void {
-  if (typeof window === "undefined") return
-
-  const today = new Date().toISOString().split("T")[0]
-  const gameKey = `${gameType}_${today}`
-  localStorage.setItem(gameKey, "completed")
-  console.log(`✅ Marcado como jugado hoy: ${gameKey}`)
+  const lastPlayed = localStorage.getItem(`lastPlayed_${gameType}`)
+  const today = getTodayAsString()
+  const result = lastPlayed === today
+  return result
 }
 
 export async function refreshUserProfile() {
   if (typeof window !== "undefined" && (window as any).refreshUserProfile) {
-    console.log("🔄 Refrescando perfil en header...")
+    
     await (window as any).refreshUserProfile()
   }
 }
 
-export async function hasPlayedGameToday(gameType: "trivia" | "jugador"): Promise<boolean> {
+export async function hasPlayedGameToday(gameType: GameType): Promise<boolean> {
   const supabase = getSupabaseClient()
+  const today = getTodayAsString()
+  const user = getAuthCurrentUser() // Obtener el usuario logueado
 
-  // Verificar en localStorage primero (más confiable)
-  const today = new Date().toISOString().split("T")[0]
-  const gameKey = `${gameType}_${today}`
+  
 
-  if (typeof window !== "undefined") {
-    const localCheck = localStorage.getItem(gameKey) === "completed"
-    if (localCheck) {
-      console.log(`🎮 Ya jugó ${gameType} hoy (localStorage)`)
-      return true
-    }
-  }
-
-  // Si Supabase no está configurado, usar solo localStorage
-  if (!supabase) {
-    console.log("⚠️ Supabase no configurado, usando solo localStorage")
-    return false
-  }
-
-  try {
-    // Verificar si hay usuario logueado
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser()
-
-    if (userError || !user) {
-      console.log("❌ No hay usuario logueado, usando localStorage")
+  // Si hay un usuario logueado, SIEMPRE consultar la base de datos primero
+  if (user) {
+    if (!supabase) {
+      
       return false
     }
+    try {
+      
+      const { data, error } = await supabase
+        .from("game_sessions")
+        .select("id")
+        .eq("user_id", user.id)
+        .eq("game_type", gameType)
+        .eq("date", today)
+        .maybeSingle()
 
-    // Verificar en la base de datos como respaldo
-    const columnName = `${gameType}_last_played`
-    const { data: profile, error: profileError } = await supabase
-      .from("profiles")
-      .select(columnName)
-      .eq("id", user.id)
-      .maybeSingle()
-
-    if (profileError) {
-      console.error(`❌ Error verificando ${gameType} en BD:`, profileError)
-      return false
-    }
-
-    if (profile && profile[columnName] === today) {
-      console.log(`🎮 Ya jugó ${gameType} hoy (BD)`)
-      // Sincronizar con localStorage
-      if (typeof window !== "undefined") {
-        localStorage.setItem(gameKey, "completed")
+      if (error) {
+        console.error(`❌ Error verificando ${gameType} en BD:`, error)
+        return false
       }
-      return true
-    }
 
-    console.log(`✅ No ha jugado ${gameType} hoy`)
-    return false
-  } catch (error) {
-    console.error(`💥 Error en hasPlayedGameToday para ${gameType}:`, error)
-    return false
+      if (data) {
+        // Sincronizar con localStorage si se encontró en BD (para futuras sesiones no logueadas)
+        if (typeof window !== "undefined") {
+          localStorage.setItem(`lastPlayed_${gameType}`, today)
+        }
+        return true
+      }
+
+      return false // No ha jugado en BD, puede jugar
+    } catch (error) {
+      console.error(`💥 Error en hasPlayedGameToday (BD) para ${gameType}:`, error)
+      return false
+    }
+  } else {
+    // Si NO hay usuario logueado, verificar solo en localStorage
+    if (typeof window === "undefined") {
+      return false
+    }
+    const localCheck = localStorage.getItem(`lastPlayed_${gameType}`) === today
+    return localCheck
   }
 }
 
@@ -222,8 +228,5 @@ export async function getCurrentUserProfile() {
 }
 
 export async function getCurrentUser() {
-  if (typeof window !== "undefined" && (window as any).getCurrentUser) {
-    return (window as any).getCurrentUser()
-  }
-  return null
+  return getAuthCurrentUser()
 }

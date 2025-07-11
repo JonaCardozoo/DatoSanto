@@ -7,107 +7,148 @@ import GameHeader from "@/components/GameHeader"
 import TriviaCard from "@/components/TriviaCard"
 import GameCompletedMessage from "@/components/GameCompletedMessage"
 import AlreadyPlayedMessage from "@/components/AlreadyPlayedMessage"
-import { getTodayAsString, hasPlayedToday, clearPreviousDayData } from "@/utils/dateUtils"
+import { getTodayAsString, clearPreviousDayData } from "@/utils/dateUtils"
 import { getTriviaForToday } from "@/lib/data/triviasDelDia"
-import { awardPoints, hasPlayedGameToday } from "@/utils/gameUtils"
+import { awardPoints, hasPlayedGameToday, markAsPlayedToday } from "@/utils/gameUtils"
 import { getSupabaseClient } from "@/utils/supabase-browser"
+import { getCurrentUser } from "@/utils/jwt-auth"
 import type { Trivia } from "@/lib/data/triviasDelDia"
 
 export default function TriviaPage() {
   const [currentTrivia, setCurrentTrivia] = useState<Trivia | null>(null)
   const [hasPlayed, setHasPlayed] = useState(false)
+  const [lastGameWon, setLastGameWon] = useState<boolean | null>(null)
   const [gameCompleted, setGameCompleted] = useState(false)
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null)
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null)
   const [pointsAwarded, setPointsAwarded] = useState(false)
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState<any>(null)
-
   const supabase = getSupabaseClient()
 
   useEffect(() => {
-    initializeGame()
-  }, [])
+    const initializeGame = async () => {
+      // Definición de initializeGame movida dentro de useEffect
+      clearPreviousDayData()
 
-  const initializeGame = async () => {
-    clearPreviousDayData()
+      console.log("🚀 Inicializando juego de Trivia del Día...")
+      const currentUser = getCurrentUser()
+      setUser(currentUser)
+      console.log("👤 Usuario logueado:", currentUser?.email || "No logueado")
 
-    // Verificar si hay usuario logueado
-    if (supabase) {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-      setUser(user)
+      const todayTrivia = getTriviaForToday()
+      setCurrentTrivia(todayTrivia)
+      console.log("❓ Trivia del día:", todayTrivia?.pregunta)
 
-      if (user) {
-        console.log("👤 Usuario logueado:", user.email)
-        // Si hay usuario, verificar en la base de datos
-        const playedToday = await hasPlayedGameToday("trivia")
-        setHasPlayed(playedToday)
+      let playedTodayFromSource = false
+      let wonFromSource: boolean | null = null
+
+      if (currentUser && todayTrivia) {
+        playedTodayFromSource = await hasPlayedGameToday("trivia")
+
+        if (playedTodayFromSource && supabase) {
+          const today = getTodayAsString()
+          const { data, error } = await supabase
+            .from("game_sessions")
+            .select("won")
+            .eq("user_id", currentUser.id)
+            .eq("game_type", "trivia")
+            .eq("date", today)
+            .order("created_at", { ascending: false })
+            .limit(1)
+            .maybeSingle()
+
+          if (error) {
+            console.error("❌ Error al obtener resultado de la última partida para Trivia:", error)
+          } else if (data) {
+            wonFromSource = data.won
+            console.log("✅ Resultado de la última partida de Trivia (de BD):", wonFromSource ? "Ganada" : "Perdida")
+          } else {
+            console.log("⚠️ No se encontró sesión de juego para hoy en BD, a pesar de hasPlayed=true.")
+          }
+        }
+
+        if (!playedTodayFromSource) {
+          console.log(
+            "🔄 Usuario logueado pero no ha jugado según BD. Limpiando estado local de juego para Trivia del Día.",
+          )
+          localStorage.removeItem("futfactos-trivia-game-state")
+        }
       } else {
-        console.log("❌ No hay usuario logueado")
-        // Si no hay usuario, usar localStorage
-        const playedToday = hasPlayedToday("trivia")
-        setHasPlayed(playedToday)
+        playedTodayFromSource = await hasPlayedGameToday("trivia")
+        console.log(`DEBUG app/trivia/page.tsx: hasPlayedGameToday("trivia") (LS) returned ${playedTodayFromSource}`)
       }
-    } else {
-      console.log("⚠️ Supabase no configurado")
-      // Sin Supabase, usar localStorage
-      const playedToday = hasPlayedToday("trivia")
-      setHasPlayed(playedToday)
+
+      setHasPlayed(playedTodayFromSource)
+      setLastGameWon(wonFromSource)
+
+      const savedState = localStorage.getItem("futfactos-trivia-game-state")
+      if (savedState && playedTodayFromSource) {
+        const gameState = JSON.parse(savedState)
+        const today = getTodayAsString()
+        if (gameState.date === today) {
+          if (currentUser && wonFromSource !== null && gameState.isCorrect !== wonFromSource) {
+            console.log("⚠️ Desincronización entre estado local y BD. Ignorando estado local obsoleto.")
+            localStorage.removeItem("futfactos-trivia-game-state")
+            setGameCompleted(false)
+          } else {
+            setSelectedAnswer(gameState.selectedAnswer)
+            setIsCorrect(gameState.isCorrect)
+            setPointsAwarded(gameState.pointsAwarded || false)
+            if (gameState.gameCompleted) {
+              setGameCompleted(true)
+            }
+            console.log("💾 Estado de juego recuperado de localStorage para hoy:", gameState)
+          }
+        } else {
+          localStorage.removeItem("futfactos-trivia-game-state")
+          console.log("🧹 Estado de juego antiguo de trivia eliminado de localStorage.")
+          setGameCompleted(false)
+        }
+      } else if (savedState && !playedTodayFromSource) {
+        localStorage.removeItem("futfactos-trivia-game-state")
+        setGameCompleted(false)
+      } else {
+        setGameCompleted(false)
+      }
+
+      setLoading(false)
+      console.log("🏁 Inicialización de Trivia del Día completa.")
     }
 
-    const todayTrivia = getTriviaForToday()
-    setCurrentTrivia(todayTrivia)
-
-    // Recuperar estado guardado si ya jugó
-    const savedState = localStorage.getItem("futfactos-trivia-game-state")
-    if (savedState) {
-      const gameState = JSON.parse(savedState)
-      const today = getTodayAsString()
-
-      if (gameState.date === today) {
-        setGameCompleted(true)
-        setSelectedAnswer(gameState.selectedAnswer)
-        setIsCorrect(gameState.isCorrect)
-        setPointsAwarded(gameState.pointsAwarded || false)
-      }
-    }
-
-    setLoading(false)
-  }
+    initializeGame() // Llamar a la función interna
+  }, []) // Dependencias para useEffect
 
   const handleAnswerSelect = useCallback(
     async (answerIndex: number) => {
       if (hasPlayed || gameCompleted) return
+      if (!currentTrivia) return
 
-      const correct = answerIndex === currentTrivia?.respuestaCorrecta
+      const correct = answerIndex === currentTrivia.respuestaCorrecta
       setSelectedAnswer(answerIndex)
       setIsCorrect(correct)
       setGameCompleted(true)
       setHasPlayed(true)
+      setLastGameWon(correct)
 
       console.log(`🎯 Respuesta ${correct ? "correcta" : "incorrecta"} seleccionada`)
 
-      // Otorgar puntos si ganó y está logueado
       let awarded = false
       if (correct && user) {
         console.log("🏆 Intentando otorgar puntos...")
         awarded = await awardPoints("trivia")
         setPointsAwarded(awarded)
-
         if (awarded) {
           console.log("✅ ¡Puntos otorgados exitosamente!")
         } else {
           console.log("❌ No se pudieron otorgar puntos")
         }
-      } else if (correct && !user) {
-        console.log("⚠️ Respuesta correcta pero no hay usuario logueado")
       }
 
-      // Guardar en localStorage
+      await markAsPlayedToday("trivia", correct)
+      console.log("💾 Estado del juego guardado en localStorage y BD (si logueado).")
+
       const today = getTodayAsString()
-      localStorage.setItem("futfactos-trivia-last-played", today)
       localStorage.setItem(
         "futfactos-trivia-game-state",
         JSON.stringify({
@@ -115,24 +156,18 @@ export default function TriviaPage() {
           isCorrect: correct,
           pointsAwarded: awarded,
           date: today,
+          gameCompleted: true,
         }),
       )
-
-      console.log("💾 Estado del juego guardado en localStorage")
+      console.log("💾 Estado final del juego de trivia guardado en localStorage.")
     },
     [hasPlayed, gameCompleted, currentTrivia, user],
   )
 
   const handlePlayAgain = useCallback(() => {
+    console.log("🔄 Reiniciando juego para nuevo desafío...")
     localStorage.removeItem("futfactos-trivia-game-state")
-    localStorage.removeItem("futfactos-trivia-last-played")
-    setHasPlayed(false)
-    setGameCompleted(false)
-    setSelectedAnswer(null)
-    setIsCorrect(null)
-    setPointsAwarded(false)
-    const newTrivia = getTriviaForToday()
-    setCurrentTrivia(newTrivia)
+    window.location.reload()
   }, [])
 
   if (loading) {
@@ -146,7 +181,6 @@ export default function TriviaPage() {
   return (
     <div className="min-h-screen bg-black text-white">
       <GameHeader />
-
       <main className="container mx-auto px-4 py-8 max-w-4xl">
         <div className="mb-6">
           <Link href="/" className="inline-flex items-center text-gray-400 hover:text-white transition-colors">
@@ -154,7 +188,6 @@ export default function TriviaPage() {
             Volver al menú
           </Link>
         </div>
-
         <div className="space-y-8">
           <div className="text-center">
             <h2 className="text-3xl md:text-4xl font-bold text-red-600 mb-2">Trivia del Día</h2>
@@ -169,10 +202,9 @@ export default function TriviaPage() {
               </p>
             )}
           </div>
-
-          {hasPlayed && !gameCompleted ? (
-            <AlreadyPlayedMessage onPlayAgain={handlePlayAgain} gameType="trivia" />
-          ) : gameCompleted ? (
+          {/* Lógica de renderizado condicional principal */}
+          {gameCompleted ? (
+            // Si el juego está completado (porque se acaba de terminar o se cargó desde un estado completado)
             <div className="space-y-6">
               <TriviaCard
                 trivia={currentTrivia!}
@@ -188,7 +220,16 @@ export default function TriviaPage() {
                 userLoggedIn={!!user}
               />
             </div>
+          ) : hasPlayed ? (
+            // Si no está gameCompleted, pero hasPlayed es true (es decir, ya jugó hoy y volvió a la página)
+            <AlreadyPlayedMessage
+              onPlayAgain={handlePlayAgain}
+              gameType="trivia"
+              playedToday={true}
+              lastGameWon={lastGameWon} // Pasar el resultado de la última partida
+            />
           ) : currentTrivia ? (
+            // Si el juego no está completado y no ha jugado hoy, mostrar el juego en curso
             <TriviaCard
               trivia={currentTrivia}
               onAnswerSelect={handleAnswerSelect}
@@ -197,6 +238,7 @@ export default function TriviaPage() {
               disabled={false}
             />
           ) : (
+            // Si no hay trivia disponible
             <div className="text-center py-12">
               <p className="text-xl text-gray-400">No hay trivia disponible para hoy</p>
             </div>
