@@ -65,7 +65,7 @@ export default function AlreadyPlayedMessage({ onPlayAgain, gameType }: AlreadyP
 
       <p className="text-gray-300 text-lg mb-2">Volvé mañana a las 00:00 para un nuevo desafío</p>
 
-      <p className="text-gray-400 text-base">¡Gracias por jugar FutFactos!</p>
+      <p className="text-gray-400 text-base">¡Gracias por jugar DatoSanto!</p>
 
       <motion.div
         initial={{ opacity: 0 }}

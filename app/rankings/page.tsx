@@ -131,7 +131,7 @@ export default function RankingsPage() {
   // Si Supabase no está configurado
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-black text-white">
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
         <GameHeader />
         <main className="container mx-auto px-4 py-8 max-w-4xl">
           <div className="mb-6">
@@ -161,7 +161,7 @@ export default function RankingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
       <GameHeader />
 
       <main className="container mx-auto px-4 py-8 max-w-4xl">
@@ -175,7 +175,7 @@ export default function RankingsPage() {
         <div className="space-y-8">
           {/* Header */}
           <div className="text-center">
-            <h2 className="text-3xl md:text-4xl font-bold text-red-600 mb-2">Rankings FutFactos</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-red-600 mb-2">Rankings DatoSanto</h2>
             <p className="text-gray-300 text-lg">Los mejores jugadores de la comunidad</p>
           </div>
 

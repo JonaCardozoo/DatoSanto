@@ -22,7 +22,7 @@ export default function RootLayout({
         <meta httpEquiv="Expires" content="0" />
         <link rel="shortcut icon" href="/DATOSANTO.ico" type="image/x-icon" />
       </head>
-      <body className="min-h-screen bg-black text-white">{children}</body>
+      <body className="min-h-screen  text-white">{children}</body>
     </html>
   )
 }

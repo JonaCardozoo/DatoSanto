@@ -62,7 +62,7 @@ const games = [
 
 export default function Home() {
   return (
-    <div className={`${poppins.className} min-h-screen bg-black text-white`}>
+    <div className={`${poppins.className} min-h-screen  bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white`}>
       <GameHeader />
 
       <main className="container mx-auto px-4 py-8 max-w-6xl">

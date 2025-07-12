@@ -40,7 +40,7 @@ export default function AuthPage() {
       }
 
       if (data.user) {
-        setMessage("¡Registro exitoso con JWT! Bienvenido a FutFactos.")
+        setMessage("¡Registro exitoso! Bienvenido a DatoSanto.")
         setTimeout(() => {
           router.push("/")
         }, 2000)
@@ -68,7 +68,7 @@ export default function AuthPage() {
       }
 
       if (data.user) {
-        setMessage("¡Inicio de sesión exitoso con JWT! Bienvenido de vuelta.")
+        setMessage("¡Inicio de sesión exitoso! Bienvenido de vuelta.")
         setTimeout(() => {
           router.push("/")
         }, 1500)
