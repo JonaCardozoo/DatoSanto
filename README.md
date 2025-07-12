@@ -26,10 +26,7 @@
 
 ## 🛣️ Roadmap (mejoras futuras)
 
-- 🏆 Sistema de ranking con puntajes acumulados.
-- 🧩 Agregar niveles de dificultad.
 - 🎮 Modo multijugador o por tiempo.
-- 📲 Convertir en PWA para jugar sin conexión.
 
 ---
 
