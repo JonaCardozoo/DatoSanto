@@ -1,30 +1,42 @@
-# FutFactos app
+# 🔴⚫ Dato Santo
 
-*Automatically synced with your [v0.dev](https://v0.dev) deployments*
+**Dato Santo** es una trivia interactiva sobre el Club Atlético **Patronato**, diseñada para hinchas y simpatizantes que quieran poner a prueba cuánto saben del Santo. Desde momentos históricos hasta jugadores icónicos, este juego es puro Patrón.
 
-[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/jonis-projects-82718bcb/v0-fut-factos-app)
-[![Built with v0](https://img.shields.io/badge/Built%20with-v0.dev-black?style=for-the-badge)](https://v0.dev/chat/projects/G0mIeWXQdHD)
+👉 [Jugar ahora](https://datosanto.vercel.app/)
 
-## Overview
+---
 
-This repository will stay in sync with your deployed chats on [v0.dev](https://v0.dev).
-Any changes you make to your deployed app will be automatically pushed to this repository from [v0.dev](https://v0.dev).
+## 📌 Características
 
-## Deployment
+- 🧠 Preguntas aleatorias sobre la historia y actualidad de Patronato.
+- ⏱️ Juego ágil e intuitivo.
+- 📱 Optimizado para dispositivos móviles y escritorio.
+- 🎯 Diseño simple y centrado en la experiencia.
 
-Your project is live at:
+---
 
-**[https://vercel.com/jonis-projects-82718bcb/v0-fut-factos-app](https://vercel.com/jonis-projects-82718bcb/v0-fut-factos-app)**
+## ⚙️ Tecnologías utilizadas
 
-## Build your app
+- **Next.js** con **React**
+- **Tailwind CSS** para estilos modernos
+- **TypeScript** para mejor mantenimiento
+- **Vercel** para deploy automático y rápido
 
-Continue building your app on:
+---
 
-**[https://v0.dev/chat/projects/G0mIeWXQdHD](https://v0.dev/chat/projects/G0mIeWXQdHD)**
+## 🛣️ Roadmap (mejoras futuras)
 
-## How It Works
+- 🏆 Sistema de ranking con puntajes acumulados.
+- 🧩 Agregar niveles de dificultad.
+- 🎮 Modo multijugador o por tiempo.
+- 📲 Convertir en PWA para jugar sin conexión.
 
-1. Create and modify your project using [v0.dev](https://v0.dev)
-2. Deploy your chats from the v0 interface
-3. Changes are automatically pushed to this repository
-4. Vercel deploys the latest version from this repository
+---
+
+## 🧪 Instalación local
+
+```bash
+git clone https://github.com/tu-usuario/datosanto.git
+cd datosanto
+npm install
+npm run dev
