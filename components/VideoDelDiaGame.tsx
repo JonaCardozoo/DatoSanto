@@ -343,13 +343,6 @@ function VideoDelDiaGame({ video, onGameComplete, userLoggedIn = false, disabled
         </div>
       )}
 
-      {playbackState === "paused_for_answer" && (
-        <div className="text-center p-4 bg-yellow-900/30 border border-yellow-500 rounded-lg animate-pulse">
-          <p className="text-yellow-200">
-            <strong>¡Tiempo!</strong> Elegí tu respuesta para ver el resto del video
-          </p>
-        </div>
-      )}
 
       {playbackState === "playing_full" && (
         <div className="text-center p-4 bg-green-900/30 border border-green-500 rounded-lg">
