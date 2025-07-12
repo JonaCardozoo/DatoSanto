@@ -23,11 +23,11 @@ export const videosDelDia: VideoDelDia[] = [
   },
 ]
 
-// Función para obtener el video del día
+
 export function getVideoDelDia(fecha?: string): VideoDelDia | null {
   const targetDate = fecha || new Date().toLocaleDateString('en-CA')
   
-  // Buscar video exacto para la fecha
+  
   const videoExacto = videosDelDia.find((video) => video.fecha === targetDate)
   if (videoExacto) return videoExacto
   
@@ -37,7 +37,7 @@ export function getVideoDelDia(fecha?: string): VideoDelDia | null {
     return videosDisponibles.sort((a, b) => b.fecha.localeCompare(a.fecha))[0]
   }
   
-  return videosDelDia[0] // Fallback
+  return videosDelDia[0] 
 }
 
 // Función para obtener todos los videos (para admin)

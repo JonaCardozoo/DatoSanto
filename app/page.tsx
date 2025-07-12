@@ -70,7 +70,7 @@ export default function Home() {
           {/* Hero Section */}
           <div className="text-center space-y-4">
             <h2 className={`${poppins.className} text-4xl md:text-5xl font-bold text-white mb-4`}>
-              ELEGI TU <span className="text-red-600">DESAFÍO</span>
+              ELEGÍ TU <span className="text-red-600">DESAFÍO</span>
             </h2>
             <p className="text-xl text-gray-300 max-w-2xl mx-auto">
               Demostrá tu conocimiento del más grande de Entre Ríos con nuestros juegos diarios
@@ -91,8 +91,8 @@ export default function Home() {
       {/* Footer */}
       <footer className="mt-16 py-8 border-t border-gray-800">
         <div className="container mx-auto px-4 text-center">
-          <p className="text-gray-400">© 2024 FutFactos - Juegos diarios de fútbol argentino</p>
-          <p className="text-sm text-gray-500 mt-2">Inspirado en la pasión de Patronato de Paraná ⚽</p>
+          <p className="text-gray-400">© 2025 DatoSanto - Juegos diarios sobre la historia del Patrón</p>
+          <p className="text-sm text-gray-500 mt-2">Desarrollado por: <a href="https://x.com/JonaCardozo185" className="text-gray-400 hover:underline">Jonatan Cardozo</a></p>
         </div>
       </footer>
     </div>

@@ -3,9 +3,9 @@ import type { Metadata } from "next"
 import "./globals.css"
 
 export const metadata: Metadata = {
-  title: "FutFactos - Trivia de Fútbol Argentino",
+  title: "DatoSanto - Trivia sobre Patronato",
   description: "Juegos de trivia y adivinanzas sobre fútbol argentino",
-    generator: 'v0.dev'
+    generator: 'Jonatan Cardozo'
 }
 
 export default function RootLayout({
@@ -20,6 +20,7 @@ export default function RootLayout({
         <meta httpEquiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
         <meta httpEquiv="Pragma" content="no-cache" />
         <meta httpEquiv="Expires" content="0" />
+        <link rel="shortcut icon" href="/DATOSANTO.ico" type="image/x-icon" />
       </head>
       <body className="min-h-screen bg-black text-white">{children}</body>
     </html>
