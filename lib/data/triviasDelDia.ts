@@ -50,22 +50,15 @@ export const triviasDelDia: Trivia[] = [
     respuestaCorrecta: 1 // Sebastián Bértoli
   },
   {
-    id: "2024-01-07",
-    fecha: "2024-01-07",
-    pregunta: "¿Qué jugador argentino es conocido como 'La Pulga'?",
-    opciones: ["Diego Maradona", "Lionel Messi", "Carlos Tevez", "Sergio Agüero"],
-    respuestaCorrecta: 1, // Lionel Messi
-  },
-  {
-    id: "2024-01-8",
-    fecha: "2024-01-8",
+    id: "2024-01-7",
+    fecha: "2024-01-7",
     pregunta: "¿Qué delantero paraguayo jugó en Patronato y luego pasó a Argentinos Juniors?",
     opciones: ["Gabriel Ávalos", "Diego Jara", "Cristian Tarragona", "Tiago Banega"],
     respuestaCorrecta: 0 // Gabriel Ávalos
   },
   {
-    id: "2024-01-09",
-    fecha: "2024-01-09",
+    id: "2024-01-08",
+    fecha: "2024-01-08",
     pregunta: "¿Cuál es el clásico rival tradicional de Patronato en Entre Ríos?",
     opciones: [
       "Atlético Paraná",
@@ -76,15 +69,15 @@ export const triviasDelDia: Trivia[] = [
     respuestaCorrecta: 0, // Atlético Paraná
   },
   {
-    id: "2024-01-10",
-    fecha: "2024-01-10",
+    id: "2024-01-9",
+    fecha: "2024-01-9",
     pregunta: "¿Cuántas Copas América ha ganado la Selección Argentina?",
     opciones: ["14", "15", "16", "17"],
     respuestaCorrecta: 1, // 15
   },
     {
-    id: "2024-01-11",
-    fecha: "2024-01-11",
+    id: "2024-01-10",
+    fecha: "2024-01-10",
     pregunta: "¿Qué jugador de Patronato usó la camiseta número 10 durante la Copa Libertadores?",
     opciones: ["Jorge Valdez Chamorro", "Nazareno Solís", "Tiago Banega", "Juan Cruz Esquivel"],
     respuestaCorrecta: 0 // Jorge Valdez Chamorro
