@@ -146,103 +146,36 @@ function ResetPasswordForm() {
     try {
       const supabase = getSupabaseClient()
       
-      // Función helper para crear timeout
-      const withTimeout = (promise: Promise<any>, timeoutMs: number) => {
-        return Promise.race([
-          promise,
-          new Promise((_, reject) => 
-            setTimeout(() => reject(new Error('Timeout')), timeoutMs)
-          )
-        ])
-      }
-
-      console.log('🔍 Verificando sesión antes de actualizar...')
+      console.log('🔄 Actualizando contraseña directamente (sin verificar sesión)...')
       
-      // Intentar obtener sesión con timeout de 5 segundos
-      let sessionResult
-      try {
-        sessionResult = await withTimeout(supabase.auth.getSession(), 5000)
-      } catch (timeoutError) {
-        console.error('❌ Timeout obteniendo sesión:', timeoutError)
-        setMessage('Timeout de sesión. Intenta directamente actualizar la contraseña.')
-        
-        // Intentar actualizar directamente sin verificar sesión
-        console.log('🔄 Intentando actualizar contraseña directamente...')
-        const { data: updateData, error: updateError } = await withTimeout(
-          supabase.auth.updateUser({ password: password }), 
-          15000 // Aumentar timeout a 15 segundos
-        )
-
-        if (updateError) {
-          console.error('❌ Error actualizando contraseña:', updateError)
-          setMessage(`Error: ${updateError.message}`)
-          setLoading(false)
-          return
-        }
-
-        console.log('✅ Contraseña actualizada correctamente (método directo)')
-        setMessage('¡Contraseña actualizada exitosamente! Redirigiendo...')
-        
-        setTimeout(() => {
-          router.push('/login')
-        }, 2500)
-        
-        setLoading(false)
-        return
-      }
-
-      const { data: currentSession, error: sessionError } = sessionResult
-
-      if (sessionError) {
-        console.error('❌ Error obteniendo sesión:', sessionError)
-        setMessage('Error de sesión. Solicita un nuevo enlace.')
-        setLoading(false)
-        return
-      }
-
-      if (!currentSession.session) {
-        console.error('❌ No hay sesión activa')
-        setMessage('No hay sesión activa. Solicita un nuevo enlace.')
-        setLoading(false)
-        return
-      }
-
-      console.log('✅ Sesión válida. Usuario:', currentSession.session.user.id)
-      console.log('🔄 Intentando actualizar contraseña...')
-
-      const updateResult = await withTimeout(
-        supabase.auth.updateUser({ password: password }), 
-        10000
-      )
-
-      const { data: updateData, error: updateError } = updateResult
+      // Actualizar contraseña directamente - la sesión ya está activa después del OTP
+      const { data: updateData, error: updateError } = await supabase.auth.updateUser({ 
+        password: password 
+      })
 
       console.log('📤 Resultado de updateUser:', { updateData, updateError })
 
       if (updateError) {
         console.error('❌ Error actualizando contraseña:', updateError)
         setMessage(`Error: ${updateError.message}`)
-        setLoading(false)
         return
       }
 
       if (!updateData.user) {
         console.error('❌ No se recibió información del usuario actualizado')
         setMessage('Error al actualizar. Intenta de nuevo.')
-        setLoading(false)
         return
       }
 
       console.log('✅ Contraseña actualizada correctamente')
       setMessage('¡Contraseña actualizada exitosamente! Redirigiendo...')
 
-      // Cerrar sesión después de actualizar
+      // Cerrar sesión después de actualizar (opcional)
       console.log('🚪 Cerrando sesión...')
       try {
-        await withTimeout(supabase.auth.signOut(), 3000)
+        await supabase.auth.signOut()
       } catch (signOutError) {
-        console.error('⚠️ Error al cerrar sesión:', signOutError)
-        // Continuar de todos modos
+        console.error('⚠️ Error al cerrar sesión (continuando):', signOutError)
       }
 
       setTimeout(() => {
