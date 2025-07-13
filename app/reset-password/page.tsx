@@ -1,49 +1,89 @@
 'use client'
 
 import { useEffect, useState, Suspense } from 'react'
-import { useSearchParams, useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { getSupabaseClient } from '@/utils/supabase-browser'
 import GameHeader from '@/components/GameHeader'
 
-// Componente interno que usa useSearchParams
 function ResetPasswordForm() {
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
   const [sessionReady, setSessionReady] = useState(false)
+  const [isClient, setIsClient] = useState(false)
 
   const router = useRouter()
-  const searchParams = useSearchParams()
 
   useEffect(() => {
-    const establishSession = async () => {
-      const token = searchParams.get('token')
-      const type = searchParams.get('type')
+    setIsClient(true)
+  }, [])
 
-      console.log('🔍 Parámetros obtenidos:', { token: !!token, type })
-
-      if (!token || type !== 'recovery') {
-        console.error('❌ Token o tipo faltante en la URL')
-        setMessage('Enlace inválido o incompleto.')
-        return
-      }
+  useEffect(() => {
+    const handleAuthCallback = async () => {
+      if (!isClient) return
 
       try {
         const supabase = getSupabaseClient()
         
-        // Verificar el token de recuperación
-        const { data, error } = await supabase.auth.verifyOtp({
-          token_hash: token,
-          type: 'recovery'
-        })
+        // Manejar el callback de autenticación
+        const { data, error } = await supabase.auth.getSession()
+        
+        if (error) {
+          console.error('❌ Error obteniendo sesión:', error)
+          setMessage('Error de autenticación. Solicita un nuevo enlace.')
+          return
+        }
 
-        if (error || !data.session) {
-          console.error('❌ Error verificando token:', error)
-          setMessage('Token inválido o expirado. Solicita un nuevo enlace de recuperación.')
-        } else {
-          console.log('✅ Token verificado correctamente')
+        if (data.session) {
+          console.log('✅ Sesión encontrada')
           setSessionReady(true)
+        } else {
+          // Intentar obtener datos de la URL
+          const urlParams = new URLSearchParams(window.location.search)
+          const accessToken = urlParams.get('access_token')
+          const refreshToken = urlParams.get('refresh_token')
+          const tokenHash = urlParams.get('token')
+          const type = urlParams.get('type')
+
+          console.log('🔍 Parámetros URL:', {
+            accessToken: !!accessToken,
+            refreshToken: !!refreshToken,
+            tokenHash: !!tokenHash,
+            type
+          })
+
+          if (accessToken && refreshToken) {
+            // Flujo con tokens explícitos
+            const { data: sessionData, error: sessionError } = await supabase.auth.setSession({
+              access_token: accessToken,
+              refresh_token: refreshToken,
+            })
+
+            if (sessionError || !sessionData.session) {
+              console.error('❌ Error estableciendo sesión:', sessionError)
+              setMessage('Error estableciendo sesión. Solicita un nuevo enlace.')
+            } else {
+              console.log('✅ Sesión establecida con tokens')
+              setSessionReady(true)
+            }
+          } else if (tokenHash && type === 'recovery') {
+            // Flujo con token hash
+            const { data: otpData, error: otpError } = await supabase.auth.verifyOtp({
+              token_hash: tokenHash,
+              type: 'recovery'
+            })
+
+            if (otpError || !otpData.session) {
+              console.error('❌ Error verificando OTP:', otpError)
+              setMessage('Token inválido o expirado. Solicita un nuevo enlace.')
+            } else {
+              console.log('✅ Token verificado correctamente')
+              setSessionReady(true)
+            }
+          } else {
+            setMessage('Enlace inválido o incompleto.')
+          }
         }
       } catch (err) {
         console.error('❌ Error inesperado:', err)
@@ -51,8 +91,8 @@ function ResetPasswordForm() {
       }
     }
 
-    establishSession()
-  }, [searchParams])
+    handleAuthCallback()
+  }, [isClient])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -68,18 +108,35 @@ function ResetPasswordForm() {
       return
     }
 
-    const supabase = getSupabaseClient()
     setLoading(true)
 
     try {
+      const supabase = getSupabaseClient()
+      
+      // Verificar sesión antes de actualizar
+      const { data: currentSession } = await supabase.auth.getSession()
+      
+      if (!currentSession.session) {
+        setMessage('No hay sesión activa. Solicita un nuevo enlace.')
+        setLoading(false)
+        return
+      }
+
+      console.log('🔍 Usuario actual:', currentSession.session.user.id)
+
+      // Actualizar contraseña
       const { error } = await supabase.auth.updateUser({ password })
 
       if (error) {
         console.error('❌ Error actualizando contraseña:', error)
-        setMessage(error.message)
+        setMessage(`Error: ${error.message}`)
       } else {
         console.log('✅ Contraseña actualizada correctamente')
-        setMessage('Contraseña actualizada exitosamente. Redirigiendo...')
+        setMessage('¡Contraseña actualizada exitosamente! Redirigiendo...')
+        
+        // Cerrar sesión después de cambiar contraseña
+        await supabase.auth.signOut()
+        
         setTimeout(() => router.push('/login'), 2500)
       }
     } catch (err) {
@@ -90,15 +147,27 @@ function ResetPasswordForm() {
     setLoading(false)
   }
 
+  if (!isClient) {
+    return (
+      <div className="w-full max-w-md bg-white p-6 rounded-xl shadow-lg">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-700 mx-auto"></div>
+          <p className="mt-2 text-gray-600">Cargando...</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="w-full max-w-md bg-white p-6 rounded-xl shadow-lg">
       <h2 className="text-2xl font-bold mb-4 text-center text-red-700">Restablecer contraseña</h2>
       
       {!sessionReady ? (
         <div className="text-center">
-          <p className="text-gray-600">Verificando enlace...</p>
+          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-red-700 mx-auto"></div>
+          <p className="mt-2 text-gray-600">Verificando enlace...</p>
           {message && (
-            <p className="text-red-600 mt-2">{message}</p>
+            <p className="text-red-600 mt-2 text-sm">{message}</p>
           )}
         </div>
       ) : (
@@ -106,7 +175,7 @@ function ResetPasswordForm() {
           <input
             type="password"
             placeholder="Nueva contraseña"
-            className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+            className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-black"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
@@ -115,7 +184,7 @@ function ResetPasswordForm() {
           <input
             type="password"
             placeholder="Confirmar contraseña"
-            className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+            className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-black"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             required
@@ -142,7 +211,6 @@ function ResetPasswordForm() {
   )
 }
 
-// Componente de carga
 function LoadingFallback() {
   return (
     <div className="w-full max-w-md bg-white p-6 rounded-xl shadow-lg">
@@ -154,7 +222,6 @@ function LoadingFallback() {
   )
 }
 
-// Componente principal
 export default function ResetPasswordPage() {
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
