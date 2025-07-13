@@ -25,7 +25,6 @@ function ResetPasswordForm() {
 
       try {
         const supabase = getSupabaseClient()
-
         const { data, error } = await supabase.auth.getSession()
 
         if (error) {
@@ -78,10 +77,22 @@ function ResetPasswordForm() {
               console.error('❌ Error verificando OTP:', otpError)
               setMessage('Token inválido o expirado. Solicita un nuevo enlace.')
             } else {
-              console.log('✅ OTP verificado. Estableciendo sesión...')
+              const session = otpData.session
+
+              if (!session?.access_token || !session?.refresh_token) {
+                console.error('⚠️ Faltan tokens en la sesión OTP')
+                setMessage('No se pudieron obtener los tokens. Intenta de nuevo.')
+                return
+              }
+
+              console.log('📤 Estableciendo sesión con:', {
+                accessToken: session.access_token,
+                refreshToken: session.refresh_token,
+              })
+
               const { error: setSessionError } = await supabase.auth.setSession({
-                access_token: otpData.session.access_token,
-                refresh_token: otpData.session.refresh_token,
+                access_token: session.access_token,
+                refresh_token: session.refresh_token,
               })
 
               console.log('🧾 Resultado setSession:', { setSessionError })
@@ -125,7 +136,6 @@ function ResetPasswordForm() {
 
     try {
       const supabase = getSupabaseClient()
-
       const { data: currentSession } = await supabase.auth.getSession()
 
       if (!currentSession.session) {
@@ -137,7 +147,6 @@ function ResetPasswordForm() {
       console.log('🔍 Usuario actual:', currentSession.session.user.id)
 
       const { error } = await supabase.auth.updateUser({ password })
-      console.log('🟡 Después de updateUser')
 
       if (error) {
         console.error('❌ Error actualizando contraseña:', error)
@@ -147,11 +156,7 @@ function ResetPasswordForm() {
         setMessage('¡Contraseña actualizada exitosamente! Redirigiendo...')
 
         await supabase.auth.signOut()
-        console.log('🟢 Sesión cerrada correctamente')
-
         setTimeout(() => {
-          console.log('🔁 Redirigiendo...')
-          setLoading(false)
           router.push('/login')
         }, 2500)
       }
