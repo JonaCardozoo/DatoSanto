@@ -23,65 +23,32 @@ function ResetPasswordForm() {
     if (!isClient) return
 
     const handleAuthCallback = async () => {
-      try {
-        const supabase = getSupabaseClient()
-        
-        // Primero verificar si ya hay una sesión activa
-        const { data: existingSession, error: sessionError } = await supabase.auth.getSession()
-        
-        if (sessionError) {
-          console.error('❌ Error obteniendo sesión:', sessionError)
-          setMessage('Error de autenticación. Solicita un nuevo enlace.')
-          return
-        }
+  try {
+    const supabase = getSupabaseClient()
 
-        if (existingSession.session) {
-          console.log('✅ Sesión existente encontrada')
-          setSessionReady(true)
-          return
-        }
-
-        // Manejar el callback de autenticación
-        const { data: authData, error: authError } = await supabase.auth.getUser()
-        
-        if (authError) {
-          console.error('❌ Error en callback de auth:', authError)
-          setMessage('Error en autenticación. Solicita un nuevo enlace.')
-          return
-        }
-
-        if (authData.user) {
-          console.log('✅ Usuario autenticado correctamente')
-          setSessionReady(true)
-          return
-        }
-
-        // Si no hay usuario, intentar con parámetros URL
-        const urlParams = new URLSearchParams(window.location.search)
-        const code = urlParams.get('code')
-        
-        if (code) {
-          console.log('🔄 Intercambiando código por sesión...')
-          const { data: exchangeData, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code)
-          
-          if (exchangeError || !exchangeData.session) {
-            console.error('❌ Error intercambiando código:', exchangeError)
-            setMessage('Error al procesar el enlace. Solicita un nuevo enlace.')
-          } else {
-            console.log('✅ Sesión establecida desde código')
-            setSessionReady(true)
-          }
-          return
-        }
-
-        console.log('⚠️ No se encontraron parámetros válidos')
-        setMessage('Enlace inválido o incompleto. Solicita un nuevo enlace.')
-
-      } catch (err) {
-        console.error('❌ Error inesperado:', err)
-        setMessage('Error inesperado. Intenta de nuevo.')
-      }
+    // 👇 INTENTA OBTENER SESIÓN DESDE LA URL
+    const { error: urlError } = await supabase.auth.getSessionFromUrl()
+    if (urlError) {
+      console.error('❌ Error al obtener sesión desde URL:', urlError)
     }
+
+    const { data: sessionData, error: sessionError } = await supabase.auth.getSession()
+
+    if (sessionError || !sessionData.session) {
+      console.error('❌ No hay sesión activa:', sessionError)
+      setMessage('Error de autenticación. Solicita un nuevo enlace.')
+      return
+    }
+
+    console.log('✅ Sesión obtenida correctamente desde la URL')
+    setSessionReady(true)
+
+  } catch (err) {
+    console.error('❌ Error inesperado:', err)
+    setMessage('Error inesperado. Intenta de nuevo.')
+  }
+}
+
 
     // Añadir un pequeño delay para asegurar que la URL esté lista
     const timeoutId = setTimeout(() => {
