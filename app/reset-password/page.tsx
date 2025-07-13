@@ -41,75 +41,39 @@ function ResetPasswordForm() {
           return
         }
 
-        // Si no hay sesión, procesar parámetros de URL
+        // Manejar el callback de autenticación
+        const { data: authData, error: authError } = await supabase.auth.getUser()
+        
+        if (authError) {
+          console.error('❌ Error en callback de auth:', authError)
+          setMessage('Error en autenticación. Solicita un nuevo enlace.')
+          return
+        }
+
+        if (authData.user) {
+          console.log('✅ Usuario autenticado correctamente')
+          setSessionReady(true)
+          return
+        }
+
+        // Si no hay usuario, intentar con parámetros URL
         const urlParams = new URLSearchParams(window.location.search)
-        const accessToken = urlParams.get('access_token')
-        const refreshToken = urlParams.get('refresh_token')
-        const tokenHash = urlParams.get('token_hash') || urlParams.get('token')
-        const type = urlParams.get('type')
-
-        console.log('🔍 Parámetros URL:', {
-          accessToken: accessToken ? '***' : null,
-          refreshToken: refreshToken ? '***' : null,
-          tokenHash: tokenHash ? '***' : null,
-          type
-        })
-
-        // Método 1: Tokens directos en URL
-        if (accessToken && refreshToken) {
-          console.log('🔁 Estableciendo sesión con tokens de URL')
-          const { data: sessionData, error: setSessionError } = await supabase.auth.setSession({
-            access_token: accessToken,
-            refresh_token: refreshToken,
-          })
-
-          if (setSessionError || !sessionData.session) {
-            console.error('❌ Error estableciendo sesión:', setSessionError)
-            setMessage('Error estableciendo sesión. Solicita un nuevo enlace.')
+        const code = urlParams.get('code')
+        
+        if (code) {
+          console.log('🔄 Intercambiando código por sesión...')
+          const { data: exchangeData, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code)
+          
+          if (exchangeError || !exchangeData.session) {
+            console.error('❌ Error intercambiando código:', exchangeError)
+            setMessage('Error al procesar el enlace. Solicita un nuevo enlace.')
           } else {
-            console.log('✅ Sesión establecida con tokens de URL')
+            console.log('✅ Sesión establecida desde código')
             setSessionReady(true)
           }
           return
         }
 
-        // Método 2: Token hash para verificación OTP
-        if (tokenHash && type === 'recovery') {
-          console.log('🔁 Verificando OTP con token hash')
-          const { data: otpData, error: otpError } = await supabase.auth.verifyOtp({
-            token_hash: tokenHash,
-            type: 'recovery'
-          })
-
-          if (otpError || !otpData.session) {
-            console.error('❌ Error verificando OTP:', otpError)
-            setMessage('Token inválido o expirado. Solicita un nuevo enlace.')
-          } else {
-            console.log('✅ OTP verificado correctamente')
-            setSessionReady(true)
-          }
-          return
-        }
-
-        // Método 3: Token simple (algunas versiones de Supabase)
-        if (tokenHash) {
-          console.log('🔁 Intentando con token simple')
-          const { data: otpData, error: otpError } = await supabase.auth.verifyOtp({
-            token_hash: tokenHash,
-            type: 'recovery'
-          })
-
-          if (otpError || !otpData.session) {
-            console.error('❌ Error con token simple:', otpError)
-            setMessage('Token inválido o expirado. Solicita un nuevo enlace.')
-          } else {
-            console.log('✅ Token simple verificado')
-            setSessionReady(true)
-          }
-          return
-        }
-
-        // Si llegamos aquí, no hay parámetros válidos
         console.log('⚠️ No se encontraron parámetros válidos')
         setMessage('Enlace inválido o incompleto. Solicita un nuevo enlace.')
 
