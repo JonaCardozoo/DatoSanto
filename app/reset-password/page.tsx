@@ -20,102 +20,111 @@ function ResetPasswordForm() {
   }, [])
 
   useEffect(() => {
-    const handleAuthCallback = async () => {
-      if (!isClient) return
+    if (!isClient) return
 
+    const handleAuthCallback = async () => {
       try {
         const supabase = getSupabaseClient()
-        const { data, error } = await supabase.auth.getSession()
-
-        if (error) {
-          console.error('❌ Error obteniendo sesión:', error)
+        
+        // Primero verificar si ya hay una sesión activa
+        const { data: existingSession, error: sessionError } = await supabase.auth.getSession()
+        
+        if (sessionError) {
+          console.error('❌ Error obteniendo sesión:', sessionError)
           setMessage('Error de autenticación. Solicita un nuevo enlace.')
           return
         }
 
-        if (data.session) {
-          console.log('✅ Sesión encontrada')
+        if (existingSession.session) {
+          console.log('✅ Sesión existente encontrada')
           setSessionReady(true)
-        } else {
-          const urlParams = new URLSearchParams(window.location.search)
-          const accessToken = urlParams.get('access_token')
-          const refreshToken = urlParams.get('refresh_token')
-          const tokenHash = urlParams.get('token')
-          const type = urlParams.get('type')
+          return
+        }
 
-          console.log('🔍 Parámetros URL:', {
-            accessToken,
-            refreshToken,
-            tokenHash,
-            type
+        // Si no hay sesión, procesar parámetros de URL
+        const urlParams = new URLSearchParams(window.location.search)
+        const accessToken = urlParams.get('access_token')
+        const refreshToken = urlParams.get('refresh_token')
+        const tokenHash = urlParams.get('token_hash') || urlParams.get('token')
+        const type = urlParams.get('type')
+
+        console.log('🔍 Parámetros URL:', {
+          accessToken: accessToken ? '***' : null,
+          refreshToken: refreshToken ? '***' : null,
+          tokenHash: tokenHash ? '***' : null,
+          type
+        })
+
+        // Método 1: Tokens directos en URL
+        if (accessToken && refreshToken) {
+          console.log('🔁 Estableciendo sesión con tokens de URL')
+          const { data: sessionData, error: setSessionError } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken,
           })
 
-          if (accessToken && refreshToken) {
-            console.log('🔁 Usando setSession con tokens')
-            const { data: sessionData, error: sessionError } = await supabase.auth.setSession({
-              access_token: accessToken,
-              refresh_token: refreshToken,
-            })
-
-            if (sessionError || !sessionData.session) {
-              console.error('❌ Error estableciendo sesión:', sessionError)
-              setMessage('Error estableciendo sesión. Solicita un nuevo enlace.')
-            } else {
-              console.log('✅ Sesión establecida con tokens')
-              setSessionReady(true)
-            }
-          } else if (tokenHash && type === 'recovery') {
-            console.log('🔁 Verificando OTP...')
-            const { data: otpData, error: otpError } = await supabase.auth.verifyOtp({
-              token_hash: tokenHash,
-              type: 'recovery'
-            })
-
-            console.log('📩 Resultado OTP:', { otpData, otpError })
-
-            if (otpError || !otpData.session) {
-              console.error('❌ Error verificando OTP:', otpError)
-              setMessage('Token inválido o expirado. Solicita un nuevo enlace.')
-            } else {
-              const session = otpData.session
-
-              if (!session?.access_token || !session?.refresh_token) {
-                console.error('⚠️ Faltan tokens en la sesión OTP')
-                setMessage('No se pudieron obtener los tokens. Intenta de nuevo.')
-                return
-              }
-
-              console.log('📤 Estableciendo sesión con:', {
-                accessToken: session.access_token,
-                refreshToken: session.refresh_token,
-              })
-
-              const { error: setSessionError } = await supabase.auth.setSession({
-                access_token: session.access_token,
-                refresh_token: session.refresh_token,
-              })
-
-              console.log('🧾 Resultado setSession:', { setSessionError })
-
-              if (setSessionError) {
-                console.error('❌ Error al establecer sesión:', setSessionError)
-                setMessage('Error al establecer sesión. Solicita un nuevo enlace.')
-              } else {
-                console.log('🟢 Sesión establecida correctamente después de OTP')
-                setSessionReady(true)
-              }
-            }
+          if (setSessionError || !sessionData.session) {
+            console.error('❌ Error estableciendo sesión:', setSessionError)
+            setMessage('Error estableciendo sesión. Solicita un nuevo enlace.')
           } else {
-            setMessage('Enlace inválido o incompleto.')
+            console.log('✅ Sesión establecida con tokens de URL')
+            setSessionReady(true)
           }
+          return
         }
+
+        // Método 2: Token hash para verificación OTP
+        if (tokenHash && type === 'recovery') {
+          console.log('🔁 Verificando OTP con token hash')
+          const { data: otpData, error: otpError } = await supabase.auth.verifyOtp({
+            token_hash: tokenHash,
+            type: 'recovery'
+          })
+
+          if (otpError || !otpData.session) {
+            console.error('❌ Error verificando OTP:', otpError)
+            setMessage('Token inválido o expirado. Solicita un nuevo enlace.')
+          } else {
+            console.log('✅ OTP verificado correctamente')
+            setSessionReady(true)
+          }
+          return
+        }
+
+        // Método 3: Token simple (algunas versiones de Supabase)
+        if (tokenHash) {
+          console.log('🔁 Intentando con token simple')
+          const { data: otpData, error: otpError } = await supabase.auth.verifyOtp({
+            token_hash: tokenHash,
+            type: 'recovery'
+          })
+
+          if (otpError || !otpData.session) {
+            console.error('❌ Error con token simple:', otpError)
+            setMessage('Token inválido o expirado. Solicita un nuevo enlace.')
+          } else {
+            console.log('✅ Token simple verificado')
+            setSessionReady(true)
+          }
+          return
+        }
+
+        // Si llegamos aquí, no hay parámetros válidos
+        console.log('⚠️ No se encontraron parámetros válidos')
+        setMessage('Enlace inválido o incompleto. Solicita un nuevo enlace.')
+
       } catch (err) {
         console.error('❌ Error inesperado:', err)
         setMessage('Error inesperado. Intenta de nuevo.')
       }
     }
 
-    handleAuthCallback()
+    // Añadir un pequeño delay para asegurar que la URL esté lista
+    const timeoutId = setTimeout(() => {
+      handleAuthCallback()
+    }, 100)
+
+    return () => clearTimeout(timeoutId)
   }, [isClient])
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -168,6 +177,19 @@ function ResetPasswordForm() {
     setLoading(false)
   }
 
+  // Añadir timeout para evitar que se quede colgado indefinidamente
+  useEffect(() => {
+    if (!sessionReady && isClient) {
+      const timeoutId = setTimeout(() => {
+        if (!sessionReady) {
+          setMessage('Tiempo de espera agotado. Solicita un nuevo enlace.')
+        }
+      }, 10000) // 10 segundos timeout
+
+      return () => clearTimeout(timeoutId)
+    }
+  }, [sessionReady, isClient])
+
   return (
     <div className="w-full max-w-md bg-white p-6 rounded-xl shadow-lg">
       <h2 className="text-2xl font-bold mb-4 text-center text-red-700">Restablecer contraseña</h2>
@@ -177,7 +199,15 @@ function ResetPasswordForm() {
           <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-red-700 mx-auto"></div>
           <p className="mt-2 text-gray-600">Verificando enlace...</p>
           {message && (
-            <p className="text-red-600 mt-2 text-sm">{message}</p>
+            <div className="mt-4">
+              <p className="text-red-600 text-sm">{message}</p>
+              <button
+                onClick={() => router.push('/login')}
+                className="mt-2 text-sm text-blue-600 hover:underline"
+              >
+                Volver al login
+              </button>
+            </div>
           )}
         </div>
       ) : (
