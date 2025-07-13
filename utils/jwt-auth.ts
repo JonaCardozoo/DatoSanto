@@ -112,7 +112,10 @@ export function getStoredAuth(): StoredAuth | null {
 // Limpiar autenticación guardada
 export function clearStoredAuth(): void {
   try {
+    if (typeof window !== 'undefined') {
+      
     localStorage.removeItem(AUTH_STORAGE_KEY)
+    }
     
   } catch (error) {
     console.error("❌ Error limpiando auth:", error)
