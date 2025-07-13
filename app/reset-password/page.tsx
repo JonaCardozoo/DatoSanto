@@ -25,10 +25,10 @@ function ResetPasswordForm() {
 
       try {
         const supabase = getSupabaseClient()
-        
+
         // Manejar el callback de autenticación
         const { data, error } = await supabase.auth.getSession()
-        
+
         if (error) {
           console.error('❌ Error obteniendo sesión:', error)
           setMessage('Error de autenticación. Solicita un nuevo enlace.')
@@ -112,10 +112,10 @@ function ResetPasswordForm() {
 
     try {
       const supabase = getSupabaseClient()
-      
+
       // Verificar sesión antes de actualizar
       const { data: currentSession } = await supabase.auth.getSession()
-      
+
       if (!currentSession.session) {
         setMessage('No hay sesión activa. Solicita un nuevo enlace.')
         setLoading(false)
@@ -126,6 +126,7 @@ function ResetPasswordForm() {
 
       // Actualizar contraseña
       const { error } = await supabase.auth.updateUser({ password })
+      console.log('🟡 Después de updateUser')
 
       if (error) {
         console.error('❌ Error actualizando contraseña:', error)
@@ -133,12 +134,17 @@ function ResetPasswordForm() {
       } else {
         console.log('✅ Contraseña actualizada correctamente')
         setMessage('¡Contraseña actualizada exitosamente! Redirigiendo...')
-        
-        // Cerrar sesión después de cambiar contraseña
+
         await supabase.auth.signOut()
-        
-        setTimeout(() => router.push('/login'), 2500)
+        console.log('🟢 Sesión cerrada correctamente')
+
+        setTimeout(() => {
+          console.log('🔁 Redirigiendo...')
+          setLoading(false)
+          router.push('/login')
+        }, 2500)
       }
+
     } catch (err) {
       console.error('❌ Error inesperado:', err)
       setMessage('Error inesperado. Intenta de nuevo.')
@@ -161,7 +167,7 @@ function ResetPasswordForm() {
   return (
     <div className="w-full max-w-md bg-white p-6 rounded-xl shadow-lg">
       <h2 className="text-2xl font-bold mb-4 text-center text-red-700">Restablecer contraseña</h2>
-      
+
       {!sessionReady ? (
         <div className="text-center">
           <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-red-700 mx-auto"></div>
@@ -199,11 +205,10 @@ function ResetPasswordForm() {
           </button>
         </form>
       )}
-      
+
       {message && sessionReady && (
-        <p className={`text-center text-sm mt-4 ${
-          message.includes('exitosamente') ? 'text-green-600' : 'text-red-600'
-        }`}>
+        <p className={`text-center text-sm mt-4 ${message.includes('exitosamente') ? 'text-green-600' : 'text-red-600'
+          }`}>
           {message}
         </p>
       )}
