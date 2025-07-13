@@ -25,7 +25,9 @@ function decodeJWT(token: string): JWTPayload | null {
     if (parts.length !== 3) return null
 
     const payload = parts[1]
-    const decoded = atob(payload.replace(/-/g, "+").replace(/_/g, "/"))
+    // Agregar padding si es necesario para base64
+    const paddedPayload = payload.padEnd(payload.length + ((4 - (payload.length % 4)) % 4), '=')
+    const decoded = atob(paddedPayload.replace(/-/g, "+").replace(/_/g, "/"))
     return JSON.parse(decoded)
   } catch (error) {
     console.error("❌ Error decodificando JWT:", error)
@@ -54,6 +56,11 @@ function needsRefresh(token: string): boolean {
 
 // Guardar autenticación en localStorage
 export function storeAuth(session: any): void {
+  if (typeof window === 'undefined') {
+    console.warn("⚠️ localStorage no disponible en el servidor")
+    return
+  }
+
   if (!session?.access_token || !session?.user) {
     console.error("❌ Sesión inválida para guardar")
     return
@@ -75,7 +82,7 @@ export function storeAuth(session: any): void {
 
   try {
     localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(authData))
-
+    console.log("✅ Auth guardada correctamente")
   } catch (error) {
     console.error("❌ Error guardando auth:", error)
   }
@@ -83,10 +90,13 @@ export function storeAuth(session: any): void {
 
 // Recuperar autenticación de localStorage
 export function getStoredAuth(): StoredAuth | null {
+  if (typeof window === 'undefined') {
+    return null
+  }
+
   try {
     const stored = localStorage.getItem(AUTH_STORAGE_KEY)
     if (!stored) {
-      
       return null
     }
 
@@ -94,12 +104,10 @@ export function getStoredAuth(): StoredAuth | null {
 
     // Verificar si el token está expirado
     if (isTokenExpired(authData.accessToken)) {
-      
+      console.log("🔄 Token expirado, limpiando storage")
       clearStoredAuth()
       return null
     }
-
-
 
     return authData
   } catch (error) {
@@ -111,12 +119,13 @@ export function getStoredAuth(): StoredAuth | null {
 
 // Limpiar autenticación guardada
 export function clearStoredAuth(): void {
+  if (typeof window === 'undefined') {
+    return
+  }
+
   try {
-    if (typeof window !== 'undefined') {
-      
     localStorage.removeItem(AUTH_STORAGE_KEY)
-    }
-    
+    console.log("🧹 Auth limpiada del storage")
   } catch (error) {
     console.error("❌ Error limpiando auth:", error)
   }
