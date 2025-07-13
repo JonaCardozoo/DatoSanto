@@ -147,6 +147,11 @@ export default function AuthPage() {
                 <Button type="submit" className="w-full bg-red-600 hover:bg-red-700" disabled={loading}>
                   {loading ? "Iniciando cuenta..." : "Iniciar Sesión"}
                 </Button>
+                <div className="text-center mt-4">
+  <Link href="/forgot-password" className="text-sm text-gray-600 hover:text-red-600 transition-colors">
+    ¿Olvidaste tu contraseña?
+  </Link>
+</div>
               </form>
             </TabsContent>
 
