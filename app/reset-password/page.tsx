@@ -45,13 +45,14 @@ function ResetPasswordForm() {
           const type = urlParams.get('type')
 
           console.log('🔍 Parámetros URL:', {
-            accessToken: !!accessToken,
-            refreshToken: !!refreshToken,
-            tokenHash: !!tokenHash,
+            accessToken,
+            refreshToken,
+            tokenHash,
             type
           })
 
           if (accessToken && refreshToken) {
+            console.log('🔁 Usando setSession con tokens')
             const { data: sessionData, error: sessionError } = await supabase.auth.setSession({
               access_token: accessToken,
               refresh_token: refreshToken,
@@ -65,22 +66,25 @@ function ResetPasswordForm() {
               setSessionReady(true)
             }
           } else if (tokenHash && type === 'recovery') {
+            console.log('🔁 Verificando OTP...')
             const { data: otpData, error: otpError } = await supabase.auth.verifyOtp({
               token_hash: tokenHash,
               type: 'recovery'
             })
 
+            console.log('📩 Resultado OTP:', { otpData, otpError })
+
             if (otpError || !otpData.session) {
               console.error('❌ Error verificando OTP:', otpError)
               setMessage('Token inválido o expirado. Solicita un nuevo enlace.')
             } else {
-              console.log('✅ Token verificado correctamente')
-
-              // 🔧 Establecer la sesión manualmente
+              console.log('✅ OTP verificado. Estableciendo sesión...')
               const { error: setSessionError } = await supabase.auth.setSession({
                 access_token: otpData.session.access_token,
                 refresh_token: otpData.session.refresh_token,
               })
+
+              console.log('🧾 Resultado setSession:', { setSessionError })
 
               if (setSessionError) {
                 console.error('❌ Error al establecer sesión:', setSessionError)
@@ -157,17 +161,6 @@ function ResetPasswordForm() {
     }
 
     setLoading(false)
-  }
-
-  if (!isClient) {
-    return (
-      <div className="w-full max-w-md bg-white p-6 rounded-xl shadow-lg">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-700 mx-auto"></div>
-          <p className="mt-2 text-gray-600">Cargando...</p>
-        </div>
-      </div>
-    )
   }
 
   return (
