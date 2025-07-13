@@ -12,11 +12,14 @@ export default function ResetPasswordPage() {
   const [message, setMessage] = useState('')
   const [sessionReady, setSessionReady] = useState(false)
 
-  const searchParams = useSearchParams()
   const router = useRouter()
+  const searchParams = typeof window !== 'undefined'
+    ? new URLSearchParams(window.location.search)
+    : null;
 
-  const access_token = searchParams.get('access_token')
-  const refresh_token = searchParams.get('refresh_token')
+  const access_token = searchParams?.get('access_token');
+  const refresh_token = searchParams?.get('refresh_token');
+
 
   useEffect(() => {
     const establishSession = async () => {
