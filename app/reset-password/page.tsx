@@ -170,7 +170,7 @@ function ResetPasswordForm() {
         console.log('🔄 Intentando actualizar contraseña directamente...')
         const { data: updateData, error: updateError } = await withTimeout(
           supabase.auth.updateUser({ password: password }), 
-          10000
+          15000 // Aumentar timeout a 15 segundos
         )
 
         if (updateError) {
