@@ -145,36 +145,70 @@ function ResetPasswordForm() {
 
     try {
       const supabase = getSupabaseClient()
-      const { data: currentSession } = await supabase.auth.getSession()
+      
+      console.log('🔍 Verificando sesión antes de actualizar...')
+      const { data: currentSession, error: sessionError } = await supabase.auth.getSession()
+
+      if (sessionError) {
+        console.error('❌ Error obteniendo sesión:', sessionError)
+        setMessage('Error de sesión. Solicita un nuevo enlace.')
+        setLoading(false)
+        return
+      }
 
       if (!currentSession.session) {
+        console.error('❌ No hay sesión activa')
         setMessage('No hay sesión activa. Solicita un nuevo enlace.')
         setLoading(false)
         return
       }
 
-      console.log('🔍 Usuario actual:', currentSession.session.user.id)
+      console.log('✅ Sesión válida. Usuario:', currentSession.session.user.id)
+      console.log('🔄 Intentando actualizar contraseña...')
 
-      const { error } = await supabase.auth.updateUser({ password })
+      const { data: updateData, error: updateError } = await supabase.auth.updateUser({ 
+        password: password 
+      })
 
-      if (error) {
-        console.error('❌ Error actualizando contraseña:', error)
-        setMessage(`Error: ${error.message}`)
-      } else {
-        console.log('✅ Contraseña actualizada correctamente')
-        setMessage('¡Contraseña actualizada exitosamente! Redirigiendo...')
+      console.log('📤 Resultado de updateUser:', { updateData, updateError })
 
-        await supabase.auth.signOut()
-        setTimeout(() => {
-          router.push('/login')
-        }, 2500)
+      if (updateError) {
+        console.error('❌ Error actualizando contraseña:', updateError)
+        setMessage(`Error: ${updateError.message}`)
+        setLoading(false)
+        return
       }
-    } catch (err) {
-      console.error('❌ Error inesperado:', err)
-      setMessage('Error inesperado. Intenta de nuevo.')
-    }
 
-    setLoading(false)
+      if (!updateData.user) {
+        console.error('❌ No se recibió información del usuario actualizado')
+        setMessage('Error al actualizar. Intenta de nuevo.')
+        setLoading(false)
+        return
+      }
+
+      console.log('✅ Contraseña actualizada correctamente')
+      setMessage('¡Contraseña actualizada exitosamente! Redirigiendo...')
+
+      // Cerrar sesión después de actualizar
+      console.log('🚪 Cerrando sesión...')
+      const { error: signOutError } = await supabase.auth.signOut()
+      
+      if (signOutError) {
+        console.error('⚠️ Error al cerrar sesión:', signOutError)
+        // Continuar de todos modos
+      }
+
+      setTimeout(() => {
+        console.log('🔄 Redirigiendo a login...')
+        router.push('/login')
+      }, 2500)
+
+    } catch (err) {
+      console.error('❌ Error inesperado en handleSubmit:', err)
+      setMessage('Error inesperado. Intenta de nuevo.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   // Añadir timeout para evitar que se quede colgado indefinidamente
