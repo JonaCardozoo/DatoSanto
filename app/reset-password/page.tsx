@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, Suspense } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { getSupabaseClient } from '@/utils/supabase-browser'
 import GameHeader from '@/components/GameHeader'
@@ -26,7 +26,6 @@ function ResetPasswordForm() {
       try {
         const supabase = getSupabaseClient()
 
-        // Manejar el callback de autenticación
         const { data, error } = await supabase.auth.getSession()
 
         if (error) {
@@ -39,7 +38,6 @@ function ResetPasswordForm() {
           console.log('✅ Sesión encontrada')
           setSessionReady(true)
         } else {
-          // Intentar obtener datos de la URL
           const urlParams = new URLSearchParams(window.location.search)
           const accessToken = urlParams.get('access_token')
           const refreshToken = urlParams.get('refresh_token')
@@ -54,7 +52,6 @@ function ResetPasswordForm() {
           })
 
           if (accessToken && refreshToken) {
-            // Flujo con tokens explícitos
             const { data: sessionData, error: sessionError } = await supabase.auth.setSession({
               access_token: accessToken,
               refresh_token: refreshToken,
@@ -68,7 +65,6 @@ function ResetPasswordForm() {
               setSessionReady(true)
             }
           } else if (tokenHash && type === 'recovery') {
-            // Flujo con token hash
             const { data: otpData, error: otpError } = await supabase.auth.verifyOtp({
               token_hash: tokenHash,
               type: 'recovery'
@@ -79,7 +75,20 @@ function ResetPasswordForm() {
               setMessage('Token inválido o expirado. Solicita un nuevo enlace.')
             } else {
               console.log('✅ Token verificado correctamente')
-              setSessionReady(true)
+
+              // 🔧 Establecer la sesión manualmente
+              const { error: setSessionError } = await supabase.auth.setSession({
+                access_token: otpData.session.access_token,
+                refresh_token: otpData.session.refresh_token,
+              })
+
+              if (setSessionError) {
+                console.error('❌ Error al establecer sesión:', setSessionError)
+                setMessage('Error al establecer sesión. Solicita un nuevo enlace.')
+              } else {
+                console.log('🟢 Sesión establecida correctamente después de OTP')
+                setSessionReady(true)
+              }
             }
           } else {
             setMessage('Enlace inválido o incompleto.')
@@ -113,7 +122,6 @@ function ResetPasswordForm() {
     try {
       const supabase = getSupabaseClient()
 
-      // Verificar sesión antes de actualizar
       const { data: currentSession } = await supabase.auth.getSession()
 
       if (!currentSession.session) {
@@ -124,7 +132,6 @@ function ResetPasswordForm() {
 
       console.log('🔍 Usuario actual:', currentSession.session.user.id)
 
-      // Actualizar contraseña
       const { error } = await supabase.auth.updateUser({ password })
       console.log('🟡 Después de updateUser')
 
@@ -144,7 +151,6 @@ function ResetPasswordForm() {
           router.push('/login')
         }, 2500)
       }
-
     } catch (err) {
       console.error('❌ Error inesperado:', err)
       setMessage('Error inesperado. Intenta de nuevo.')
@@ -207,22 +213,12 @@ function ResetPasswordForm() {
       )}
 
       {message && sessionReady && (
-        <p className={`text-center text-sm mt-4 ${message.includes('exitosamente') ? 'text-green-600' : 'text-red-600'
-          }`}>
+        <p className={`text-center text-sm mt-4 ${
+          message.includes('exitosamente') ? 'text-green-600' : 'text-red-600'
+        }`}>
           {message}
         </p>
       )}
-    </div>
-  )
-}
-
-function LoadingFallback() {
-  return (
-    <div className="w-full max-w-md bg-white p-6 rounded-xl shadow-lg">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-700 mx-auto"></div>
-        <p className="mt-2 text-gray-600">Cargando...</p>
-      </div>
     </div>
   )
 }
@@ -232,9 +228,7 @@ export default function ResetPasswordPage() {
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
       <GameHeader />
       <div className="flex-1 flex items-center justify-center px-4">
-        <Suspense fallback={<LoadingFallback />}>
-          <ResetPasswordForm />
-        </Suspense>
+        <ResetPasswordForm />
       </div>
     </div>
   )
