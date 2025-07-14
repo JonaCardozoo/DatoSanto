@@ -9,19 +9,7 @@ interface DebugInfo {
   url: string
   search: string
   hash: string
-  hasAccessToken: boolean
-  hasRefreshToken: boolean
-  type: string | null
-  tokenLengths: {
-    access: number
-    refresh: number
-  }
-}
-
-interface TokenData {
-  access_token: string | null
-  refresh_token: string | null
-  type: string | null
+  allParams: Record<string, string>
 }
 
 export default function ResetPassword(): JSX.Element {
@@ -32,161 +20,183 @@ export default function ResetPassword(): JSX.Element {
     url: "",
     search: "",
     hash: "",
-    hasAccessToken: false,
-    hasRefreshToken: false,
-    type: null,
-    tokenLengths: { access: 0, refresh: 0 }
+    allParams: {}
   })
   const router = useRouter()
 
   useEffect(() => {
-    const extractTokensFromURL = (): TokenData => {
-      let access_token: string | null = null
-      let refresh_token: string | null = null
-      let type: string | null = null
-
-      // Log de la URL completa para debugging
-      const fullURL = window.location.href
-      console.log("URL completa:", fullURL)
-
-      // Extraer de query params
+    const extractAllParams = () => {
+      const allParams: Record<string, string> = {}
+      
+      // Extraer todos los parámetros de query string
       if (window.location.search) {
         const searchParams = new URLSearchParams(window.location.search)
-        
-        // Intentar diferentes nombres para el token
-        access_token = searchParams.get("access_token") || searchParams.get("token")
-        refresh_token = searchParams.get("refresh_token")
-        type = searchParams.get("type")
-        
-        console.log("Query params encontrados:", {
-          access_token: access_token ? `${access_token.substring(0, 20)}... (${access_token.length} chars)` : "VACÍO",
-          refresh_token: refresh_token ? `${refresh_token.substring(0, 20)}... (${refresh_token.length} chars)` : "VACÍO", 
-          type: type || "VACÍO"
+        searchParams.forEach((value, key) => {
+          allParams[key] = value
         })
       }
-
-      // Si no está en query params, probar hash
-      if (!access_token && window.location.hash) {
+      
+      // Extraer todos los parámetros de hash
+      if (window.location.hash) {
         const hashParams = new URLSearchParams(window.location.hash.substring(1))
-        access_token = hashParams.get("access_token") || hashParams.get("token")
-        refresh_token = hashParams.get("refresh_token")
-        type = hashParams.get("type")
-        
-        console.log("Hash params encontrados:", {
-          access_token: access_token ? `${access_token.substring(0, 20)}... (${access_token.length} chars)` : "VACÍO",
-          refresh_token: refresh_token ? `${refresh_token.substring(0, 20)}... (${refresh_token.length} chars)` : "VACÍO",
-          type: type || "VACÍO"
+        hashParams.forEach((value, key) => {
+          allParams[`hash_${key}`] = value
         })
       }
-
-      return { access_token, refresh_token, type }
+      
+      return allParams
     }
 
-    const restoreSession = async (): Promise<void> => {
+    const handlePasswordRecovery = async (): Promise<void> => {
       try {
-        const { access_token, refresh_token, type } = extractTokensFromURL()
-
+        const allParams = extractAllParams()
+        
+        console.log("Todos los parámetros encontrados:", allParams)
+        
         // Guardar info de debug
         setDebugInfo({
           url: window.location.href,
           search: window.location.search,
           hash: window.location.hash,
-          hasAccessToken: !!access_token,
-          hasRefreshToken: !!refresh_token,
-          type: type,
-          tokenLengths: {
-            access: access_token?.length || 0,
-            refresh: refresh_token?.length || 0
-          }
+          allParams
         })
 
-        // Verificar si es una solicitud de recovery
-        if (type !== "recovery") {
-          setMessage("❌ Tipo de solicitud inválido. Debe ser 'recovery'.")
-          setLoading(false)
-          return
-        }
-
-        if (!access_token) {
-          setMessage("❌ Access token faltante en la URL.")
-          setLoading(false)
-          return
-        }
-
-        // Verificar que los tokens no estén vacíos
-        if (access_token.length === 0) {
-          setMessage("❌ El access_token está vacío.")
-          setLoading(false)
-          return
-        }
-
-        // Para password recovery, podríamos no necesitar refresh_token
-        // Intentemos con solo el access_token si el refresh_token no está presente
-        if (!refresh_token) {
-          console.log("⚠️ Refresh token no presente, intentando solo con access token...")
-        }
-
-        // Validación más flexible - verificar solo que no estén vacíos
-        const validateToken = (token: string, tokenName: string): boolean => {
-          if (!token || typeof token !== 'string' || token.length === 0) {
-            console.log(`${tokenName} inválido: vacío o nulo`)
-            return false
-          }
-          
-          // Para tokens muy cortos, probablemente no sean JWT válidos
-          if (token.length < 20) {
-            console.log(`${tokenName} sospechosamente corto: ${token.length} caracteres`)
-            return false
-          }
-          
-          return true
-        }
-
-        if (!validateToken(access_token, "Access token")) {
-          setMessage("❌ El access_token parece inválido. Solicita un nuevo enlace de recuperación.")
-          setLoading(false)
-          return
-        }
-
-        console.log("Intentando establecer sesión...")
         const supabase = getSupabaseClient()
         
-        // Intentar limpiar cualquier sesión existente primero
+        // Limpiar sesión existente
         await supabase.auth.signOut()
-        
-        // Para password recovery, usar verifyOtp que es el método correcto
-        console.log("Usando verifyOtp para password recovery...")
-        const response = await supabase.auth.verifyOtp({
-          token_hash: access_token,
-          type: 'recovery'
-        })
 
-        const { data, error } = response
+        // Intentar diferentes métodos según los parámetros disponibles
+        let success = false
+        let lastError = null
 
-        if (error) {
-          console.error("Error al establecer sesión:", error)
-          
-          // Mensajes más específicos según el error
-          if (error.message.includes('invalid_token') || error.message.includes('expired')) {
-            setMessage("❌ El enlace ha expirado o es inválido. Solicita un nuevo enlace de recuperación.")
-          } else if (error.message.includes('invalid_grant')) {
-            setMessage("❌ Tokens inválidos. Verifica que uses el enlace más reciente de tu email.")
-          } else {
-            setMessage("❌ Error al establecer sesión: " + error.message)
+        // Método 1: Si tenemos access_token y refresh_token
+        if (allParams.access_token && allParams.refresh_token) {
+          console.log("🔄 Intentando con setSession (access_token + refresh_token)...")
+          try {
+            const { data, error } = await supabase.auth.setSession({
+              access_token: allParams.access_token,
+              refresh_token: allParams.refresh_token,
+            })
+            
+            if (error) throw error
+            
+            if (data?.session) {
+              console.log("✅ setSession exitoso")
+              storeAuth(data.session)
+              setMessage("✅ Sesión establecida correctamente. Ahora puedes cambiar tu contraseña.")
+              success = true
+            }
+          } catch (error) {
+            console.log("❌ setSession falló:", error)
+            lastError = error
           }
-        } else if (data?.session) {
-          console.log("✅ Sesión establecida correctamente")
-          storeAuth(data.session)
-          setMessage("✅ Sesión establecida correctamente. Ahora puedes cambiar tu contraseña.")
-        } else if (data?.user) {
-          // En caso de verifyOtp exitoso sin sesión
-          console.log("✅ Usuario verificado correctamente")
-          setMessage("✅ Verificación exitosa. Ahora puedes cambiar tu contraseña.")
-        } else {
-          setMessage("❌ No se pudo establecer la sesión. Verifica el enlace de recuperación.")
         }
+
+        // Método 2: Si tenemos token_hash y type=recovery
+        if (!success && allParams.token_hash && allParams.type === 'recovery') {
+          console.log("🔄 Intentando con verifyOtp (token_hash)...")
+          try {
+            const { data, error } = await supabase.auth.verifyOtp({
+              token_hash: allParams.token_hash,
+              type: 'recovery'
+            })
+            
+            if (error) throw error
+            
+            if (data?.session) {
+              console.log("✅ verifyOtp exitoso con sesión")
+              storeAuth(data.session)
+              setMessage("✅ Verificación exitosa. Ahora puedes cambiar tu contraseña.")
+              success = true
+            } else if (data?.user) {
+              console.log("✅ verifyOtp exitoso sin sesión")
+              setMessage("✅ Verificación exitosa. Ahora puedes cambiar tu contraseña.")
+              success = true
+            }
+          } catch (error) {
+            console.log("❌ verifyOtp falló:", error)
+            lastError = error
+          }
+        }
+
+        // Método 3: Si tenemos solo token (cualquier parámetro llamado token)
+        if (!success && allParams.token) {
+          console.log("🔄 Intentando con verifyOtp (token simple)...")
+          try {
+            const { data, error } = await supabase.auth.verifyOtp({
+              token_hash: allParams.token,
+              type: 'recovery'
+            })
+            
+            if (error) throw error
+            
+            if (data?.session) {
+              console.log("✅ verifyOtp (token simple) exitoso con sesión")
+              storeAuth(data.session)
+              setMessage("✅ Verificación exitosa. Ahora puedes cambiar tu contraseña.")
+              success = true
+            } else if (data?.user) {
+              console.log("✅ verifyOtp (token simple) exitoso sin sesión")
+              setMessage("✅ Verificación exitosa. Ahora puedes cambiar tu contraseña.")
+              success = true
+            }
+          } catch (error) {
+            console.log("❌ verifyOtp (token simple) falló:", error)
+            lastError = error
+          }
+        }
+
+        // Método 4: Buscar en hash params
+        if (!success && allParams.hash_access_token) {
+          console.log("🔄 Intentando con tokens del hash...")
+          try {
+            const sessionData: {
+              access_token: string
+              refresh_token?: string
+            } = {
+              access_token: allParams.hash_access_token
+            }
+            
+            if (allParams.hash_refresh_token) {
+              sessionData.refresh_token = allParams.hash_refresh_token
+            }
+            
+            const { data, error } = await supabase.auth.setSession(sessionData)
+            
+            if (error) throw error
+            
+            if (data?.session) {
+              console.log("✅ Hash tokens exitoso")
+              storeAuth(data.session)
+              setMessage("✅ Sesión establecida correctamente. Ahora puedes cambiar tu contraseña.")
+              success = true
+            }
+          } catch (error) {
+            console.log("❌ Hash tokens falló:", error)
+            lastError = error
+          }
+        }
+
+        // Si nada funcionó
+        if (!success) {
+          console.error("❌ Todos los métodos fallaron. Último error:", lastError)
+          
+          if (lastError && (lastError as Error).message) {
+            if ((lastError as Error).message.includes('expired')) {
+              setMessage("❌ El enlace ha expirado. Solicita un nuevo enlace de recuperación.")
+            } else if ((lastError as Error).message.includes('invalid')) {
+              setMessage("❌ El enlace es inválido. Solicita un nuevo enlace de recuperación.")
+            } else {
+              setMessage("❌ Error: " + (lastError as Error).message)
+            }
+          } else {
+            setMessage("❌ No se pudieron encontrar tokens válidos en la URL. Verifica que uses el enlace completo del email.")
+          }
+        }
+
       } catch (error) {
-        console.error("Error en restoreSession:", error)
+        console.error("Error general:", error)
         const errorMessage = error instanceof Error ? error.message : "Error desconocido"
         setMessage("❌ Error inesperado: " + errorMessage)
       }
@@ -194,7 +204,7 @@ export default function ResetPassword(): JSX.Element {
       setLoading(false)
     }
 
-    restoreSession()
+    handlePasswordRecovery()
   }, [])
 
   const handlePasswordReset = async (): Promise<void> => {
@@ -234,7 +244,7 @@ export default function ResetPassword(): JSX.Element {
     return (
       <div className="max-w-md mx-auto mt-10 flex flex-col gap-4">
         <div className="text-center">
-          <p>🔍 Verificando tokens de acceso...</p>
+          <p>🔍 Verificando enlace de recuperación...</p>
         </div>
       </div>
     )
@@ -269,16 +279,23 @@ export default function ResetPassword(): JSX.Element {
         </p>
       )}
       
-      {/* Debug info detallada */}
+      {/* Debug info completa */}
       <details className="text-xs text-gray-500 border p-2 rounded">
-        <summary>🔧 Información de debugging</summary>
+        <summary>🔧 Información de debugging completa</summary>
         <div className="mt-2 space-y-1">
-          <p><strong>URL:</strong> <span className="break-all text-xs">{debugInfo.url}</span></p>
-          <p><strong>Query params:</strong> <span className="break-all text-xs">{debugInfo.search || "Ninguno"}</span></p>
-          <p><strong>Hash:</strong> <span className="break-all text-xs">{debugInfo.hash || "Ninguno"}</span></p>
-          <p><strong>Tiene access_token:</strong> {debugInfo.hasAccessToken ? "✅" : "❌"} ({debugInfo.tokenLengths.access} chars)</p>
-          <p><strong>Tiene refresh_token:</strong> {debugInfo.hasRefreshToken ? "✅" : "❌"} ({debugInfo.tokenLengths.refresh} chars)</p>
-          <p><strong>Tipo:</strong> {debugInfo.type || "No especificado"}</p>
+          <p><strong>URL completa:</strong></p>
+          <p className="break-all text-xs bg-gray-100 p-1 rounded">{debugInfo.url}</p>
+          
+          <p><strong>Query params:</strong></p>
+          <p className="break-all text-xs bg-gray-100 p-1 rounded">{debugInfo.search || "Ninguno"}</p>
+          
+          <p><strong>Hash:</strong></p>
+          <p className="break-all text-xs bg-gray-100 p-1 rounded">{debugInfo.hash || "Ninguno"}</p>
+          
+          <p><strong>Todos los parámetros encontrados:</strong></p>
+          <pre className="text-xs bg-gray-100 p-2 rounded overflow-x-auto">
+            {JSON.stringify(debugInfo.allParams, null, 2)}
+          </pre>
         </div>
       </details>
     </div>
