@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { getSupabaseClient } from "@/utils/supabase-browser"
 import { storeAuth } from "@/utils/jwt-auth"
+import GameHeader from '@/components/GameHeader'
 
 interface DebugInfo {
   url: string
@@ -57,7 +58,6 @@ export default function ResetPassword(): JSX.Element {
 
         // ✅ Solo token simple
         if (allParams.token && allParams.type === "recovery") {
-          console.log("🔄 Intentando con verifyOtp...")
           try {
             const { data, error } = await supabase.auth.verifyOtp({
               email: allParams.email,
@@ -68,17 +68,14 @@ export default function ResetPassword(): JSX.Element {
             if (error) throw error
 
             if (data?.session) {
-              console.log("✅ verifyOtp con sesión")
               storeAuth(data.session)
               setMessage("✅ Verificación exitosa. Ahora puedes cambiar tu contraseña.")
               success = true
             } else if (data?.user) {
-              console.log("✅ verifyOtp sin sesión")
               setMessage("✅ Verificación exitosa. Ahora puedes cambiar tu contraseña.")
               success = true
             }
           } catch (error) {
-            console.log("❌ verifyOtp falló:", error)
             lastError = error
           }
         }
@@ -146,6 +143,8 @@ export default function ResetPassword(): JSX.Element {
   }
 
   return (
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+      <GameHeader />
     <div className="max-w-md mx-auto mt-10 flex flex-col gap-4">
       <h1 className="text-2xl font-bold">Restablecer contraseña</h1>
 
@@ -172,24 +171,7 @@ export default function ResetPassword(): JSX.Element {
         </p>
       )}
 
-      <details className="text-xs text-gray-500 border p-2 rounded">
-        <summary>🔧 Información de debugging completa</summary>
-        <div className="mt-2 space-y-1">
-          <p><strong>URL completa:</strong></p>
-          <p className="break-all bg-gray-100 p-1 rounded">{debugInfo.url}</p>
-
-          <p><strong>Query params:</strong></p>
-          <p className="break-all bg-gray-100 p-1 rounded">{debugInfo.search || "Ninguno"}</p>
-
-          <p><strong>Hash:</strong></p>
-          <p className="break-all bg-gray-100 p-1 rounded">{debugInfo.hash || "Ninguno"}</p>
-
-          <p><strong>Todos los parámetros encontrados:</strong></p>
-          <pre className="bg-gray-100 p-2 rounded overflow-x-auto">
-            {JSON.stringify(debugInfo.allParams, null, 2)}
-          </pre>
-        </div>
-      </details>
+    </div>
     </div>
   )
 }

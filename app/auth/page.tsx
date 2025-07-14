@@ -13,6 +13,7 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { ArrowLeft, Eye, EyeOff } from "lucide-react"
 import Image from "next/image"
+import GameHeader from '@/components/GameHeader'
 
 export default function AuthPage() {
   const [email, setEmail] = useState("")
@@ -86,7 +87,9 @@ export default function AuthPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center p-4">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+      <GameHeader />
+    <div className=" flex items-center justify-center p-4">
       <Card className="w-full max-w-md bg-gray-900 border-gray-800">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold text-red-600 flex justify-center items-center">
@@ -148,7 +151,7 @@ export default function AuthPage() {
                   {loading ? "Iniciando cuenta..." : "Iniciar Sesión"}
                 </Button>
                 <div className="text-center mt-4">
-  <Link href="/forgot-password" className="text-sm text-gray-600 hover:text-red-600 transition-colors">
+  <Link href="/forgot-password" className="text-sm text-gray-300 hover:text-red-600 transition-colors">
     ¿Olvidaste tu contraseña?
   </Link>
 </div>
@@ -238,6 +241,7 @@ export default function AuthPage() {
 
         </CardContent>
       </Card>
+    </div>
     </div>
   )
 }
