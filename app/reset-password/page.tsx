@@ -5,56 +5,111 @@ import { useRouter } from "next/navigation"
 import { getSupabaseClient } from "@/utils/supabase-browser"
 import { storeAuth } from "@/utils/jwt-auth"
 
-export default function ResetPassword() {
-  const [password, setPassword] = useState("")
-  const [message, setMessage] = useState("")
-  const [loading, setLoading] = useState(true)
+interface DebugInfo {
+  url: string
+  search: string
+  hash: string
+  hasAccessToken: boolean
+  hasRefreshToken: boolean
+  type: string | null
+}
+
+interface TokenData {
+  access_token: string | null
+  refresh_token: string | null
+  type: string | null
+}
+
+export default function ResetPassword(): JSX.Element {
+  const [password, setPassword] = useState<string>("")
+  const [message, setMessage] = useState<string>("")
+  const [loading, setLoading] = useState<boolean>(true)
+  const [debugInfo, setDebugInfo] = useState<DebugInfo>({
+    url: "",
+    search: "",
+    hash: "",
+    hasAccessToken: false,
+    hasRefreshToken: false,
+    type: null
+  })
   const router = useRouter()
 
   useEffect(() => {
-    const extractTokensFromURL = () => {
-      let access_token = null
-      let refresh_token = null
+    const extractTokensFromURL = (): TokenData => {
+      let access_token: string | null = null
+      let refresh_token: string | null = null
+      let type: string | null = null
 
-      // Primero intento obtener del hash (#access_token=...)
-      if (window.location.hash) {
-        const hashParams = new URLSearchParams(window.location.hash.substring(1))
-        access_token = hashParams.get("access_token")
-        refresh_token = hashParams.get("refresh_token")
-        
-        console.log("Hash params:", {
-          hash: window.location.hash,
-          access_token: access_token ? "presente" : "ausente",
-          refresh_token: refresh_token ? "presente" : "ausente"
-        })
-      }
+      // Log de la URL completa para debugging
+      const fullURL = window.location.href
+      console.log("URL completa:", fullURL)
 
-      // Si no está en hash, pruebo en query params (?access_token=...)
-      if (!access_token && window.location.search) {
+      // Extraer de query params (?access_token=...)
+      if (window.location.search) {
         const searchParams = new URLSearchParams(window.location.search)
         access_token = searchParams.get("access_token")
         refresh_token = searchParams.get("refresh_token")
+        type = searchParams.get("type")
         
-        console.log("Search params:", {
-          search: window.location.search,
-          access_token: access_token ? "presente" : "ausente",
-          refresh_token: refresh_token ? "presente" : "ausente"
+        console.log("Query params encontrados:", {
+          access_token: access_token || "VACÍO",
+          refresh_token: refresh_token || "VACÍO", 
+          type: type || "VACÍO"
         })
       }
 
-      return { access_token, refresh_token }
+      // Si no está en query params, probar hash (#access_token=...)
+      if (!access_token && window.location.hash) {
+        const hashParams = new URLSearchParams(window.location.hash.substring(1))
+        access_token = hashParams.get("access_token")
+        refresh_token = hashParams.get("refresh_token")
+        type = hashParams.get("type")
+        
+        console.log("Hash params encontrados:", {
+          access_token: access_token || "VACÍO",
+          refresh_token: refresh_token || "VACÍO",
+          type: type || "VACÍO"
+        })
+      }
+
+      return { access_token, refresh_token, type }
     }
 
-    const restoreSession = async () => {
+    const restoreSession = async (): Promise<void> => {
       try {
-        const { access_token, refresh_token } = extractTokensFromURL()
+        const { access_token, refresh_token, type } = extractTokensFromURL()
 
-        if (!access_token || !refresh_token) {
-          setMessage("No se encontró token de acceso en la URL. URL actual: " + window.location.href)
+        // Guardar info de debug
+        setDebugInfo({
+          url: window.location.href,
+          search: window.location.search,
+          hash: window.location.hash,
+          hasAccessToken: !!access_token,
+          hasRefreshToken: !!refresh_token,
+          type: type
+        })
+
+        // Verificar si es una solicitud de recovery
+        if (type !== "recovery") {
+          setMessage("Tipo de solicitud inválido. Debe ser 'recovery'.")
           setLoading(false)
           return
         }
 
+        if (!access_token || !refresh_token) {
+          setMessage("❌ Tokens faltantes en la URL. Los tokens pueden estar vacíos o mal formateados.")
+          setLoading(false)
+          return
+        }
+
+        // Verificar que los tokens no estén vacíos
+        if (access_token.length === 0 || refresh_token.length === 0) {
+          setMessage("❌ Los tokens están vacíos. Esto indica un problema en la generación del email.")
+          setLoading(false)
+          return
+        }
+
+        console.log("Intentando establecer sesión con tokens...")
         const supabase = getSupabaseClient()
         
         const response = await supabase.auth.setSession({
@@ -66,17 +121,18 @@ export default function ResetPassword() {
 
         if (error) {
           console.error("Error al establecer sesión:", error)
-          setMessage("Error al establecer sesión: " + error.message)
+          setMessage("❌ Error al establecer sesión: " + error.message)
         } else if (data?.session) {
-          console.log("Sesión establecida correctamente")
+          console.log("✅ Sesión establecida correctamente")
           storeAuth(data.session)
-          setMessage("Sesión establecida correctamente. Ahora puedes cambiar tu contraseña.")
+          setMessage("✅ Sesión establecida correctamente. Ahora puedes cambiar tu contraseña.")
         } else {
-          setMessage("No se pudo establecer la sesión")
+          setMessage("❌ No se pudo establecer la sesión")
         }
       } catch (error) {
         console.error("Error en restoreSession:", error)
-        setMessage("Error inesperado: " + error.message)
+        const errorMessage = error instanceof Error ? error.message : "Error desconocido"
+        setMessage("❌ Error inesperado: " + errorMessage)
       }
       
       setLoading(false)
@@ -85,7 +141,7 @@ export default function ResetPassword() {
     restoreSession()
   }, [])
 
-  const handlePasswordReset = async () => {
+  const handlePasswordReset = async (): Promise<void> => {
     if (!password) {
       setMessage("Por favor ingresa una nueva contraseña")
       return
@@ -102,26 +158,33 @@ export default function ResetPassword() {
 
       if (error) {
         console.error("Error al actualizar contraseña:", error)
-        setMessage("Error al actualizar contraseña: " + error.message)
+        setMessage("❌ Error al actualizar contraseña: " + error.message)
       } else {
         setMessage("✅ Contraseña actualizada exitosamente. Redirigiendo...")
         setTimeout(() => router.push("/auth"), 2000)
       }
     } catch (error) {
       console.error("Error inesperado:", error)
-      setMessage("Error inesperado: " + error.message)
+      const errorMessage = error instanceof Error ? error.message : "Error desconocido"
+      setMessage("❌ Error inesperado: " + errorMessage)
     }
+  }
+
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    setPassword(e.target.value)
   }
 
   if (loading) {
     return (
       <div className="max-w-md mx-auto mt-10 flex flex-col gap-4">
         <div className="text-center">
-          <p>Verificando tokens de acceso...</p>
+          <p>🔍 Verificando tokens de acceso...</p>
         </div>
       </div>
     )
   }
+
+  const canResetPassword: boolean = message.includes("✅ Sesión establecida")
 
   return (
     <div className="max-w-md mx-auto mt-10 flex flex-col gap-4">
@@ -131,14 +194,14 @@ export default function ResetPassword() {
         type="password"
         placeholder="Nueva contraseña (mínimo 6 caracteres)"
         value={password}
-        onChange={(e) => setPassword(e.target.value)}
+        onChange={handlePasswordChange}
         className="p-2 border rounded"
-        disabled={message.includes("No se encontró token")}
+        disabled={!canResetPassword}
       />
 
       <button
         onClick={handlePasswordReset}
-        disabled={message.includes("No se encontró token") || !password}
+        disabled={!canResetPassword || !password}
         className="bg-green-600 text-white p-2 rounded disabled:bg-gray-400"
       >
         Cambiar contraseña
@@ -150,12 +213,17 @@ export default function ResetPassword() {
         </p>
       )}
       
-      {/* Para debugging - quitar en producción */}
-      <details className="text-xs text-gray-500">
-        <summary>Debug info</summary>
-        <p>URL actual: {typeof window !== 'undefined' ? window.location.href : 'N/A'}</p>
-        <p>Hash: {typeof window !== 'undefined' ? window.location.hash : 'N/A'}</p>
-        <p>Search: {typeof window !== 'undefined' ? window.location.search : 'N/A'}</p>
+      {/* Debug info detallada */}
+      <details className="text-xs text-gray-500 border p-2 rounded">
+        <summary>🔧 Información de debugging</summary>
+        <div className="mt-2 space-y-1">
+          <p><strong>URL:</strong> {debugInfo.url}</p>
+          <p><strong>Query params:</strong> {debugInfo.search || "Ninguno"}</p>
+          <p><strong>Hash:</strong> {debugInfo.hash || "Ninguno"}</p>
+          <p><strong>Tiene access_token:</strong> {debugInfo.hasAccessToken ? "✅" : "❌"}</p>
+          <p><strong>Tiene refresh_token:</strong> {debugInfo.hasRefreshToken ? "✅" : "❌"}</p>
+          <p><strong>Tipo:</strong> {debugInfo.type || "No especificado"}</p>
+        </div>
       </details>
     </div>
   )
