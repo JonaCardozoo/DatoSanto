@@ -102,15 +102,44 @@ export default function ResetPassword(): JSX.Element {
           return
         }
 
-        // Verificar que los tokens no estén vacíos
-        if (access_token.length === 0 || refresh_token.length === 0) {
-          setMessage("❌ Los tokens están vacíos. Esto indica un problema en la generación del email.")
+        // Verificar que los tokens no estén vacíos y tengan formato válido
+        if (access_token && access_token.length === 0) {
+          setMessage("❌ El access_token está vacío.")
+          setLoading(false)
+          return
+        }
+        
+        if (refresh_token && refresh_token.length === 0) {
+          setMessage("❌ El refresh_token está vacío.")
           setLoading(false)
           return
         }
 
-        console.log("Intentando establecer sesión con tokens...")
+        // Validar formato básico de JWT (debe tener 3 partes separadas por puntos)
+        const validateJWT = (token: string): boolean => {
+          const parts = token.split('.')
+          return parts.length === 3 && parts.every(part => part.length > 0)
+        }
+
+        if (access_token && !validateJWT(access_token)) {
+          console.error("Access token inválido:", access_token.substring(0, 50) + "...")
+          setMessage("❌ El access_token tiene formato inválido. Solicita un nuevo enlace de recuperación.")
+          setLoading(false)
+          return
+        }
+
+        if (refresh_token && !validateJWT(refresh_token)) {
+          console.error("Refresh token inválido:", refresh_token.substring(0, 50) + "...")
+          setMessage("❌ El refresh_token tiene formato inválido. Solicita un nuevo enlace de recuperación.")
+          setLoading(false)
+          return
+        }
+
+        console.log("Intentando establecer sesión con tokens válidos...")
         const supabase = getSupabaseClient()
+        
+        // Intentar limpiar cualquier sesión existente primero
+        await supabase.auth.signOut()
         
         const response = await supabase.auth.setSession({
           access_token,
