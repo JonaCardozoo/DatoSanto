@@ -22,40 +22,49 @@ function ResetPasswordForm() {
   useEffect(() => {
     if (!isClient) return
 
-    const handleAuthCallback = async () => {
-  try {
-    const supabase = getSupabaseClient()
+    const handleRecovery = async () => {
+      try {
+        const supabase = getSupabaseClient()
+        const urlParams = new URLSearchParams(window.location.search)
+        const tokenHash = urlParams.get('token')
+        const type = urlParams.get('type')
 
-    // 👇 INTENTA OBTENER SESIÓN DESDE LA URL
-    const { error: urlError } = await supabase.auth.getSessionFromUrl()
-    if (urlError) {
-      console.error('❌ Error al obtener sesión desde URL:', urlError)
+        console.log('🔍 Parámetros:', { tokenHash, type })
+
+        if (tokenHash && type === 'recovery') {
+          console.log('🔄 Verificando OTP...')
+
+          const { data, error } = await supabase.auth.verifyOtp({
+            token_hash: tokenHash,
+            type: 'recovery',
+          })
+
+          console.log('🧾 Resultado OTP:', data)
+
+          if (error || !data.session) {
+            console.error('❌ Error OTP:', error)
+            setMessage('El enlace expiró o es inválido.')
+            return
+          }
+
+          console.log('✅ OTP verificado correctamente. Estableciendo sesión...')
+
+          await supabase.auth.setSession({
+            access_token: data.session.access_token,
+            refresh_token: data.session.refresh_token,
+          })
+
+          setSessionReady(true)
+        } else {
+          setMessage('Enlace inválido.')
+        }
+      } catch (err) {
+        console.error('❌ Error inesperado:', err)
+        setMessage('Error inesperado. Intenta de nuevo.')
+      }
     }
 
-    const { data: sessionData, error: sessionError } = await supabase.auth.getSession()
-
-    if (sessionError || !sessionData.session) {
-      console.error('❌ No hay sesión activa:', sessionError)
-      setMessage('Error de autenticación. Solicita un nuevo enlace.')
-      return
-    }
-
-    console.log('✅ Sesión obtenida correctamente desde la URL')
-    setSessionReady(true)
-
-  } catch (err) {
-    console.error('❌ Error inesperado:', err)
-    setMessage('Error inesperado. Intenta de nuevoo.')
-  }
-}
-
-
-    // Añadir un pequeño delay para asegurar que la URL esté lista
-    const timeoutId = setTimeout(() => {
-      handleAuthCallback()
-    }, 100)
-
-    return () => clearTimeout(timeoutId)
+    handleRecovery()
   }, [isClient])
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -76,44 +85,19 @@ function ResetPasswordForm() {
 
     try {
       const supabase = getSupabaseClient()
-      
-      console.log('🔄 Actualizando contraseña directamente (sin verificar sesión)...')
-      
-      // Actualizar contraseña directamente - la sesión ya está activa después del OTP
-      const { data: updateData, error: updateError } = await supabase.auth.updateUser({ 
-        password: password 
-      })
 
-      console.log('📤 Resultado de updateUser:', { updateData, updateError })
+      const { error } = await supabase.auth.updateUser({ password })
 
-      if (updateError) {
-        console.error('❌ Error actualizando contraseña:', updateError)
-        setMessage(`Error: ${updateError.message}`)
+      if (error) {
+        console.error('❌ Error actualizando contraseña:', error)
+        setMessage(`Error: ${error.message}`)
         return
       }
 
-      if (!updateData.user) {
-        console.error('❌ No se recibió información del usuario actualizado')
-        setMessage('Error al actualizar. Intenta de nuevo.')
-        return
-      }
-
-      console.log('✅ Contraseña actualizada correctamente')
       setMessage('¡Contraseña actualizada exitosamente! Redirigiendo...')
+      await supabase.auth.signOut()
 
-      // Cerrar sesión después de actualizar (opcional)
-      console.log('🚪 Cerrando sesión...')
-      try {
-        await supabase.auth.signOut()
-      } catch (signOutError) {
-        console.error('⚠️ Error al cerrar sesión (continuando):', signOutError)
-      }
-
-      setTimeout(() => {
-        console.log('🔄 Redirigiendo a login...')
-        router.push('/login')
-      }, 2500)
-
+      setTimeout(() => router.push('/login'), 2500)
     } catch (err) {
       console.error('❌ Error inesperado en handleSubmit:', err)
       setMessage('Error inesperado. Intenta de nuevo.')
@@ -121,19 +105,6 @@ function ResetPasswordForm() {
       setLoading(false)
     }
   }
-
-  // Añadir timeout para evitar que se quede colgado indefinidamente
-  useEffect(() => {
-    if (!sessionReady && isClient) {
-      const timeoutId = setTimeout(() => {
-        if (!sessionReady) {
-          setMessage('Tiempo de espera agotado. Solicita un nuevo enlace.')
-        }
-      }, 10000) // 10 segundos timeout
-
-      return () => clearTimeout(timeoutId)
-    }
-  }, [sessionReady, isClient])
 
   return (
     <div className="w-full max-w-md bg-white p-6 rounded-xl shadow-lg">
@@ -144,15 +115,7 @@ function ResetPasswordForm() {
           <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-red-700 mx-auto"></div>
           <p className="mt-2 text-gray-600">Verificando enlace...</p>
           {message && (
-            <div className="mt-4">
-              <p className="text-red-600 text-sm">{message}</p>
-              <button
-                onClick={() => router.push('/login')}
-                className="mt-2 text-sm text-blue-600 hover:underline"
-              >
-                Volver al login
-              </button>
-            </div>
+            <p className="text-red-600 mt-2 text-sm">{message}</p>
           )}
         </div>
       ) : (
