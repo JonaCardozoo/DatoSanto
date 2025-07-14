@@ -60,6 +60,7 @@ export default function ResetPassword(): JSX.Element {
           console.log("🔄 Intentando con verifyOtp...")
           try {
             const { data, error } = await supabase.auth.verifyOtp({
+              email: allParams.email,
               token: allParams.token,
               type: "recovery"
             })
