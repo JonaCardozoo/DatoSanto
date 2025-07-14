@@ -1,6 +1,7 @@
 "use client"
 
 import { memo } from "react"
+import { Delete } from "lucide-react"
 
 interface WordleKeyboardProps {
   onKeyPress: (key: string) => void
@@ -72,7 +73,7 @@ function WordleKeyboard({ onKeyPress, guesses, targetWord, disabled }: WordleKey
               disabled={disabled}
               className={getKeyClass(key) + (disabled ? " opacity-60 cursor-not-allowed" : " cursor-pointer")}
             >
-              {key}
+              {key === "DEL" ? <Delete className="w-4 h-4" /> : key}
             </button>
           ))}
         </div>
