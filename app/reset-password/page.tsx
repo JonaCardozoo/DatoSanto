@@ -45,7 +45,7 @@ function ResetPasswordForm() {
 
   } catch (err) {
     console.error('❌ Error inesperado:', err)
-    setMessage('Error inesperado. Intenta de nuevo.')
+    setMessage('Error inesperado. Intenta de nuevoo.')
   }
 }
 
