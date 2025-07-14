@@ -15,6 +15,7 @@ interface DebugInfo {
 
 export default function ResetPassword(): JSX.Element {
   const [password, setPassword] = useState<string>("")
+  const [showPassword, setShowPassword] = useState<boolean>(false)
   const [message, setMessage] = useState<string>("")
   const [loading, setLoading] = useState<boolean>(true)
   const [debugInfo, setDebugInfo] = useState<DebugInfo>({
@@ -132,6 +133,10 @@ export default function ResetPassword(): JSX.Element {
     setPassword(e.target.value)
   }
 
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword)
+  }
+
   const canResetPassword = message.includes("✅")
 
   if (loading) {
@@ -148,14 +153,33 @@ export default function ResetPassword(): JSX.Element {
     <div className="max-w-md mx-auto mt-10 flex flex-col gap-4">
       <h1 className="text-2xl font-bold">Restablecer contraseña</h1>
 
-      <input
-        type="password"
-        placeholder="Nueva contraseña (mínimo 6 caracteres)"
-        value={password}
-        onChange={handlePasswordChange}
-        className="p-2 border rounded"
-        disabled={!canResetPassword}
-      />
+      <div className="relative">
+        <input
+          type={showPassword ? "text" : "password"}
+          placeholder="Nueva contraseña (mínimo 6 caracteres)"
+          value={password}
+          onChange={handlePasswordChange}
+          className="p-2 pr-12 border rounded text-black w-full"
+          disabled={!canResetPassword}
+        />
+        <button
+          type="button"
+          onClick={togglePasswordVisibility}
+          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
+          disabled={!canResetPassword}
+        >
+          {showPassword ? (
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L12 12l4.242-4.242M9.878 9.878L6.636 6.636m12.728 12.728L12 12m7.364 7.364L12 12m7.364 7.364l-3.536-3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          ) : (
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            </svg>
+          )}
+        </button>
+      </div>
 
       <button
         onClick={handlePasswordReset}
