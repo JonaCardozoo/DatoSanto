@@ -49,10 +49,12 @@ export default function ResetPassword(): JSX.Element {
       const fullURL = window.location.href
       console.log("URL completa:", fullURL)
 
-      // Extraer de query params (?access_token=...)
+      // Extraer de query params
       if (window.location.search) {
         const searchParams = new URLSearchParams(window.location.search)
-        access_token = searchParams.get("access_token")
+        
+        // Intentar diferentes nombres para el token
+        access_token = searchParams.get("access_token") || searchParams.get("token")
         refresh_token = searchParams.get("refresh_token")
         type = searchParams.get("type")
         
@@ -63,10 +65,10 @@ export default function ResetPassword(): JSX.Element {
         })
       }
 
-      // Si no está en query params, probar hash (#access_token=...)
+      // Si no está en query params, probar hash
       if (!access_token && window.location.hash) {
         const hashParams = new URLSearchParams(window.location.hash.substring(1))
-        access_token = hashParams.get("access_token")
+        access_token = hashParams.get("access_token") || hashParams.get("token")
         refresh_token = hashParams.get("refresh_token")
         type = hashParams.get("type")
         
@@ -152,24 +154,12 @@ export default function ResetPassword(): JSX.Element {
         // Intentar limpiar cualquier sesión existente primero
         await supabase.auth.signOut()
         
-        // Intentar diferentes métodos según lo que tengamos
-        let response
-        
-        if (refresh_token && validateToken(refresh_token, "Refresh token")) {
-          // Si tenemos ambos tokens, usar setSession
-          console.log("Usando setSession con ambos tokens...")
-          response = await supabase.auth.setSession({
-            access_token,
-            refresh_token,
-          })
-        } else {
-          // Si solo tenemos access_token, intentar con verifyOtp
-          console.log("Intentando con verifyOtp...")
-          response = await supabase.auth.verifyOtp({
-            token_hash: access_token,
-            type: 'recovery'
-          })
-        }
+        // Para password recovery, usar verifyOtp que es el método correcto
+        console.log("Usando verifyOtp para password recovery...")
+        const response = await supabase.auth.verifyOtp({
+          token_hash: access_token,
+          type: 'recovery'
+        })
 
         const { data, error } = response
 
