@@ -12,35 +12,42 @@ export default function ResetPassword() {
   const router = useRouter()
 
   useEffect(() => {
-    const hash = window.location.hash
-    const params = new URLSearchParams(hash.substring(1)) // Elimina el "#"
+  // Primero intento obtener del hash (#access_token=...)
+  let params = new URLSearchParams(window.location.hash.substring(1))
 
-    const access_token = params.get("access_token")
-    const refresh_token = params.get("refresh_token")
+  let access_token = params.get("access_token")
+  let refresh_token = params.get("refresh_token")
 
-    const supabase = getSupabaseClient()
+  // Si no está en hash, pruebo en query params (?access_token=...)
+  if (!access_token) {
+    params = new URLSearchParams(window.location.search)
+    access_token = params.get("access_token")
+    refresh_token = params.get("refresh_token")
+  }
 
-    const restoreSession = async () => {
-      if (access_token && refresh_token) {
-        const response: AuthTokenResponse = await supabase.auth.setSession({
-          access_token,
-          refresh_token,
-        })
+  const supabase = getSupabaseClient()
 
-        const { data, error } = response
+  const restoreSession = async () => {
+    if (access_token && refresh_token) {
+      const response = await supabase.auth.setSession({
+        access_token,
+        refresh_token,
+      })
 
-        if (error) {
-          setMessage("Error al establecer sesión: " + error.message)
-        } else if (data?.session) {
-          storeAuth(data.session) // Guardás tu sesión JWT
-        }
-      } else {
-        setMessage("No se encontró token de acceso en la URL")
+      const { data, error } = response
+
+      if (error) {
+        setMessage("Error al establecer sesión: " + error.message)
+      } else if (data?.session) {
+        storeAuth(data.session)
       }
+    } else {
+      setMessage("No se encontró token de acceso en la URL")
     }
+  }
 
-    restoreSession()
-  }, [])
+  restoreSession()
+}, [])
 
   const handlePasswordReset = async () => {
     const supabase = getSupabaseClient()
