@@ -117,19 +117,36 @@ export default function ResetPassword(): JSX.Element {
 
         // Validar formato básico de JWT (debe tener 3 partes separadas por puntos)
         const validateJWT = (token: string): boolean => {
+          if (!token || typeof token !== 'string') return false
           const parts = token.split('.')
-          return parts.length === 3 && parts.every(part => part.length > 0)
+          const isValid = parts.length === 3 && parts.every(part => part.length > 0)
+          
+          if (!isValid) {
+            console.log("Token inválido - partes:", parts.length, "contenido:", parts.map(p => `${p.length} chars`))
+          }
+          
+          return isValid
         }
 
         if (access_token && !validateJWT(access_token)) {
-          console.error("Access token inválido:", access_token.substring(0, 50) + "...")
+          console.error("Access token inválido:", {
+            length: access_token.length,
+            starts: access_token.substring(0, 20),
+            ends: access_token.substring(access_token.length - 20),
+            parts: access_token.split('.').length
+          })
           setMessage("❌ El access_token tiene formato inválido. Solicita un nuevo enlace de recuperación.")
           setLoading(false)
           return
         }
 
         if (refresh_token && !validateJWT(refresh_token)) {
-          console.error("Refresh token inválido:", refresh_token.substring(0, 50) + "...")
+          console.error("Refresh token inválido:", {
+            length: refresh_token.length,
+            starts: refresh_token.substring(0, 20),
+            ends: refresh_token.substring(refresh_token.length - 20),
+            parts: refresh_token.split('.').length
+          })
           setMessage("❌ El refresh_token tiene formato inválido. Solicita un nuevo enlace de recuperación.")
           setLoading(false)
           return
@@ -246,9 +263,9 @@ export default function ResetPassword(): JSX.Element {
       <details className="text-xs text-gray-500 border p-2 rounded">
         <summary>🔧 Información de debugging</summary>
         <div className="mt-2 space-y-1">
-          <p><strong>URL:</strong> {debugInfo.url}</p>
-          <p><strong>Query params:</strong> {debugInfo.search || "Ninguno"}</p>
-          <p><strong>Hash:</strong> {debugInfo.hash || "Ninguno"}</p>
+          <p><strong>URL:</strong> <span className="break-all text-xs">{debugInfo.url}</span></p>
+          <p><strong>Query params:</strong> <span className="break-all text-xs">{debugInfo.search || "Ninguno"}</span></p>
+          <p><strong>Hash:</strong> <span className="break-all text-xs">{debugInfo.hash || "Ninguno"}</span></p>
           <p><strong>Tiene access_token:</strong> {debugInfo.hasAccessToken ? "✅" : "❌"}</p>
           <p><strong>Tiene refresh_token:</strong> {debugInfo.hasRefreshToken ? "✅" : "❌"}</p>
           <p><strong>Tipo:</strong> {debugInfo.type || "No especificado"}</p>
