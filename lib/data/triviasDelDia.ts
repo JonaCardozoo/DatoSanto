@@ -55,13 +55,6 @@ export const triviasDelDia: Trivia[] = [
     opciones: ["Superliga", "Copa Argentina", "Primera Nacional", "Copa de la Liga"],
     respuestaCorrecta: 1 // Copa Argentina
   },
-  {
-    id: "7",
-    fecha: "2025-01-9",
-    pregunta: "¿Cuántas Copas América ha ganado la Selección Argentina?",
-    opciones: ["14", "15", "16", "17"],
-    respuestaCorrecta: 1, // 15
-  },
     {
     id: "8",
     fecha: "2025-01-10",
