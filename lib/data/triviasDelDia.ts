@@ -18,7 +18,7 @@ export const triviasDelDia: Trivia[] = [
     id: "2",
     fecha: "2025-01-02",
     pregunta: "¿Quién fue el arquero histórico de Patronato, símbolo del ascenso y la permanencia?",
-    opciones: ["Federico Costa", "Sebastián Bértoli", "Facundo Altamirano", "Matias Mansilla"],
+    opciones: ["Daniel Sappa", "Sebastián Bértoli", "Facundo Altamirano", "Matias Mansilla"],
     respuestaCorrecta: 1 // Sebastián Bértoli
   },
   {
