@@ -68,12 +68,6 @@ export default function TriviaPage() {
           }
         }
 
-        if (!playedTodayFromSource) {
-          console.log(
-            "🔄 Usuario logueado pero no ha jugado según BD. Limpiando estado local de juego para Trivia del Día.",
-          )
-          localStorage.removeItem("futfactos-trivia-game-state")
-        }
       } else {
         playedTodayFromSource = await hasPlayedGameToday("trivia")
         console.log(`DEBUG app/trivia/page.tsx: hasPlayedGameToday("trivia") (LS) returned ${playedTodayFromSource}`)
@@ -83,34 +77,42 @@ export default function TriviaPage() {
       setLastGameWon(wonFromSource)
 
       const savedState = localStorage.getItem("futfactos-trivia-game-state")
-      if (savedState && playedTodayFromSource) {
-        const gameState = JSON.parse(savedState)
-        const today = getTodayAsString()
-        if (gameState.date === today) {
-          if (currentUser && wonFromSource !== null && gameState.isCorrect !== wonFromSource) {
-            console.log("⚠️ Desincronización entre estado local y BD. Ignorando estado local obsoleto.")
-            localStorage.removeItem("futfactos-trivia-game-state")
-            setGameCompleted(false)
-          } else {
-            setSelectedAnswer(gameState.selectedAnswer)
-            setIsCorrect(gameState.isCorrect)
-            setPointsAwarded(gameState.pointsAwarded || false)
-            if (gameState.gameCompleted) {
-              setGameCompleted(true)
-            }
-            console.log("💾 Estado de juego recuperado de localStorage para hoy:", gameState)
-          }
-        } else {
-          localStorage.removeItem("futfactos-trivia-game-state")
-          console.log("🧹 Estado de juego antiguo de trivia eliminado de localStorage.")
-          setGameCompleted(false)
-        }
-      } else if (savedState && !playedTodayFromSource) {
-        localStorage.removeItem("futfactos-trivia-game-state")
-        setGameCompleted(false)
-      } else {
-        setGameCompleted(false)
-      }
+
+if (savedState) {
+  const gameState = JSON.parse(savedState)
+  const today = getTodayAsString()
+
+  if (gameState.date === today) {
+    if (playedTodayFromSource) {
+      // Estado válido tanto en BD como en LS
+      setSelectedAnswer(gameState.selectedAnswer)
+      setIsCorrect(gameState.isCorrect)
+      setPointsAwarded(gameState.pointsAwarded || false)
+      if (gameState.gameCompleted) setGameCompleted(true)
+      setHasPlayed(true)
+      setLastGameWon(gameState.isCorrect)
+      console.log("💾 Estado cargado desde LS")
+    } else {
+      // Aún no jugó según BD, pero hay estado local
+      console.log("⚠️ Estado local indica juego pero BD no. Manteniendo local hasta que se confirme.")
+      setSelectedAnswer(gameState.selectedAnswer)
+      setIsCorrect(gameState.isCorrect)
+      setPointsAwarded(gameState.pointsAwarded || false)
+      if (gameState.gameCompleted) setGameCompleted(true)
+      setHasPlayed(true)
+      setLastGameWon(gameState.isCorrect)
+    }
+  } else {
+    // Estado local viejo
+    localStorage.removeItem("futfactos-trivia-game-state")
+    setGameCompleted(false)
+    console.log("🧹 Estado viejo eliminado")
+  }
+} else {
+  // No hay estado local
+  setGameCompleted(false)
+}
+
 
       setLoading(false)
       console.log("🏁 Inicialización de Trivia del Día completa.")

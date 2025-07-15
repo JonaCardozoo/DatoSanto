@@ -8,17 +8,17 @@ import WordleGrid from "@/components/WordleGrid"
 import WordleKeyboard from "@/components/WordleKeyboard"
 import WordleCompletedMessage from "@/components/WordleCompletedMessage"
 import AlreadyPlayedMessage from "@/components/AlreadyPlayedMessage"
-import { getTodayAsString, clearPreviousDayData } from "@/utils/dateUtils" // No usar hasPlayedToday aquí, usar gameUtils
+import { getTodayAsString, clearPreviousDayData } from "@/utils/dateUtils"
 import { getPlayerForToday } from "@/lib/data/jugadoresDelDia"
-import { awardPoints, hasPlayedGameToday, markAsPlayedToday } from "@/utils/gameUtils" // Usar hasPlayedGameToday y markAsPlayedToday de gameUtils
+import { awardPoints, markAsPlayedToday } from "@/utils/gameUtils"
 import { getSupabaseClient } from "@/utils/supabase-browser"
-import { getCurrentUser } from "@/utils/jwt-auth" // Importar getCurrentUser de jwt-auth
+import { getCurrentUser } from "@/utils/jwt-auth"
 import type { Player } from "@/lib/data/jugadoresDelDia"
 
 export default function JugadorPage() {
   const [currentPlayer, setCurrentPlayer] = useState<Player | null>(null)
-  const [hasPlayed, setHasPlayed] = useState(false) // Indica si el usuario ya completó el juego HOY
-  const [lastGameWon, setLastGameWon] = useState<boolean | null>(null) // Resultado de la última partida de hoy
+  const [hasPlayed, setHasPlayed] = useState(false)
+  const [lastGameWon, setLastGameWon] = useState<boolean | null>(null)
   const [gameCompleted, setGameCompleted] = useState(false)
   const [currentGuess, setCurrentGuess] = useState("")
   const [guesses, setGuesses] = useState<string[]>([])
@@ -31,7 +31,7 @@ export default function JugadorPage() {
   const supabase = getSupabaseClient()
 
   const submitGuess = useCallback(async () => {
-    if (!currentPlayer || gameCompleted || hasPlayed) return // Evitar múltiples envíos
+    if (!currentPlayer || gameCompleted || hasPlayed) return
 
     const newGuesses = [...guesses, currentGuess]
     setGuesses(newGuesses)
@@ -43,17 +43,17 @@ export default function JugadorPage() {
     if (won || lost) {
       setGameCompleted(true)
       setGameWon(won)
-      setHasPlayed(true) // Marcar como jugado para la sesión actual
-      setLastGameWon(won) // Establecer el resultado de esta partida
+      setHasPlayed(true)
+      setLastGameWon(won)
 
       let awarded = false
       if (won && user) {
-        awarded = await awardPoints("jugador") // Usar awardPoints de gameUtils
+        awarded = await awardPoints("jugador")
         setPointsAwarded(awarded)
       }
 
-      // SIEMPRE marcar como jugado en la BD y localStorage al finalizar la partida
-      await markAsPlayedToday("jugador", won, newGuesses.length) // Pasar 'won' y 'attempts'
+      // Guardar el estado completo del juego en localStorage y DB (si hay usuario)
+      await markAsPlayedToday("jugador", won, newGuesses.length, newGuesses, awarded)
     }
     setCurrentGuess("")
   }, [currentPlayer, guesses, currentGuess, user, gameCompleted, hasPlayed, MAX_GUESSES])
@@ -62,89 +62,119 @@ export default function JugadorPage() {
     initializeGame()
   }, [])
 
-  const initializeGame = async () => {
-    clearPreviousDayData() // Asegurarse de limpiar datos antiguos
+  // Efecto para guardar el estado del juego en localStorage cada vez que cambie
+  useEffect(() => {
+    if (!currentPlayer || loading) return // Solo guardar si el juego está inicializado y no cargando
 
-    const currentUser = getCurrentUser() // Obtener usuario de jwt-auth
+    const today = getTodayAsString()
+    const gameState = {
+      date: today,
+      guesses,
+      currentRow,
+      gameWon,
+      gameCompleted,
+      pointsAwarded,
+    }
+    localStorage.setItem("futfactos-jugador-game-state", JSON.stringify(gameState))
+  }, [guesses, currentRow, gameWon, gameCompleted, pointsAwarded, currentPlayer, loading])
+
+  const initializeGame = async () => {
+    clearPreviousDayData() // Asegurarse de limpiar datos antiguos de días anteriores
+
+    const currentUser = getCurrentUser()
     setUser(currentUser)
 
     const todayPlayer = getPlayerForToday()
     setCurrentPlayer(todayPlayer)
 
-    let playedTodayFromSource = false
-    let wonFromSource: boolean | null = null
-
-    // Verificar si ya jugó hoy y obtener el resultado de la última partida
-    if (currentUser && todayPlayer) {
-      // Si hay usuario logueado, la fuente principal es la DB
-      playedTodayFromSource = await hasPlayedGameToday("jugador") // Esta función ya prioriza la DB para logueados
-
-      if (playedTodayFromSource && supabase) {
-        const today = getTodayAsString()
-        const { data, error } = await supabase
-          .from("game_sessions")
-          .select("won")
-          .eq("user_id", currentUser.id)
-          .eq("game_type", "jugador")
-          .eq("date", today)
-          .order("created_at", { ascending: false }) // Obtener la última sesión
-          .limit(1)
-          .maybeSingle()
-
-        if (error) {
-          console.error("❌ Error al obtener resultado de la última partida para Jugador:", error)
-        } else if (data) {
-          wonFromSource = data.won
-        }
-      }
-
-      // **NUEVA LÓGICA:** Si el usuario está logueado pero la BD dice que NO ha jugado,
-      // entonces cualquier estado de juego guardado LOCALMENTE (de una sesión no logueada previa) debe ser ignorado/limpiado.
-      if (!playedTodayFromSource) {
-        localStorage.removeItem("futfactos-jugador-game-state")
-      }
-    } else {
-      // Si NO hay usuario logueado, la fuente principal es localStorage
-      playedTodayFromSource = await hasPlayedGameToday("jugador") // Esta función ya usa localStorage para no logueados
-    }
-
-    setHasPlayed(playedTodayFromSource)
-    setLastGameWon(wonFromSource)
-
-    // Recuperar estado de la partida actual del día (si la recarga fue a mitad del juego)
-    // Solo intentar cargar si 'hasPlayed' es verdadero (ya sea por BD o LS)
+    const today = getTodayAsString()
+    let localGameState = null
     const savedState = localStorage.getItem("futfactos-jugador-game-state")
-    if (savedState && playedTodayFromSource) {
-      const gameState = JSON.parse(savedState)
-      const today = getTodayAsString()
-      if (gameState.date === today) {
-        // Asegurarse de que el estado local coincida con la victoria/derrota si se obtuvo de la BD
-        if (currentUser && wonFromSource !== null && gameState.gameWon !== wonFromSource) {
-          localStorage.removeItem("futfactos-jugador-game-state")
-          setGameCompleted(false) // No mostrar el mensaje de completado detallado
+
+    if (savedState) {
+      try {
+        const parsedState = JSON.parse(savedState)
+        if (parsedState.date === today) {
+          localGameState = parsedState
         } else {
-          setGuesses(gameState.guesses)
-          setCurrentRow(gameState.currentRow)
-          setGameWon(gameState.gameWon)
-          setPointsAwarded(gameState.pointsAwarded || false)
-          // Si el juego ya estaba completado al cargar, marcarlo
-          if (gameState.gameCompleted) {
-            setGameCompleted(true)
-          }
+          // El estado guardado es de un día anterior, limpiarlo
+          localStorage.removeItem("futfactos-jugador-game-state")
         }
-      } else {
-        // Si el estado guardado es de un día anterior, limpiarlo
-        localStorage.removeItem("futfactos-jugador-game-state")
-        setGameCompleted(false) // Asegurarse de que no se muestre el mensaje de completado
+      } catch (e) {
+        console.error("Error al parsear el estado local del juego:", e)
+        localStorage.removeItem("futfactos-jugador-game-state") // Limpiar estado corrupto
       }
-    } else if (savedState && !playedTodayFromSource) {
-      // Si hay un savedState pero playedTodayFromSource es false (ej: jugó no logueado, ahora logueado)
-      // Limpiarlo explícitamente para asegurar que se pueda jugar.
-      localStorage.removeItem("futfactos-jugador-game-state")
-      setGameCompleted(false)
-    } else {
-      setGameCompleted(false) // Por defecto, no mostrar el mensaje de completado detallado
     }
+
+    let dbGameSession = null
+    if (currentUser && todayPlayer) {
+      // Verificar en la BD si hay una sesión de juego completada para hoy
+      const { data, error } = await supabase
+        .from("game_sessions")
+        .select("won, completed, attempts")
+        .eq("user_id", currentUser.id)
+        .eq("game_type", "jugador")
+        .eq("date", today)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle()
+
+      if (error) {
+        console.error("❌ Error al obtener sesión de juego de la BD:", error)
+      } else if (data && data.completed) {
+        dbGameSession = data
+      }
+    }
+
+    // Determinar el estado final del juego, priorizando la BD si hay una sesión completada
+    let finalHasPlayed = false
+    let finalLastGameWon: boolean | null = null
+    let finalGuesses: string[] = []
+    let finalCurrentRow = 0
+    let finalGameWon = false
+    let finalGameCompleted = false
+    let finalPointsAwarded = false
+
+    if (dbGameSession) {
+      // El estado de la BD tiene precedencia si existe una sesión completada
+      finalHasPlayed = true
+      finalLastGameWon = dbGameSession.won
+      finalGameCompleted = true
+      finalGameWon = dbGameSession.won
+
+      // Si la partida fue ganada y tenemos el jugador de hoy, mostramos la palabra en la cuadrícula
+      if (dbGameSession.won && todayPlayer?.apellido) {
+        finalGuesses = [todayPlayer.apellido.toUpperCase()]
+      } else {
+        // Si se perdió o no se ganó, o no hay apellido, la cuadrícula se mantiene vacía o con los intentos guardados localmente
+        finalGuesses = localGameState?.guesses || []
+      }
+
+      // Asegurarse de que los intentos sean al menos 1 si se ganó, o usar los de la DB/local
+      finalCurrentRow =
+        dbGameSession.attempts && dbGameSession.attempts > 0 ? dbGameSession.attempts : dbGameSession.won ? 1 : 0
+      finalPointsAwarded = dbGameSession.won // Asumimos que los puntos se otorgan al ganar
+    } else if (localGameState) {
+      // Si no hay sesión completada en la BD, pero existe un estado local para hoy
+      finalGuesses = localGameState.guesses || []
+      finalCurrentRow = localGameState.currentRow || 0
+      finalGameWon = localGameState.gameWon || false
+      finalGameCompleted = localGameState.gameCompleted || false
+      finalPointsAwarded = localGameState.pointsAwarded || false
+
+      if (finalGameCompleted) {
+        finalHasPlayed = true
+        finalLastGameWon = finalGameWon
+      }
+    }
+
+    setGuesses(finalGuesses)
+    setCurrentRow(finalCurrentRow)
+    setGameWon(finalGameWon)
+    setGameCompleted(finalGameCompleted)
+    setPointsAwarded(finalPointsAwarded)
+    setHasPlayed(finalHasPlayed)
+    setLastGameWon(finalLastGameWon)
 
     setLoading(false)
   }
@@ -152,7 +182,6 @@ export default function JugadorPage() {
   const handleKeyPress = useCallback(
     (key: string) => {
       if (gameCompleted || hasPlayed) {
-        // Si el juego ya está completado o ya jugó hoy, no permitir más entradas
         return
       }
 
@@ -160,6 +189,7 @@ export default function JugadorPage() {
         if (currentGuess.length === (currentPlayer?.apellido?.length || 0)) {
           submitGuess()
         } else {
+          // Opcional: mostrar un mensaje al usuario de que la palabra es demasiado corta
         }
       } else if (key === "DEL" || key === "BACKSPACE") {
         setCurrentGuess((prev) => prev.slice(0, -1))
@@ -170,13 +200,12 @@ export default function JugadorPage() {
         }
       }
     },
-    [gameCompleted, hasPlayed, currentGuess, currentPlayer, submitGuess], // Agregado submitGuess como dependencia
+    [gameCompleted, hasPlayed, currentGuess, currentPlayer, submitGuess],
   )
 
   // Event listener para el teclado físico
   useEffect(() => {
     const handlePhysicalKeyPress = (event: KeyboardEvent) => {
-      // Evitar que el enter o backspace hagan scroll
       if (event.key === "Enter" || event.key === "Backspace") {
         event.preventDefault()
       }
@@ -198,8 +227,6 @@ export default function JugadorPage() {
   }, [gameCompleted, hasPlayed, loading, handleKeyPress])
 
   const handlePlayAgain = useCallback(() => {
-    // Al hacer click en "Jugar Nuevo Desafío", forzar una recarga para iniciar un nuevo día
-    // (el `clearPreviousDayData` al inicializar se encargará de esto)
     localStorage.removeItem("futfactos-jugador-game-state") // Limpiar estado local
     window.location.reload()
   }, [])
@@ -212,7 +239,6 @@ export default function JugadorPage() {
     )
   }
 
-  // Lógica de renderizado principal
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
       <GameHeader />
@@ -255,9 +281,7 @@ export default function JugadorPage() {
               </li>
             </ul>
           </div>
-          {/* Lógica de renderizado condicional principal */}
           {gameCompleted ? (
-            // Si el juego está completado (porque se acaba de terminar o se cargó desde un estado completado)
             <div className="space-y-6">
               <WordleGrid
                 targetWord={currentPlayer?.apellido || ""}
@@ -283,7 +307,6 @@ export default function JugadorPage() {
               />
             </div>
           ) : hasPlayed ? (
-            // Si no está gameCompleted, pero hasPlayed es true (es decir, ya jugó hoy y volvió a la página)
             <AlreadyPlayedMessage
               onPlayAgain={handlePlayAgain}
               gameType="jugador"
@@ -291,7 +314,6 @@ export default function JugadorPage() {
               lastGameWon={lastGameWon}
             />
           ) : currentPlayer ? (
-            // Si el juego no está completado y no ha jugado hoy, mostrar el juego en curso
             <div className="space-y-6">
               <WordleGrid
                 targetWord={currentPlayer.apellido}
@@ -324,7 +346,6 @@ export default function JugadorPage() {
               )}
             </div>
           ) : (
-            // Si no hay jugador disponible
             <div className="text-center py-12">
               <p className="text-xl text-gray-400">No hay jugador disponible para hoy</p>
             </div>

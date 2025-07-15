@@ -2,11 +2,13 @@
 
 import { motion } from "framer-motion"
 import { Clock, Calendar } from "lucide-react"
-import { canPlayAgain } from "@/utils/dateUtils"
+import { canPlayAgain, GameType } from "@/utils/dateUtils"
 
 interface AlreadyPlayedMessageProps {
   onPlayAgain: () => void
-  gameType: string
+  gameType: GameType
+  playedToday: boolean
+  lastGameWon: boolean | null
 }
 
 export default function AlreadyPlayedMessage({ onPlayAgain, gameType }: AlreadyPlayedMessageProps) {
