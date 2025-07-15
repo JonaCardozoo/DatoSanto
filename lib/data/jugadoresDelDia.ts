@@ -40,15 +40,7 @@ export const jugadoresDelDia: Player[] = [
     equipo: "Patronato",
     posicion: "Defensor"
   },
-  {
-    id: "5",
-    fecha: "2025-01-05",
-    nombre: "Lautaro",
-    apellido: "GEMINIANI",
-    equipo: "Patronato",
-    posicion: "Defensor"
-  },
-  {
+    {
     id: "6",
     fecha: "2025-01-06",
     nombre: "Cristian",
@@ -56,6 +48,15 @@ export const jugadoresDelDia: Player[] = [
     equipo: "Patronato",
     posicion: "Delantero"
   },
+  {
+    id: "7",
+    fecha: "2025-01-05",
+    nombre: "Lautaro",
+    apellido: "GEMINIANI",
+    equipo: "Patronato",
+    posicion: "Defensor"
+  },
+
   {
     id: "7",
     fecha: "2025-01-07",

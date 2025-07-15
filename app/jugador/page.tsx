@@ -14,6 +14,8 @@ import { awardPoints, markAsPlayedToday } from "@/utils/gameUtils"
 import { getSupabaseClient } from "@/utils/supabase-browser"
 import { getCurrentUser } from "@/utils/jwt-auth"
 import type { Player } from "@/lib/data/jugadoresDelDia"
+import GuestWarningModal from "@/components/GuestWarningModal"
+import { useRouter } from "next/navigation"
 
 export default function JugadorPage() {
   const [currentPlayer, setCurrentPlayer] = useState<Player | null>(null)
@@ -25,10 +27,32 @@ export default function JugadorPage() {
   const [currentRow, setCurrentRow] = useState(0)
   const [gameWon, setGameWon] = useState(false)
   const [pointsAwarded, setPointsAwarded] = useState(false)
+  const [showGuestWarning, setShowGuestWarning] = useState(false)
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState<any>(null)
   const MAX_GUESSES = 5
   const supabase = getSupabaseClient()
+
+  const router = useRouter()
+
+
+
+  const handleLogin = () => {
+    router.push("/auth")
+    setShowGuestWarning(false)
+  }
+
+  const handleCloseWarning = () => {
+    setShowGuestWarning(false)
+  }
+
+   useEffect(() => {
+      if (!user && !loading) {
+        setShowGuestWarning(true)
+      }
+    }, [user, loading])
+
+
 
   const submitGuess = useCallback(async () => {
     if (!currentPlayer || gameCompleted || hasPlayed) return
@@ -58,31 +82,65 @@ export default function JugadorPage() {
     setCurrentGuess("")
   }, [currentPlayer, guesses, currentGuess, user, gameCompleted, hasPlayed, MAX_GUESSES])
 
-  useEffect(() => {
-    initializeGame()
-  }, [])
-
-  // Efecto para guardar el estado del juego en localStorage cada vez que cambie
-  useEffect(() => {
-    if (!currentPlayer || loading) return // Solo guardar si el juego está inicializado y no cargando
+  // Función para guardar el estado del juego
+  const saveGameState = useCallback(() => {
+    if (!currentPlayer || loading) return
 
     const today = getTodayAsString()
     const gameState = {
       date: today,
       guesses,
+      currentGuess, // ✅ Ahora también guardamos currentGuess
       currentRow,
       gameWon,
       gameCompleted,
       pointsAwarded,
+      hasPlayed,
+      lastGameWon,
     }
     localStorage.setItem("futfactos-jugador-game-state", JSON.stringify(gameState))
-  }, [guesses, currentRow, gameWon, gameCompleted, pointsAwarded, currentPlayer, loading])
+  }, [guesses, currentGuess, currentRow, gameWon, gameCompleted, pointsAwarded, hasPlayed, lastGameWon, currentPlayer, loading])
+
+  useEffect(() => {
+    initializeGame()
+  }, [])
+
+  // Efecto para guardar el estado del juego cada vez que cambie
+  useEffect(() => {
+    saveGameState()
+  }, [saveGameState])
+
+  // ✅ Guardar estado cuando el usuario sale de la página
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      saveGameState()
+    }
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        saveGameState()
+      }
+    }
+
+   
+
+    // Guardar cuando el usuario cierra la página o cambia de pestaña
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload)
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+    }
+  }, [saveGameState])
 
   const initializeGame = async () => {
     clearPreviousDayData() // Asegurarse de limpiar datos antiguos de días anteriores
 
     const currentUser = getCurrentUser()
     setUser(currentUser)
+
+
 
     const todayPlayer = getPlayerForToday()
     setCurrentPlayer(todayPlayer)
@@ -130,6 +188,7 @@ export default function JugadorPage() {
     let finalHasPlayed = false
     let finalLastGameWon: boolean | null = null
     let finalGuesses: string[] = []
+    let finalCurrentGuess = "" // ✅ Agregar currentGuess al estado final
     let finalCurrentRow = 0
     let finalGameWon = false
     let finalGameCompleted = false
@@ -157,10 +216,13 @@ export default function JugadorPage() {
     } else if (localGameState) {
       // Si no hay sesión completada en la BD, pero existe un estado local para hoy
       finalGuesses = localGameState.guesses || []
+      finalCurrentGuess = localGameState.currentGuess || "" // ✅ Restaurar currentGuess
       finalCurrentRow = localGameState.currentRow || 0
       finalGameWon = localGameState.gameWon || false
       finalGameCompleted = localGameState.gameCompleted || false
       finalPointsAwarded = localGameState.pointsAwarded || false
+      finalHasPlayed = localGameState.hasPlayed || false
+      finalLastGameWon = localGameState.lastGameWon || null
 
       if (finalGameCompleted) {
         finalHasPlayed = true
@@ -169,6 +231,7 @@ export default function JugadorPage() {
     }
 
     setGuesses(finalGuesses)
+    setCurrentGuess(finalCurrentGuess) // ✅ Restaurar currentGuess
     setCurrentRow(finalCurrentRow)
     setGameWon(finalGameWon)
     setGameCompleted(finalGameCompleted)
@@ -254,13 +317,11 @@ export default function JugadorPage() {
             <h2 className="text-3xl md:text-4xl font-bold text-orange-500 mb-2">JUGADOR DEL DÍA</h2>
             <p className="text-gray-300 text-lg">Adiviná el apellido del jugador en 5 intentos</p>
             {!user && (
-              <p className="text-yellow-400 text-sm mt-2">
-                💡{" "}
-                <Link href="/auth" className="underline">
-                  Iniciá sesión
-                </Link>{" "}
-                para ganar puntos y aparecer en el ranking
-              </p>
+              <GuestWarningModal
+                isOpen={showGuestWarning}
+                onClose={handleCloseWarning}
+                onLogin={handleLogin}
+              />
             )}
           </div>
           <div className="bg-gray-900 rounded-lg p-4 border border-gray-700">

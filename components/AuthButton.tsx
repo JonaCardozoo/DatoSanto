@@ -1,10 +1,11 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { User, LogOut, AlertCircle, RefreshCw, Info } from "lucide-react"
+import { User, LogOut, AlertCircle, RefreshCw, Info, X } from "lucide-react"
 import Link from "next/link"
 import { getSupabaseClient, restoreSessionFromJWT, signOutWithJWT } from "@/utils/supabase-browser"
 import { getCurrentUser, getAuthDebugInfo, shouldRefreshToken } from "@/utils/jwt-auth"
+import TimeoutModal from "./TimeoutModal"
 
 export default function AuthButton() {
   const [user, setUser] = useState<any>(null)
@@ -12,6 +13,7 @@ export default function AuthButton() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [showDebug, setShowDebug] = useState(false)
+  const [showTimeoutModal, setShowTimeoutModal] = useState(false)
 
   const supabase = getSupabaseClient()
 
@@ -22,6 +24,14 @@ export default function AuthButton() {
     }
 
     let mounted = true
+
+    // ✅ Timeout de 5 segundos
+    const timeoutId = setTimeout(() => {
+      if (mounted && loading) {
+        setShowTimeoutModal(true)
+        setLoading(false)
+      }
+    }, 5000)
 
     const initializeAuth = async () => {
       try {
@@ -42,6 +52,7 @@ export default function AuthButton() {
         } else {
           if (mounted) {
             setLoading(false)
+            clearTimeout(timeoutId)
           }
         }
 
@@ -64,6 +75,7 @@ export default function AuthButton() {
               setProfile(null)
               setError(null)
               setLoading(false)
+              clearTimeout(timeoutId)
               break
 
             case "TOKEN_REFRESHED":
@@ -79,6 +91,7 @@ export default function AuthButton() {
         if (mounted) {
           setError("Error de inicialización")
           setLoading(false)
+          clearTimeout(timeoutId)
         }
       }
     }
@@ -108,6 +121,7 @@ export default function AuthButton() {
       } finally {
         if (mounted) {
           setLoading(false)
+          clearTimeout(timeoutId)
         }
       }
     }
@@ -169,6 +183,7 @@ export default function AuthButton() {
 
     return () => {
       mounted = false
+      clearTimeout(timeoutId)
     }
   }, [supabase])
 
@@ -220,6 +235,16 @@ export default function AuthButton() {
     }
   }
 
+  // ✅ Función para recargar la página
+  const handleReloadPage = () => {
+    window.location.reload()
+  }
+
+  // ✅ Función para cerrar el modal
+  const handleCloseModal = () => {
+    setShowTimeoutModal(false)
+  }
+
   // Debug info
   const debugInfo = getAuthDebugInfo()
   const needsRefresh = shouldRefreshToken()
@@ -255,7 +280,6 @@ export default function AuthButton() {
           <div className="text-red-400 text-sm">{profile.points || 0} puntos</div>
         </div>
 
-
         <button
           onClick={handleLogout}
           className="flex items-center space-x-2 px-2 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
@@ -265,24 +289,32 @@ export default function AuthButton() {
           <span className="hidden md:inline text-white">Salir</span>
         </button>
 
-        {/* Debug panel */}
-        {showDebug && (
-          <div className="fixed top-20 right-4 bg-black border border-gray-600 rounded-lg p-4 text-xs max-w-sm z-50">
-            <h3 className="text-white font-bold mb-2">🔍 Debug JWT</h3>
-            <pre className="text-gray-300 whitespace-pre-wrap">{JSON.stringify(debugInfo, null, 2)}</pre>
-          </div>
-        )}
+        {/* Modal de timeout */}
+        <TimeoutModal
+          isOpen={showTimeoutModal}
+          onClose={handleCloseModal}
+          onReload={handleReloadPage}
+        />
       </div>
     )
   }
 
   return (
-    <Link
-      href="/auth"
-      className="flex items-center space-x-2 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
-    >
-      <User className="w-5 h-5" />
-      <span>Iniciar Sesión</span>
-    </Link>
+    <>
+      <Link
+        href="/auth"
+        className="flex items-center space-x-2 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
+      >
+        <User className="w-5 h-5" />
+        <span>Iniciar Sesión</span>
+      </Link>
+      
+      {/* Modal de timeout */}
+      <TimeoutModal
+        isOpen={showTimeoutModal}
+        onClose={handleCloseModal}
+        onReload={handleReloadPage}
+      />
+    </>
   )
 }
