@@ -1,7 +1,6 @@
 export interface VideoDelDia {
   id: string
   videoUrl: string
-  pregunta: string
   opciones: string[]
   respuestaCorrecta: number
   fecha: string
