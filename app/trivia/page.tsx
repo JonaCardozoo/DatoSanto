@@ -9,7 +9,7 @@ import GameCompletedMessage from "@/components/GameCompletedMessage"
 import AlreadyPlayedMessage from "@/components/AlreadyPlayedMessage"
 import { getTodayAsString, clearPreviousDayData } from "@/utils/dateUtils"
 import { getTriviaForToday } from "@/lib/data/triviasDelDia"
-import { awardPoints, hasPlayedGameToday, markAsPlayedToday } from "@/utils/gameUtils"
+import { awardPoints, hasPlayedToday, markAsPlayedToday } from "@/utils/gameUtils"
 import { getSupabaseClient } from "@/utils/supabase-browser"
 import { getCurrentUser } from "@/utils/jwt-auth"
 import type { Trivia } from "@/lib/data/triviasDelDia"
@@ -44,7 +44,7 @@ export default function TriviaPage() {
       let wonFromSource: boolean | null = null
 
       if (currentUser && todayTrivia) {
-        playedTodayFromSource = await hasPlayedGameToday("trivia")
+        playedTodayFromSource = await hasPlayedToday("trivia")
 
         if (playedTodayFromSource && supabase) {
           const today = getTodayAsString()
@@ -69,7 +69,7 @@ export default function TriviaPage() {
         }
 
       } else {
-        playedTodayFromSource = await hasPlayedGameToday("trivia")
+        playedTodayFromSource = await hasPlayedToday("trivia")
         console.log(`DEBUG app/trivia/page.tsx: hasPlayedGameToday("trivia") (LS) returned ${playedTodayFromSource}`)
       }
 

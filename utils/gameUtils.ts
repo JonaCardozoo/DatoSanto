@@ -3,18 +3,15 @@ import type { GameType } from "./dateUtils"
 import { getSupabaseClient } from "./supabase-browser"
 import { getCurrentUser as getAuthCurrentUser } from "./jwt-auth"
 
-// 🔹 Marcar como jugado y guardar estado completo en localStorage (si está logueado también guarda en BD para puntos)
+// Guardar estado local y marcar jugado hoy
 export async function markAsPlayedToday(
   gameType: GameType,
   won: boolean,
-  attempts: number | null = null,
-  guesses: string[] = [], // Añadido para guardar las adivinanzas
-  pointsAwarded = false, // Añadido para guardar si se otorgaron puntos
+  extraState: Record<string, any> = {}
 ): Promise<void> {
   if (typeof window === "undefined") return
   const today = getTodayAsString()
 
-  // 1. Guardar en localStorage
   localStorage.setItem(`lastPlayed_${gameType}`, today)
 
   const gameStateKey = `futfactos-${gameType}-game-state`
@@ -26,23 +23,20 @@ export async function markAsPlayedToday(
       state = JSON.parse(existing)
     } catch (e) {
       console.error("Error parsing existing game state from localStorage:", e)
-      // Si el estado está corrupto, lo sobreescribimos
     }
   }
 
   const newState = {
-    ...state, // Mantener cualquier otra propiedad que pudiera existir
+    ...state,
     date: today,
-    gameCompleted: true, // Marcar como completado al finalizar
+    gameCompleted: true,
     gameWon: won,
-    currentRow: attempts || 0,
-    pointsAwarded: pointsAwarded, // Usar el valor pasado
-    guesses: guesses, // Guardar el array de adivinanzas
+    ...extraState, // aquí mezclamos el estado extra (como selectedAnswer, isCorrect, pointsAwarded)
   }
 
   localStorage.setItem(gameStateKey, JSON.stringify(newState))
 
-  // 2. Guardar en Supabase solo para tracking, si hay sesión
+  // Guardar en Supabase (igual que antes)
   const user = getAuthCurrentUser()
   if (!user) return
 
@@ -56,53 +50,71 @@ export async function markAsPlayedToday(
       date: today,
       completed: true,
       won,
-      attempts,
-      answer: null, // Puedes guardar la respuesta si es necesario
+      attempts: null,
+      answer: null,
     })
 
     if (error) {
-      console.error("❌ Error al guardar sesión en Supabase:", error)
+      console.error("Error guardando sesión en Supabase:", error)
     }
   } catch (err) {
-    console.error("💥 Error inesperado al guardar sesión:", err)
+    console.error("Error inesperado guardando sesión:", err)
   }
 }
 
-// 🔹 Obtener si jugó hoy (solo localStorage)
+
+// Saber si ya jugó hoy (localStorage)
 export function hasPlayedToday(gameType: GameType): boolean {
   if (typeof window === "undefined") return false
   return localStorage.getItem(`lastPlayed_${gameType}`) === getTodayAsString()
 }
 
-// 🔹 Alternativa asíncrona (si querés dejarla por compatibilidad)
-export async function hasPlayedGameToday(gameType: GameType): Promise<boolean> {
-  return hasPlayedToday(gameType)
-}
-
-// 🔹 Otorgar puntos si ganó (requiere sesión activa)
+// Otorgar puntos sólo una vez por día
 export async function awardPoints(gameType: GameType): Promise<boolean> {
   const supabase = getSupabaseClient()
   const user = getAuthCurrentUser()
   if (!supabase || !user) return false
 
+  const today = getTodayAsString()
+
   try {
+    // Verificar si ya ganó hoy
+    const { data: sessions, error: sessionsError } = await supabase
+      .from("game_sessions")
+      .select("id")
+      .eq("user_id", user.id)
+      .eq("game_type", gameType)
+      .eq("date", today)
+      .eq("won", true)
+      .limit(1)
+
+    if (sessionsError) {
+      console.error("Error verificando sesión ganada:", sessionsError)
+      return false
+    }
+
+    if (sessions && sessions.length > 0) {
+      // Ya ganó hoy, no otorgar puntos
+      return false
+    }
+
+    // Otorgar puntos
     const points = 10
 
     const { data: existingProfile, error: profileError } = await supabase
       .from("profiles")
-      .select("id, username, points, games_won")
+      .select("id, points, games_won")
       .eq("id", user.id)
       .maybeSingle()
 
     if (profileError) {
-      console.error("❌ Error buscando perfil:", profileError)
+      console.error("Error buscando perfil:", profileError)
       return false
     }
 
-    let updatedProfile = null
     if (!existingProfile) {
       const username = user.user_metadata?.username || user.email?.split("@")[0] || `Usuario${user.id.slice(0, 8)}`
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from("profiles")
         .insert({
           id: user.id,
@@ -112,12 +124,9 @@ export async function awardPoints(gameType: GameType): Promise<boolean> {
           games_won: 1,
           created_at: new Date().toISOString(),
         })
-        .select("*")
-        .single()
       if (error) return false
-      updatedProfile = data
     } else {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from("profiles")
         .update({
           points: existingProfile.points + points,
@@ -125,13 +134,10 @@ export async function awardPoints(gameType: GameType): Promise<boolean> {
           updated_at: new Date().toISOString(),
         })
         .eq("id", user.id)
-        .select("*")
-        .single()
       if (error) return false
-      updatedProfile = data
     }
 
-    // Refrescar perfil (si se usa en frontend)
+    // Refrescar perfil en frontend (si tienes función global)
     setTimeout(() => {
       if (typeof window !== "undefined" && (window as any).refreshUserProfile) {
         ;(window as any).refreshUserProfile()
@@ -140,25 +146,7 @@ export async function awardPoints(gameType: GameType): Promise<boolean> {
 
     return true
   } catch (err) {
-    console.error("💥 Error al otorgar puntos:", err)
+    console.error("Error al otorgar puntos:", err)
     return false
   }
-}
-
-// 🔹 Funciones auxiliares
-export async function getCurrentUserProfile() {
-  if (typeof window !== "undefined" && (window as any).getCurrentProfile) {
-    return (window as any).getCurrentProfile()
-  }
-  return null
-}
-
-export async function refreshUserProfile() {
-  if (typeof window !== "undefined" && (window as any).refreshUserProfile) {
-    await (window as any).refreshUserProfile()
-  }
-}
-
-export function getCurrentUser() {
-  return getAuthCurrentUser()
 }
