@@ -1,4 +1,4 @@
-import { getTodayAsString } from "./dateUtils"
+import { getGameDateString } from "./dateUtils" // Cambio aquí
 import type { GameType } from "./dateUtils"
 import { getSupabaseClient } from "./supabase-browser"
 import { getCurrentUser as getAuthCurrentUser } from "./jwt-auth"
@@ -10,9 +10,9 @@ export async function markAsPlayedToday(
   extraState: Record<string, any> = {}
 ): Promise<void> {
   if (typeof window === "undefined") return
-  const today = getTodayAsString()
+  const gameDate = getGameDateString() // Cambio aquí
 
-  localStorage.setItem(`lastPlayed_${gameType}`, today)
+  localStorage.setItem(`lastPlayed_${gameType}`, gameDate) // Cambio aquí
 
   const gameStateKey = `futfactos-${gameType}-game-state`
   const existing = localStorage.getItem(gameStateKey)
@@ -28,7 +28,7 @@ export async function markAsPlayedToday(
 
   const newState = {
     ...state,
-    date: today,
+    date: gameDate, // Cambio aquí
     gameCompleted: true,
     gameWon: won,
     ...extraState, // aquí mezclamos el estado extra (como selectedAnswer, isCorrect, pointsAwarded)
@@ -47,7 +47,7 @@ export async function markAsPlayedToday(
     const { error } = await supabase.from("game_sessions").insert({
       user_id: user.id,
       game_type: gameType,
-      date: today,
+      date: gameDate, // Cambio aquí
       completed: true,
       won,
       attempts: null,
@@ -66,7 +66,7 @@ export async function markAsPlayedToday(
 // Saber si ya jugó hoy (localStorage)
 export function hasPlayedToday(gameType: GameType): boolean {
   if (typeof window === "undefined") return false
-  return localStorage.getItem(`lastPlayed_${gameType}`) === getTodayAsString()
+  return localStorage.getItem(`lastPlayed_${gameType}`) === getGameDateString() // Cambio aquí
 }
 
 // Otorgar puntos sólo una vez por día
@@ -75,7 +75,7 @@ export async function awardPoints(gameType: GameType): Promise<boolean> {
   const user = getAuthCurrentUser()
   if (!supabase || !user) return false
 
-  const today = getTodayAsString()
+  const gameDate = getGameDateString() // Cambio aquí
 
   try {
     // Verificar si ya ganó hoy
@@ -84,7 +84,7 @@ export async function awardPoints(gameType: GameType): Promise<boolean> {
       .select("id")
       .eq("user_id", user.id)
       .eq("game_type", gameType)
-      .eq("date", today)
+      .eq("date", gameDate) // Cambio aquí
       .eq("won", true)
       .limit(1)
 

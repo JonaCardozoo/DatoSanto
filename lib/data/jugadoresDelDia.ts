@@ -1,3 +1,5 @@
+import { getGameDateString } from "../../utils/dateUtils" // Agregar import
+
 export interface Player {
   id: string
   fecha: string // YYYY-MM-DD
@@ -204,16 +206,17 @@ export const jugadoresDelDia: Player[] = [
 ]
 
 export function getPlayerForToday(): Player | null {
-  const today = new Date()
-  const dateString = today.toISOString().split("T")[0] // YYYY-MM-DD
+  const gameDateString = getGameDateString() // Cambio aquí
 
   // Buscar jugador específico para hoy
-  let todayPlayer = jugadoresDelDia.find((player) => player.fecha === dateString)
+  let todayPlayer = jugadoresDelDia.find((player) => player.fecha === gameDateString)
 
   // Si no hay jugador específico para hoy, usar uno basado en el día del año
   if (!todayPlayer) {
+    // Crear fecha a partir del gameDateString para el fallback
+    const gameDate = new Date(gameDateString + 'T00:00:00')
     const dayOfYear = Math.floor(
-      (today.getTime() - new Date(today.getFullYear(), 0, 0).getTime()) / (1000 * 60 * 60 * 24),
+      (gameDate.getTime() - new Date(gameDate.getFullYear(), 0, 0).getTime()) / (1000 * 60 * 60 * 24),
     )
     const playerIndex = dayOfYear % jugadoresDelDia.length
     todayPlayer = jugadoresDelDia[playerIndex]

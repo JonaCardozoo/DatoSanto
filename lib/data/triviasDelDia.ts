@@ -1,3 +1,5 @@
+import { getGameDateString } from "../../utils/dateUtils"  // Agregar import
+
 export interface Trivia {
   id: string
   fecha: string // YYYY-MM-DD
@@ -80,16 +82,17 @@ export const triviasDelDia: Trivia[] = [
 ]
 
 export function getTriviaForToday(): Trivia | null {
-  const today = new Date()
-  const dateString = today.toISOString().split("T")[0] // YYYY-MM-DD
+  const gameDateString = getGameDateString() // Cambio aquí
 
   // Buscar trivia específica para hoy
-  let todayTrivia = triviasDelDia.find((trivia) => trivia.fecha === dateString)
+  let todayTrivia = triviasDelDia.find((trivia) => trivia.fecha === gameDateString)
 
   // Si no hay trivia específica para hoy, usar una basada en el día del año
   if (!todayTrivia) {
+    // Crear fecha a partir del gameDateString para el fallback
+    const gameDate = new Date(gameDateString + 'T00:00:00')
     const dayOfYear = Math.floor(
-      (today.getTime() - new Date(today.getFullYear(), 0, 0).getTime()) / (1000 * 60 * 60 * 24),
+      (gameDate.getTime() - new Date(gameDate.getFullYear(), 0, 0).getTime()) / (1000 * 60 * 60 * 24),
     )
     const triviaIndex = dayOfYear % triviasDelDia.length
     todayTrivia = triviasDelDia[triviaIndex]
