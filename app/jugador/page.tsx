@@ -91,7 +91,7 @@ export default function JugadorPage() {
   const handleKeyPress = useCallback(
     (key: string) => {
       if (gameCompleted || hasPlayed) return
-
+      
       if (key === "ENTER") {
         if (currentGuess.length === (currentPlayer?.apellido?.length || 0)) {
           submitGuess()
@@ -210,7 +210,16 @@ export default function JugadorPage() {
             <>
               <WordleGrid targetWord={currentPlayer!.apellido} guesses={guesses} currentGuess={currentGuess} currentRow={currentRow} maxGuesses={MAX_GUESSES} />
               <WordleKeyboard onKeyPress={handleKeyPress} guesses={guesses} targetWord={currentPlayer!.apellido} disabled={true} />
-              <WordleCompletedMessage gameWon={gameWon} targetWord={currentPlayer!.apellido} playerName={currentPlayer!.nombre} attempts={guesses.length} maxAttempts={MAX_GUESSES} pointsAwarded={pointsAwarded} userLoggedIn={!!user} />
+              <WordleCompletedMessage 
+                gameWon={gameWon} 
+                targetWord={currentPlayer!.apellido} 
+                playerName={currentPlayer!.nombre} 
+                attempts={guesses.length} 
+                maxAttempts={MAX_GUESSES} 
+                pointsAwarded={pointsAwarded} 
+                userLoggedIn={!!user}
+                playerImageUrl={currentPlayer!.imageUrl}
+              />
             </>
           ) : hasPlayed ? (
             <AlreadyPlayedMessage onPlayAgain={handlePlayAgain} gameType="jugador" playedToday={true} lastGameWon={lastGameWon} />

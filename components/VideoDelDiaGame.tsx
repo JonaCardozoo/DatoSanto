@@ -292,7 +292,7 @@ function VideoDelDiaGame({ video, onGameComplete, userLoggedIn = false, disabled
 
         {/* Botón de Play/Replay Preview en el centro */}
         {showPlayButtonOverlay && (
-          <div className="absolute inset-0 flex items-center justify-center">
+          <div className="absolute top-0 left-0 right-0 flex justify-center mt-4">
             <button
               onClick={startPreviewPlayback} // Unificado para iniciar o reiniciar preview
               className="p-4 bg-red-600 hover:bg-red-700 text-white font-bold rounded-full text-lg transition-colors flex items-center space-x-2 shadow-lg"
@@ -302,10 +302,9 @@ function VideoDelDiaGame({ video, onGameComplete, userLoggedIn = false, disabled
                   <Play className="w-8 h-8" />
                 </>
               ) : (
-                <>
-                  <RotateCcw className="w-6 h-6" />
-                  <span>Volver a ver preview</span>
-                </>
+                <div className="flex items-center justify-center">
+                  <RotateCcw className="w-5 h-5" />
+                </div>
               )}
             </button>
           </div>

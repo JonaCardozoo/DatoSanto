@@ -1,16 +1,36 @@
-// Función para obtener la "fecha de juego" actual (cambia a las 23:00)
 export function getGameDateString(): string {
   const now = new Date()
-  const gameDate = new Date(now)
-  
-  // Si son antes de las 23:00, usamos la fecha actual
-  // Si son las 23:00 o después, usamos la fecha del día siguiente
-  if (now.getHours() >= 23) {
+  const formatter = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "America/Argentina/Buenos_Aires",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  })
+
+  // Obtener partes bien separadas
+  const parts = formatter.formatToParts(now)
+  const getPart = (type: string) => parts.find(p => p.type === type)?.value || "00"
+
+  const year = getPart("year")
+  const month = getPart("month")
+  const day = getPart("day")
+  const hour = parseInt(getPart("hour"))
+
+  // Crear la fecha base
+  const gameDate = new Date(`${year}-${month}-${day}T00:00:00`)
+  if (hour >= 23) {
     gameDate.setDate(gameDate.getDate() + 1)
   }
-  
-  return gameDate.toISOString().split("T")[0] // YYYY-MM-DD
+
+  const dateStr = gameDate.toISOString().split("T")[0]
+  console.log("🕒 Fecha de juego (ARG):", dateStr)
+  return dateStr
 }
+
 
 // Función auxiliar para obtener la fecha real de hoy
 export function getTodayAsString(): string {

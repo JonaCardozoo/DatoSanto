@@ -7,6 +7,7 @@ export interface Player {
   apellido: string
   equipo: string
   posicion: string
+  imageUrl: string
 }
 
 export const jugadoresDelDia: Player[] = [
@@ -16,7 +17,8 @@ export const jugadoresDelDia: Player[] = [
     nombre: "Sebastián",
     apellido: "BERTOLI",
     equipo: "Patronato",
-    posicion: "Arquero"
+    posicion: "Arquero",
+    imageUrl: "/images/jugadores/sebastian.png",
   },
   {
     id: "2",
@@ -24,7 +26,8 @@ export const jugadoresDelDia: Player[] = [
     nombre: "Diego",
     apellido: "JARA",
     equipo: "Patronato",
-    posicion: "Delantero"
+    posicion: "Delantero",
+    imageUrl: "/images/jugadores/diego.png",
   },
   {
     id: "3",
@@ -32,7 +35,8 @@ export const jugadoresDelDia: Player[] = [
     nombre: "Marcelo",
     apellido: "GUZMAN",
     equipo: "Patronato",
-    posicion: "Volante"
+    posicion: "Volante",
+    imageUrl: "/images/jugadores/marcelo.png",
   },
   {
     id: "4",
@@ -40,15 +44,18 @@ export const jugadoresDelDia: Player[] = [
     nombre: "Walter",
     apellido: "ANDRADE",
     equipo: "Patronato",
-    posicion: "Defensor"
+    posicion: "Defensor",
+    imageUrl: "/images/jugadores/walter.png",
   },
-    {
+  {
     id: "6",
     fecha: "2025-01-06",
     nombre: "Cristian",
     apellido: "TARRAGONA",
     equipo: "Patronato",
-    posicion: "Delantero"
+    posicion: "Delantero",
+    imageUrl: "/images/jugadores/cristian.png",
+
   },
   {
     id: "7",
@@ -56,7 +63,8 @@ export const jugadoresDelDia: Player[] = [
     nombre: "Lautaro",
     apellido: "GEMINIANI",
     equipo: "Patronato",
-    posicion: "Defensor"
+    posicion: "Defensor",
+    imageUrl: "/images/jugadores/lautaro.png",
   },
 
   {
@@ -65,7 +73,8 @@ export const jugadoresDelDia: Player[] = [
     nombre: "Federico",
     apellido: "BRAVO",
     equipo: "Patronato",
-    posicion: "Volante"
+    posicion: "Volante",
+    imageUrl: "https://elonce-media.elonce.com/fotos-super/2019/03/03/o_1551650905.jpg",
   },
   {
     id: "8",
@@ -73,7 +82,8 @@ export const jugadoresDelDia: Player[] = [
     nombre: "Facundo",
     apellido: "ALTAMIRANO",
     equipo: "Patronato",
-    posicion: "Arquero"
+    posicion: "Arquero",
+    imageUrl: "https://media.tycsports.com/files/2022/10/29/498981/facundo-altamirano_862x485.webp?v=1",
   },
   {
     id: "9",
@@ -81,7 +91,8 @@ export const jugadoresDelDia: Player[] = [
     nombre: "Tiago",
     apellido: "BANEGA",
     equipo: "Patronato",
-    posicion: "Volante"
+    posicion: "Volante",
+    imageUrl: "/images/jugadores/tiago.png",
   },
   {
     id: "10",
@@ -89,7 +100,8 @@ export const jugadoresDelDia: Player[] = [
     nombre: "Nicolás",
     apellido: "DOMINGO",
     equipo: "Patronato",
-    posicion: "Volante"
+    posicion: "Volante",
+    imageUrl: "/images/jugadores/nicolas.png",
   },
   {
     id: "11",
@@ -97,7 +109,8 @@ export const jugadoresDelDia: Player[] = [
     nombre: "Nazareno",
     apellido: "SOLIS",
     equipo: "Patronato",
-    posicion: "Delantero"
+    posicion: "Delantero",
+    imageUrl: "/images/jugadores/nazareno.png",
   },
   {
     id: "12",
@@ -105,15 +118,17 @@ export const jugadoresDelDia: Player[] = [
     nombre: "Pablo",
     apellido: "HOFSTETTER",
     equipo: "Patronato",
-    posicion: "Delantero"
+    posicion: "Delantero",
+    imageUrl: "/images/jugadores/pablo.png",
   },
-    {
+  {
     id: "13",
     fecha: "2025-01-13",
     nombre: "Matías",
     apellido: "GARRIDO",
     equipo: "Patronato",
-    posicion: "Volante"
+    posicion: "Volante",
+    imageUrl: "/images/jugadores/matias.png",
   },
   {
     id: "14",
@@ -121,7 +136,8 @@ export const jugadoresDelDia: Player[] = [
     nombre: "Iván",
     apellido: "FURIOS",
     equipo: "Patronato",
-    posicion: "Defensor"
+    posicion: "Defensor",
+    imageUrl: "/images/jugadores/ivan.png",
   },
   {
     id: "15",
@@ -129,7 +145,8 @@ export const jugadoresDelDia: Player[] = [
     nombre: "Fernando",
     apellido: "TELECHEA",
     equipo: "Patronato",
-    posicion: "Delantero"
+    posicion: "Delantero",
+    imageUrl: "/images/jugadores/fernando.png",
   },
   {
     id: "17",
@@ -137,7 +154,8 @@ export const jugadoresDelDia: Player[] = [
     nombre: "Bruno",
     apellido: "URRIBARRI",
     equipo: "Patronato",
-    posicion: "Defensor"
+    posicion: "Defensor",
+    imageUrl: "/images/jugadores/bruno.png",
   },
   {
     id: "18",
@@ -145,7 +163,8 @@ export const jugadoresDelDia: Player[] = [
     nombre: "Gabriel",
     apellido: "ÁVALOS",
     equipo: "Patronato",
-    posicion: "Delantero"
+    posicion: "Delantero",
+    imageUrl: "/images/jugadores/gabriel.png",
   },
   {
     id: "19",
@@ -153,7 +172,8 @@ export const jugadoresDelDia: Player[] = [
     nombre: "Axel",
     apellido: "RODRIGUEZ",
     equipo: "Patronato",
-    posicion: "Delantero"
+    posicion: "Delantero",
+    imageUrl: "/images/jugadores/axel.png",
   },
   {
     id: "20",
@@ -161,7 +181,8 @@ export const jugadoresDelDia: Player[] = [
     nombre: "Justo",
     apellido: "GIANI",
     equipo: "Patronato",
-    posicion: "Delantero"
+    posicion: "Delantero",
+    imageUrl: "/images/jugadores/axel.png",
   },
   {
     id: "21",
@@ -169,7 +190,8 @@ export const jugadoresDelDia: Player[] = [
     nombre: "Jorge",
     apellido: "VALDEZ CHAMORRO",
     equipo: "Patronato",
-    posicion: "Volante"
+    posicion: "Volante",
+    imageUrl: "/images/jugadores/axel.png",
   },
   {
     id: "22",
@@ -177,7 +199,8 @@ export const jugadoresDelDia: Player[] = [
     nombre: "Juan Cruz",
     apellido: "ESQUIVEL",
     equipo: "Patronato",
-    posicion: "Delantero"
+    posicion: "Delantero",
+    imageUrl: "/images/jugadores/axel.png",
   },
   {
     id: "23",
@@ -185,7 +208,8 @@ export const jugadoresDelDia: Player[] = [
     nombre: "Lucas",
     apellido: "KRUSPKZY",
     equipo: "Patronato",
-    posicion: "Defensor"
+    posicion: "Defensor",
+    imageUrl: "/images/jugadores/axel.png",
   },
   {
     id: "24",
@@ -193,7 +217,8 @@ export const jugadoresDelDia: Player[] = [
     nombre: "Ignacio",
     apellido: "RUSSO",
     equipo: "Patronato",
-    posicion: "Delantero"
+    posicion: "Delantero",
+    imageUrl: "/images/jugadores/axel.png",
   },
   {
     id: "25",
@@ -201,7 +226,8 @@ export const jugadoresDelDia: Player[] = [
     nombre: "Matías",
     apellido: "PARDO",
     equipo: "Patronato",
-    posicion: "Defensor"
+    posicion: "Defensor",
+    imageUrl: "/images/jugadores/axel.png",
   },
 ]
 

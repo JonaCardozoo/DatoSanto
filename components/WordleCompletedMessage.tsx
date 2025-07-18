@@ -7,20 +7,24 @@ interface WordleCompletedMessageProps {
   gameWon: boolean
   targetWord: string
   playerName: string
+  playerLastName: string
   attempts: number
   maxAttempts: number
   pointsAwarded?: boolean
   userLoggedIn?: boolean
+  playerImageUrl?: string
 }
 
 export default function WordleCompletedMessage({
   gameWon,
   targetWord,
   playerName,
+  playerLastName,
   attempts,
   maxAttempts,
   pointsAwarded = false,
   userLoggedIn = false,
+  playerImageUrl,
 }: WordleCompletedMessageProps) {
   return (
     <div
@@ -46,11 +50,26 @@ export default function WordleCompletedMessage({
             </p>
           )}
 
-          <div className="flex items-center justify-center space-x-2 text-base">
-            <User className="w-5 h-5" />
-            <span>Jugador: {playerName}</span>
-          </div>
         </div>
+
+        {/* Imagen del jugador cuando gana */}
+        {gameWon && playerImageUrl && (
+          <div className="flex justify-center mt-6">
+            <div className="relative">
+              <img 
+                src={playerImageUrl} 
+                alt={`${playerName} - ${targetWord}`}
+                className="w-32 h-32 md:w-40 md:h-40 object-cover rounded-full border-4 border-yellow-400 shadow-lg"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none'
+                }}
+              />
+              <div className="absolute -top-2 -right-2 bg-yellow-400 rounded-full p-2">
+                <Trophy className="w-6 h-6 text-yellow-900" />
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Mensaje de puntos */}
         {gameWon && userLoggedIn && pointsAwarded && (
