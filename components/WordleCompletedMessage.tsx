@@ -87,7 +87,6 @@ export default function WordleCompletedMessage({
           <div className="bg-blue-900/30 border border-blue-500 rounded-lg p-4 mt-4">
             <div className="flex items-center justify-center space-x-2">
               <User className="w-6 h-6 text-blue-400" />
-              <span className="text-blue-300 font-bold text-lg">¡Respuesta correcta!</span>
             </div>
             <p className="text-blue-200 text-sm mt-2">
               <Link href="/auth" className="underline hover:text-blue-100">
@@ -99,7 +98,6 @@ export default function WordleCompletedMessage({
         )}
 
         <div className="pt-4 border-t border-gray-600">
-          <p className="text-gray-300 text-base">¡Volvé mañana para adivinar otro jugador!</p>
           <p className="text-gray-400 text-sm mt-2">Próximo desafío disponible a las 00:00</p>
         </div>
       </div>

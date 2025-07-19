@@ -49,7 +49,7 @@ export default function GameCompletedMessage({
           <div className="bg-blue-900/30 border border-blue-500 rounded-lg p-4 mt-4">
             <div className="flex items-center justify-center space-x-2">
               <User className="w-6 h-6 text-blue-400" />
-              <span className="text-blue-300 font-bold text-lg">¡Respuesta correcta!</span>
+              <span className="text-blue-300 font-bold text-lg">¡Respuesta correctaa!</span>
             </div>
             <p className="text-blue-200 text-sm mt-2">
               <Link href="/auth" className="underline hover:text-blue-100">
