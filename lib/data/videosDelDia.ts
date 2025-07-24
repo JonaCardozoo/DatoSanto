@@ -41,7 +41,7 @@ export const videosDelDia: VideoDelDia[] = [
     fecha: "2025-07-18",
     videoUrl: "/videos/videodeldia5.mp4",
     opciones: ["Gol por arriba", "Engancha y gol", "Engancha y afuera", "Gol por abajo"],
-    respuestaCorrecta: 0, 
+    respuestaCorrecta: 2, 
     duracionPreview: 6,
   },
 ]
