@@ -61,7 +61,7 @@ export const triviasDelDia: Trivia[] = [
     id: "8",
     fecha: "2025-01-10",
     pregunta: "¿Qué jugador de Patronato usó la camiseta número 10 durante la Copa Libertadores?",
-    opciones: ["Jorge Valdez Chamorro", "Nazareno Solís", "Tiago Banega", "Juan Cruz Esquivel"],
+    opciones: ["Jorge Valdez Chamorro", "Nazareno Solís", "Juan Pablo Barinaga", "Juan Cruz Esquivel"],
     respuestaCorrecta: 0 // Jorge Valdez Chamorro
   },
     {
