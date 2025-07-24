@@ -128,7 +128,7 @@ export const jugadoresDelDia: Player[] = [
     apellido: "GARRIDO",
     equipo: "Patronato",
     posicion: "Volante",
-    imageUrl: "/images/jugadores/matias.png",
+    imageUrl: "https://ddc-site.s3.us-east-2.amazonaws.com/sites/diariodecuyo/img/2018/04/09/ddc100418-037f01.jpg",
   },
   {
     id: "14",
