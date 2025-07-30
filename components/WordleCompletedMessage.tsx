@@ -13,6 +13,7 @@ interface WordleCompletedMessageProps {
   pointsAwarded?: boolean
   userLoggedIn?: boolean
   playerImageUrl?: string
+  pointsEarned: number
 }
 
 export default function WordleCompletedMessage({
@@ -25,6 +26,7 @@ export default function WordleCompletedMessage({
   pointsAwarded = false,
   userLoggedIn = false,
   playerImageUrl,
+  pointsEarned,
 }: WordleCompletedMessageProps) {
   return (
     <div
@@ -77,6 +79,7 @@ export default function WordleCompletedMessage({
             <div className="flex items-center justify-center space-x-2">
               <Star className="w-6 h-6 text-yellow-400" />
               <span className="text-yellow-300 font-bold text-lg">¡Ganaste 10 puntos!</span>
+              <span className="text-yellow-300 font-bold text-lg">¡Ganaste {pointsEarned} puntos!</span>
             </div>
             <p className="text-yellow-200 text-sm mt-2">Tus puntos se actualizaron automáticamente</p>
           </div>

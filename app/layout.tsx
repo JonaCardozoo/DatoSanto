@@ -1,6 +1,10 @@
 import type React from "react"
 import type { Metadata } from "next"
 import "./globals.css"
+<<<<<<< HEAD
+=======
+import {Toaster} from "@/components/ui/toaster"
+>>>>>>> cdb9605 (juegos)
 
 export const metadata: Metadata = {
   title: "DatoSanto - Trivia sobre Patronato",
@@ -22,7 +26,13 @@ export default function RootLayout({
         <meta httpEquiv="Expires" content="0" />
         <link rel="shortcut icon" href="/DATOSANTO.ico" type="image/x-icon" />
       </head>
+<<<<<<< HEAD
       <body className="min-h-screen  text-white">{children}</body>
+=======
+      <body className="min-h-screen  text-white">{children}
+        <Toaster />
+      </body>
+>>>>>>> cdb9605 (juegos)
     </html>
   )
 }

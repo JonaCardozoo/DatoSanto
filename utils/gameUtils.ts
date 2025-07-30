@@ -70,7 +70,11 @@ export function hasPlayedToday(gameType: GameType): boolean {
 }
 
 // Otorgar puntos sólo una vez por día
+<<<<<<< HEAD
 export async function awardPoints(gameType: GameType): Promise<boolean> {
+=======
+export async function awardPoints(gameType: GameType,customPoints?:number): Promise<boolean> {
+>>>>>>> cdb9605 (juegos)
   const supabase = getSupabaseClient()
   const user = getAuthCurrentUser()
   if (!supabase || !user) return false
@@ -99,7 +103,11 @@ export async function awardPoints(gameType: GameType): Promise<boolean> {
     }
 
     // Otorgar puntos
+<<<<<<< HEAD
     const points = 10
+=======
+    const points = customPoints ?? 10
+>>>>>>> cdb9605 (juegos)
 
     const { data: existingProfile, error: profileError } = await supabase
       .from("profiles")
