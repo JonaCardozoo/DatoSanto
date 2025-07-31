@@ -432,17 +432,6 @@ export default function FootballGame() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
       <GameHeader />
-
-      {/* Panel de usuario */}
-      {currentUser && (
-        <div className="bg-gray-800 p-4 text-center">
-          <div className="flex items-center justify-center gap-4">
-            <span className="text-green-400">✓ {currentUser.email}</span>
-            <span className="text-yellow-400">Logueado</span>
-          </div>
-        </div>
-      )}
-
       {/* Vista cuando el juego está terminado */}
       {gameCompletedToday && gameOutcome !== null ? (
         <div className="flex flex-col items-center justify-center gap-8 p-8 min-h-[calc(100vh-120px)]">

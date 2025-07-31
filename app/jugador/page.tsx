@@ -245,6 +245,7 @@ export default function JugadorPage() {
               pointsEarned={pointsEarned}
               userLoggedIn={!!user}
               playerImageUrl={currentPlayer!.imageUrl}
+              
             />
           </>
         ) : hasPlayed ? (

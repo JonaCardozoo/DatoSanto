@@ -67,15 +67,6 @@ export default function GameControls({
         <h2 className="text-2xl font-bold text-red-600 uppercase">{currentClubName}</h2>
       </div>
 
-      {/* Contador de pistas */}
-      <div className="flex items-center space-x-2 bg-blue-50 px-3 py-2 rounded-lg">
-        <Lightbulb className="w-5 h-5 text-blue-600" />
-        <span className="text-blue-700 font-medium text-sm">
-          Pistas: {hintsUsed}/{maxHints}
-        </span>
-        {remainingHints > 0 && <span className="text-blue-600 text-xs">({remainingHints} restantes)</span>}
-      </div>
-
       <form onSubmit={handleSubmit} className="flex flex-col items-center space-y-4 w-full max-w-sm">
         <Input
           type="text"

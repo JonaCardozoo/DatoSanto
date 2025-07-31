@@ -19,7 +19,7 @@ export default function FootballPitch({
   flippingPlayer = null,
 }: FootballPitchProps) {
   return (
-    <div className="relative w-[500px] h-[600px] bg-green-700 rounded-lg overflow-hidden shadow-lg border-4 border-white">
+    <div className="relative w-full max-w-[500px] aspect-[5/6] bg-green-700 rounded-lg overflow-hidden shadow-lg border-4 border-white mx-auto my-4">
       {/* Field Lines */}
       <div className="absolute inset-0 border-2 border-white m-4 rounded-lg">
         {/* Center Circle */}
@@ -40,7 +40,7 @@ export default function FootballPitch({
           <div
             key={pos.id}
             className={cn(
-              "absolute flex flex-col items-center justify-center w-20 h-20 rounded-full border-2",
+              "absolute flex flex-col items-center justify-center w-[17%] h-[14%] rounded-full border-2",
               "transform -translate-x-1/2 -translate-y-1/2",
               "border-red-500 bg-red-500/20 shadow-lg",
               pos.type === "coach" ? "right-0 top-0 translate-x-1/2 -translate-y-1/2" : "",
@@ -85,7 +85,7 @@ export default function FootballPitch({
                   className="rounded-full object-cover w-full h-full"
                 />
                 {showPlayerNames && (
-                  <span className="absolute bottom-[-25px] left-1/2 transform -translate-x-1/2 text-white text-xs font-bold whitespace-nowrap bg-black/50 px-2 py-1 rounded">
+                  <span className="absolute bottom-[-30px] left-1/2 transform -translate-x-1/2 text-white text-xs font-bold whitespace-nowrap bg-black/50 px-2 py-1 rounded">
                     {playerAtSlot.player.name.split(" ").pop()}
                   </span>
                 )}

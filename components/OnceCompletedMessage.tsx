@@ -10,7 +10,7 @@ interface GameCompletedMessageProps {
   userLoggedIn?: boolean
 }
 
-export default function GameCompletedMessage({
+export default function OnceCompletedMessage({
   isCorrect,
   correctAnswer,
   pointsAwarded = false,
