@@ -47,7 +47,7 @@ export async function markAsPlayedToday(
     const { error } = await supabase.from("game_sessions").insert({
       user_id: user.id,
       game_type: gameType,
-      date: gameDate, // Cambio aquí
+      date: gameDate,
       completed: true,
       won,
       attempts: null,
