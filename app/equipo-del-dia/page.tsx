@@ -6,6 +6,7 @@ import FootballPitch from "../../components/football-pitch"
 import GameControls from "../../components/game-controls"
 import GameCompletedMessage from "../../components/GameCompletedMessage"
 import PlayerSelection from "../../components/player-selection"
+import { GiSoccerKick } from "react-icons/gi";
 import {
   players,
   fixedSecondaryClubName,
@@ -20,6 +21,11 @@ import { GAME_TYPES, getTimeUntilReset, getGameDateString } from "@/utils/dateUt
 import { markAsPlayedToday, awardPoints } from "@/utils/gameUtils"
 import { getCurrentUser } from "@/utils/jwt-auth"
 import GameHeader from "../../components/GameHeader"
+import { ArrowLeft, Play } from "lucide-react"
+import Link from "next/link"
+import { useState } from "react"
+import GuestWarningModal from "@/components/GuestWarningModal"
+import router from "next/router"
 
 const GAME_TYPE_EQUIPO = GAME_TYPES.EQUIPO
 const GAME_STATE_KEY = `futfactos-${GAME_TYPE_EQUIPO}-game-state`
@@ -35,6 +41,8 @@ export default function FootballGame() {
   const [hintedPlayerName, setHintedPlayerName] = React.useState("")
   const [gameOutcome, setGameOutcome] = React.useState<"win" | "lose" | null>(null)
   const [hintsUsed, setHintsUsed] = React.useState(0) // Solo contador total de pistas
+  const [user, setUser] = useState<any>(null)
+  const [showGuestWarning, setShowGuestWarning] = useState(false)
 
   // Estados para el sistema de puntos y autenticación
   const [userLoggedIn, setUserLoggedIn] = React.useState(false)
@@ -60,94 +68,101 @@ export default function FootballGame() {
     setCurrentUser(user)
     return isLoggedIn
   }
+  const handleLogin = () => {
+    router.push("/auth")
+    setShowGuestWarning(false)
+  }
 
+  const handleCloseWarning = () => {
+    setShowGuestWarning(false)
+  }
   // Efecto para cargar el estado del juego al inicio
   React.useEffect(() => {
-  setCurrentFormation(getDailyFormation())
-  checkUserAuthentication()
+    setCurrentFormation(getDailyFormation())
+    checkUserAuthentication()
 
-  if (typeof window !== "undefined") {
-    const gameDate = getGameDateString()
-    const savedStateString = localStorage.getItem(GAME_STATE_KEY)
-    const lastPlayedDateFromStorage = localStorage.getItem(`lastPlayed_${GAME_TYPE_EQUIPO}`)
-    const savedChallengesString = localStorage.getItem(`dailyChallenges_${gameDate}`)
+    if (typeof window !== "undefined") {
+      const gameDate = getGameDateString()
+      const savedStateString = localStorage.getItem(GAME_STATE_KEY)
+      const lastPlayedDateFromStorage = localStorage.getItem(`lastPlayed_${GAME_TYPE_EQUIPO}`)
+      const savedChallengesString = localStorage.getItem(`dailyChallenges_${gameDate}`)
 
 
-    // Cargar o generar desafíos diarios
-    if (savedChallengesString) {
-      try {
-        dailyClubChallenges.current = JSON.parse(savedChallengesString)
-      } catch (e) {
-        console.error("Error al parsear desafíos guardados. Generando nuevos.")
+      // Cargar o generar desafíos diarios
+      if (savedChallengesString) {
+        try {
+          dailyClubChallenges.current = JSON.parse(savedChallengesString)
+        } catch (e) {
+          console.error("Error al parsear desafíos guardados. Generando nuevos.")
+          dailyClubChallenges.current = getDailyRandomClubChallenges()
+          localStorage.setItem(`dailyChallenges_${gameDate}`, JSON.stringify(dailyClubChallenges.current))
+        }
+      } else {
         dailyClubChallenges.current = getDailyRandomClubChallenges()
         localStorage.setItem(`dailyChallenges_${gameDate}`, JSON.stringify(dailyClubChallenges.current))
       }
-    } else {
-      dailyClubChallenges.current = getDailyRandomClubChallenges()
-      localStorage.setItem(`dailyChallenges_${gameDate}`, JSON.stringify(dailyClubChallenges.current))
-    }
 
-    // Estado inicial por defecto
-    let initialState: GameState = {
-      guessedPlayers: [],
-      currentChallengeIndex: 0,
-      gameCompletedToday: false,
-      gameOutcome: null,
-      hintsUsed: 0,
-      pointsAwarded: false,
-    }
+      // Estado inicial por defecto
+      let initialState: GameState = {
+        guessedPlayers: [],
+        currentChallengeIndex: 0,
+        gameCompletedToday: false,
+        gameOutcome: null,
+        hintsUsed: 0,
+        pointsAwarded: false,
+      }
 
-    // Evaluar estado guardado
-    if (lastPlayedDateFromStorage && lastPlayedDateFromStorage !== gameDate) {
-      localStorage.removeItem(GAME_STATE_KEY)
-      localStorage.removeItem(`lastPlayed_${GAME_TYPE_EQUIPO}`)
-      setMessage("¡Nuevo día! Comienza un nuevo desafío.")
-    } else if (savedStateString) {
-      try {
-        const parsedState: GameState = JSON.parse(savedStateString)
-        initialState = {
-          ...parsedState,
-          hintsUsed: parsedState.hintsUsed || 0,
-          pointsAwarded: parsedState.pointsAwarded || false,
-        }
-
-        if (parsedState.gameCompletedToday) {
-          setMessage(`¡Ya jugaste hoy! Vuelve en ${getTimeUntilReset()} para un nuevo desafío.`)
-        } else {
-          setMessage("¡Bienvenido de nuevo! Continúa tu desafío.")
-        }
-      } catch (e) {
-        console.error("Error al parsear estado del juego. Reiniciando.")
+      // Evaluar estado guardado
+      if (lastPlayedDateFromStorage && lastPlayedDateFromStorage !== gameDate) {
         localStorage.removeItem(GAME_STATE_KEY)
         localStorage.removeItem(`lastPlayed_${GAME_TYPE_EQUIPO}`)
-        setMessage("Error al cargar el juego. Se ha reiniciado.")
+        setMessage("¡Nuevo día! Comienza un nuevo desafío.")
+      } else if (savedStateString) {
+        try {
+          const parsedState: GameState = JSON.parse(savedStateString)
+          initialState = {
+            ...parsedState,
+            hintsUsed: parsedState.hintsUsed || 0,
+            pointsAwarded: parsedState.pointsAwarded || false,
+          }
+
+          if (parsedState.gameCompletedToday) {
+            setMessage(`¡Ya jugaste hoy! Vuelve en ${getTimeUntilReset()} para un nuevo desafío.`)
+          } else {
+            setMessage("¡Bienvenido de nuevo! Continúa tu desafío.")
+          }
+        } catch (e) {
+          console.error("Error al parsear estado del juego. Reiniciando.")
+          localStorage.removeItem(GAME_STATE_KEY)
+          localStorage.removeItem(`lastPlayed_${GAME_TYPE_EQUIPO}`)
+          setMessage("Error al cargar el juego. Se ha reiniciado.")
+        }
+      } else if (lastPlayedDateFromStorage === gameDate) {
+        initialState.gameCompletedToday = true
+        initialState.gameOutcome = "lose"
+        setMessage(`¡Ya jugaste hoy! Vuelve en ${getTimeUntilReset()} para un nuevo desafío.`)
+      } else {
+        setMessage("¡Bienvenido! Adivina el jugador del día.")
       }
-    } else if (lastPlayedDateFromStorage === gameDate) {
-      initialState.gameCompletedToday = true
-      initialState.gameOutcome = "lose"
-      setMessage(`¡Ya jugaste hoy! Vuelve en ${getTimeUntilReset()} para un nuevo desafío.`)
-    } else {
-      setMessage("¡Bienvenido! Adivina el jugador del día.")
+
+      // Aplicar estado inicial
+      setGuessedPlayers(initialState.guessedPlayers)
+      setCurrentChallengeIndex(initialState.currentChallengeIndex)
+      setGameCompletedToday(initialState.gameCompletedToday)
+      setGameOutcome(initialState.gameOutcome ?? null)
+      setHintsUsed(initialState.hintsUsed)
+      setPointsAwarded(initialState.pointsAwarded || false)
+
     }
 
-    // Aplicar estado inicial
-    setGuessedPlayers(initialState.guessedPlayers)
-    setCurrentChallengeIndex(initialState.currentChallengeIndex)
-    setGameCompletedToday(initialState.gameCompletedToday)
-    setGameOutcome(initialState.gameOutcome ?? null)
-    setHintsUsed(initialState.hintsUsed)
-    setPointsAwarded(initialState.pointsAwarded || false)
+    const interval = setInterval(() => {
+      setTimeToReset(getTimeUntilReset())
+    }, 60 * 1000)
 
-  }
-
-  const interval = setInterval(() => {
     setTimeToReset(getTimeUntilReset())
-  }, 60 * 1000)
 
-  setTimeToReset(getTimeUntilReset())
-
-  return () => clearInterval(interval)
-}, [])
+    return () => clearInterval(interval)
+  }, [])
 
 
   // Efecto para guardar el estado del juego cada vez que cambie
@@ -297,7 +312,7 @@ export default function FootballGame() {
 
       // SEGUNDO: Intentar otorgar puntos usando las nuevas utilidades
       if (userLoggedIn && !pointsAwarded) {
-        const pointsGranted = awardPoints(GAME_TYPE_EQUIPO)
+        const pointsGranted = awardPoints(GAME_TYPE_EQUIPO, 50)
         if (pointsGranted) {
           setPointsAwarded(true)
         } else {
@@ -432,57 +447,99 @@ export default function FootballGame() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
       <GameHeader />
-      {/* Vista cuando el juego está terminado */}
-      {gameCompletedToday && gameOutcome !== null ? (
-        <div className="flex flex-col items-center justify-center gap-8 p-8 min-h-[calc(100vh-120px)]">
-          <FootballPitch
-            guessedPlayers={guessedPlayers}
-            currentFormation={currentFormation}
-            showPlayerNames={false}
-            flippingPlayer={flippingPlayer}
-          />
-          <GameCompletedMessage
-            isCorrect={gameOutcome === "win"}
-            correctAnswer=""
-            pointsAwarded={pointsAwarded && userLoggedIn}
-            userLoggedIn={userLoggedIn}
-            timeToReset={timeToReset}
-          />
-        </div>
-      ) : (
-        /* Vista durante el juego */
-        <div className="flex flex-col lg:flex-row items-center lg:items-start justify-center gap-8 p-8">
-          <GameControls
-            onGuess={handleGuess}
-            onGiveUp={handleGiveUp}
-            onShowHint={handleShowHint}
-            message={message}
-            currentClubName={currentPrimaryClubName}
-            currentClubLogo={currentPrimaryClubLogo}
-            hintedPlayerName={hintedPlayerName}
-            isHintButtonDisabled={isHintButtonDisabled}
-            disabled={showPlayerSelection}
-            hintsUsed={hintsUsed}
-            maxHints={MAX_HINTS}
-          />
-          <FootballPitch
-            guessedPlayers={guessedPlayers}
-            currentFormation={currentFormation}
-            showPlayerNames={true}
-            flippingPlayer={flippingPlayer}
-          />
 
-          {/* Selector de jugadores múltiples */}
-          {showPlayerSelection && (
-            <PlayerSelection
-              players={multiplePlayersFound}
-              searchedName={searchedName}
-              onPlayerSelect={handlePlayerSelect}
-              onCancel={handleCancelSelection}
-            />
+      <div className="container mx-auto px-4 py-6">
+        {/* Header Section */}
+        <div className="mb-6">
+          <Link href="/" className="inline-flex items-center text-gray-400 hover:text-white transition-colors mb-4">
+            <ArrowLeft className="w-5 h-5 mr-2" />
+            Volver al menú
+          </Link>
+
+          <div className="text-center">
+            <h2 className="text-3xl md:text-4xl font-bold text-red-600 mb-2">Once del Día</h2>
+            <p className="text-gray-300 text-lg mb-2">Ponete a prueba armando un once con estos equipos</p>
+            {!user && (
+              <p className="text-yellow-400 text-sm">
+                💡{" "}
+                <Link href="/auth" className="underline hover:text-yellow-300">
+                  Iniciá sesión
+                </Link>{" "}
+                para ganar puntos y aparecer en el ranking
+              </p>
+            )}
+          </div>
+          {!user && (
+            <GuestWarningModal isOpen={showGuestWarning} onClose={handleCloseWarning} onLogin={handleLogin} />
           )}
         </div>
-      )}
+
+        {/* Main Game Content */}
+        {gameCompletedToday && gameOutcome !== null ? (
+          /* Vista cuando el juego está terminado */
+          <div className="flex flex-col items-center justify-center gap-8">
+            <div className="w-full max-w-2xl">
+              <FootballPitch
+                guessedPlayers={guessedPlayers}
+                currentFormation={currentFormation}
+                showPlayerNames={true}
+                flippingPlayer={flippingPlayer}
+              />
+            </div>
+            <GameCompletedMessage
+              isCorrect={gameOutcome === "win"}
+              correctAnswer=""
+              pointsAwarded={pointsAwarded && userLoggedIn}
+              userLoggedIn={userLoggedIn}
+              timeToReset={timeToReset}
+            />
+          </div>
+        ) : (
+          /* Vista durante el juego */
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+            {/* Panel de controles - Izquierda en desktop, arriba en mobile */}
+            <div className="order-1 lg:order-1">
+              <GameControls
+                onGuess={handleGuess}
+                onGiveUp={handleGiveUp}
+                onShowHint={handleShowHint}
+                message={message}
+                currentClubName={currentPrimaryClubName}
+                currentClubLogo={currentPrimaryClubLogo}
+                hintedPlayerName={hintedPlayerName}
+                isHintButtonDisabled={isHintButtonDisabled}
+                disabled={showPlayerSelection}
+                hintsUsed={hintsUsed}
+                maxHints={MAX_HINTS}
+              />
+            </div>
+
+            {/* Campo de fútbol - Derecha en desktop, abajo en mobile */}
+            <div className="order-2 lg:order-2 flex justify-center">
+              <FootballPitch
+                guessedPlayers={guessedPlayers}
+                currentFormation={currentFormation}
+                showPlayerNames={true}
+                flippingPlayer={flippingPlayer}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Selector de jugadores múltiples - Modal overlay */}
+        {showPlayerSelection && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-gray-800 rounded-lg max-w-md w-full max-h-[80vh] overflow-y-auto">
+              <PlayerSelection
+                players={multiplePlayersFound}
+                searchedName={searchedName}
+                onPlayerSelect={handlePlayerSelect}
+                onCancel={handleCancelSelection}
+              />
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   )
 }

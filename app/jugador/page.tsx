@@ -226,6 +226,18 @@ export default function JugadorPage() {
         <div className="text-center mb-8">
           <h2 className="text-3xl md:text-4xl font-bold text-orange-500 mb-2">JUGADOR DEL DÍA</h2>
           <p className="text-gray-300 text-lg">Adiviná el apellido del jugador en 5 intentos</p>
+          <div className="text-center">
+
+            {!user && (
+              <p className="text-yellow-400 text-sm mt-2">
+                💡{" "}
+                <Link href="/auth" className="underline">
+                  Iniciá sesión
+                </Link>{" "}
+                para ganar puntos y aparecer en el ranking
+              </p>
+            )}
+          </div>
           {!user && (
             <GuestWarningModal isOpen={showGuestWarning} onClose={handleCloseWarning} onLogin={handleLogin} />
           )}
@@ -245,7 +257,7 @@ export default function JugadorPage() {
               pointsEarned={pointsEarned}
               userLoggedIn={!!user}
               playerImageUrl={currentPlayer!.imageUrl}
-              
+
             />
           </>
         ) : hasPlayed ? (

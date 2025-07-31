@@ -138,7 +138,7 @@ if (savedState) {
       let awarded = false
       if (correct && user) {
         console.log("🏆 Intentando otorgar puntos...")
-        awarded = await awardPoints("trivia")
+        awarded = await awardPoints("trivia",20)
         setPointsAwarded(awarded)
         if (awarded) {
           console.log("✅ ¡Puntos otorgados exitosamente!")

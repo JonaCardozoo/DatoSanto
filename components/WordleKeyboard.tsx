@@ -44,28 +44,31 @@ function WordleKeyboard({ onKeyPress, guesses, targetWord, disabled }: WordleKey
 
   const getKeyClass = (key: string) => {
     const status = getKeyStatus(key)
-    const baseClass = "px-2 py-3 rounded font-bold text-sm transition-colors duration-200 "
+    const baseClass =
+      "rounded font-bold transition-colors duration-200 " +
+      "text-xs sm:text-sm md:text-base " +       
+      "px-3 py-2 sm:px-4 sm:py-3 md:px-3 md:py-4 " 
 
     if (key === "ENTER" || key === "DEL") {
-      return baseClass + "bg-gray-600 hover:bg-gray-500 text-white px-4"
+      return baseClass + " bg-gray-600 hover:bg-gray-500 text-white"
     }
 
     switch (status) {
       case "correct":
-        return baseClass + "bg-green-600 text-white"
+        return baseClass + " bg-green-600 text-white"
       case "present":
-        return baseClass + "bg-yellow-600 text-white"
+        return baseClass + " bg-yellow-600 text-white"
       case "absent":
-        return baseClass + "bg-gray-600 text-gray-300"
+        return baseClass + " bg-gray-600 text-gray-300"
       default:
-        return baseClass + "bg-gray-700 hover:bg-gray-600 text-white"
+        return baseClass + " bg-gray-700 hover:bg-gray-600 text-white"
     }
   }
 
   return (
-    <div className="flex flex-col items-center space-y-2">
+    <div className="flex flex-col items-center space-y-1 sm:space-y-2">
       {rows.map((row, rowIndex) => (
-        <div key={rowIndex} className="flex space-x-1">
+        <div key={rowIndex} className="flex space-x-1 sm:space-x-2">
           {row.map((key) => (
             <button
               key={key}
@@ -73,7 +76,7 @@ function WordleKeyboard({ onKeyPress, guesses, targetWord, disabled }: WordleKey
               disabled={disabled}
               className={getKeyClass(key) + (disabled ? " opacity-60 cursor-not-allowed" : " cursor-pointer")}
             >
-              {key === "DEL" ? <Delete className="w-4 h-4" /> : key}
+              {key === "DEL" ? <Delete className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5" /> : key}
             </button>
           ))}
         </div>

@@ -27,43 +27,42 @@ function WordleGrid({ targetWord, guesses, currentGuess, currentRow, maxGuesses 
 
   const getCellClass = (status: string, hasLetter: boolean) => {
     const baseClass =
-      "w-12 h-12 md:w-14 md:h-14 border-2 rounded flex items-center justify-center font-bold text-lg md:text-xl transition-all duration-200 "
+      "w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 border-2 rounded flex items-center justify-center font-bold text-base sm:text-lg md:text-xl transition-all duration-200"
 
     switch (status) {
       case "correct":
-        return baseClass + "bg-green-600 border-green-500 text-white"
+        return baseClass + " bg-green-600 border-green-500 text-white"
       case "present":
-        return baseClass + "bg-yellow-600 border-yellow-500 text-white"
+        return baseClass + " bg-yellow-600 border-yellow-500 text-white"
       case "absent":
-        return baseClass + "bg-gray-600 border-gray-500 text-white"
+        return baseClass + " bg-gray-600 border-gray-500 text-white"
       default:
-        // Para la fila actual, resaltar si tiene letra
         if (hasLetter) {
-          return baseClass + "bg-gray-700 border-gray-500 text-white scale-105"
+          return baseClass + " bg-gray-700 border-gray-500 text-white scale-105"
         }
-        return baseClass + "bg-gray-800 border-gray-600 text-white"
+        return baseClass + " bg-gray-800 border-gray-600 text-white"
     }
   }
 
   return (
-    <div className="flex justify-center">
-      <div className="grid gap-2" style={{ gridTemplateRows: `repeat(${maxGuesses}, 1fr)` }}>
+    <div className="flex justify-center px-2">
+      <div
+        className="grid gap-1 sm:gap-2"
+        style={{ gridTemplateRows: `repeat(${maxGuesses}, 1fr)` }}
+      >
         {Array.from({ length: maxGuesses }).map((_, rowIndex) => (
-          <div key={rowIndex} className="flex gap-2">
+          <div key={rowIndex} className="flex gap-1 sm:gap-2 justify-center">
             {Array.from({ length: targetWord.length }).map((_, colIndex) => {
               let letter = ""
               let status = ""
               let hasLetter = false
 
               if (rowIndex < guesses.length) {
-                // Fila completada
                 letter = guesses[rowIndex][colIndex] || ""
                 status = getLetterStatus(letter, colIndex, guesses[rowIndex])
               } else if (rowIndex === currentRow) {
-                // Fila actual
                 letter = currentGuess[colIndex] || ""
                 hasLetter = !!letter
-                status = ""
               }
 
               return (

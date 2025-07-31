@@ -3,6 +3,7 @@
 import { Trophy, Target, User, Star } from "lucide-react"
 import Link from "next/link"
 
+
 interface WordleCompletedMessageProps {
   gameWon: boolean
   targetWord: string
@@ -29,12 +30,15 @@ export default function WordleCompletedMessage({
   pointsEarned,
 }: WordleCompletedMessageProps) {
   return (
+  <div className="flex items-center justify-center m-10">
     <div
-      className={`rounded-xl p-6 md:p-8 border-2 ${
-        gameWon ? "bg-green-900/30 border-green-500 text-green-100" : "bg-red-900/30 border-red-500 text-red-100"
+      className={`w-full max-w-sm rounded-xl p-6 md:p-8 border-2 shadow-lg text-center ${
+        gameWon
+          ? "bg-green-900/30 border-green-500 text-green-100"
+          : "bg-red-900/30 border-red-500 text-red-100"
       }`}
     >
-      <div className="text-center space-y-4">
+      <div className="space-y-4">
         <div className="flex justify-center">
           {gameWon ? <Trophy className="w-16 h-16 text-yellow-400" /> : <Target className="w-16 h-16 text-red-400" />}
         </div>
@@ -51,10 +55,8 @@ export default function WordleCompletedMessage({
               La respuesta era: <strong>{targetWord}</strong>
             </p>
           )}
-
         </div>
 
-        {/* Imagen del jugador cuando gana */}
         {gameWon && playerImageUrl && (
           <div className="flex justify-center mt-6">
             <div className="relative">
@@ -66,14 +68,11 @@ export default function WordleCompletedMessage({
                   e.currentTarget.style.display = 'none'
                 }}
               />
-              <div className="absolute -top-2 -right-2 bg-yellow-400 rounded-full p-2">
-                <Trophy className="w-6 h-6 text-yellow-900" />
-              </div>
+
             </div>
           </div>
         )}
 
-        {/* Mensaje de puntos */}
         {gameWon && userLoggedIn && pointsAwarded && (
           <div className="bg-yellow-900/30 border border-yellow-500 rounded-lg p-4 mt-4">
             <div className="flex items-center justify-center space-x-2">
@@ -84,7 +83,6 @@ export default function WordleCompletedMessage({
           </div>
         )}
 
-        {/* Mensaje para usuarios no logueados */}
         {gameWon && !userLoggedIn && (
           <div className="bg-blue-900/30 border border-blue-500 rounded-lg p-4 mt-4">
             <div className="flex items-center justify-center space-x-2">
@@ -104,5 +102,7 @@ export default function WordleCompletedMessage({
         </div>
       </div>
     </div>
-  )
+  </div>
+)
+
 }
