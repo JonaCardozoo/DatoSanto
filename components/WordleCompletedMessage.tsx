@@ -78,7 +78,6 @@ export default function WordleCompletedMessage({
           <div className="bg-yellow-900/30 border border-yellow-500 rounded-lg p-4 mt-4">
             <div className="flex items-center justify-center space-x-2">
               <Star className="w-6 h-6 text-yellow-400" />
-              <span className="text-yellow-300 font-bold text-lg">¡Ganaste 10 puntos!</span>
               <span className="text-yellow-300 font-bold text-lg">¡Ganaste {pointsEarned} puntos!</span>
             </div>
             <p className="text-yellow-200 text-sm mt-2">Tus puntos se actualizaron automáticamente</p>

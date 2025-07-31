@@ -37,6 +37,7 @@ const games = [
     color: "from-purple-600 to-purple-800",
     href: "/video",
     difficulty: "Fácil",
+    disabled: true,
   }, 
 
   {
