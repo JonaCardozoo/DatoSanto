@@ -38,23 +38,15 @@ const games = [
     href: "/video",
     difficulty: "Fácil",
   }, 
+
   {
-    id: "proximo1",
-    title: "Próximamente",
-    description: "Nuevo juego en desarrollo",
-    icon: Trophy,
+    id: "equipodeldia",
+    title: "Equipo del dia",
+    description: "Arma el 11 del dia",
+    icon: Target,
     color: "from-gray-600 to-gray-800",
     href: "/equipo-del-dia",
     difficulty: "Dificil",
-  },
-  {
-    id: "proximo2",
-    title: "Próximamente",
-    description: "Otro juego increíble viene en camino",
-    icon: Target,
-    color: "from-gray-600 to-gray-800",
-    href: "#",
-    difficulty: "Pronto",
   },
   {
     id: "trayectoria",

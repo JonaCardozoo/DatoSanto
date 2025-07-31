@@ -26,36 +26,13 @@ export default function JugadorPage() {
   const [currentRow, setCurrentRow] = useState(0)
   const [gameWon, setGameWon] = useState(false)
   const [pointsAwarded, setPointsAwarded] = useState(false)
-<<<<<<< HEAD
   const [showGuestWarning, setShowGuestWarning] = useState(false)
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState<any>(null)
-=======
-  const [pointsEarned, setPointsEarned] = useState(0)
-  const [showGuestWarning, setShowGuestWarning] = useState(false)
-  const [loading, setLoading] = useState(true)
-  const [user, setUser] = useState<any>(null)
-  const [userPoints, setUserPoints] = useState(0)
->>>>>>> cdb9605 (juegos)
 
   const MAX_GUESSES = 5
   const router = useRouter()
 
-<<<<<<< HEAD
-=======
-  // Sistema de puntos por intento
-  const calculatePoints = (attempts: number): number => {
-    const pointsTable: Record<number, number> = {
-      1: 50,
-      2: 40,
-      3: 30,
-      4: 20,
-      5: 10
-    }
-    return pointsTable[attempts] || 0
-  }
-
->>>>>>> cdb9605 (juegos)
   const handleLogin = () => {
     router.push("/auth")
     setShowGuestWarning(false)
@@ -72,12 +49,6 @@ export default function JugadorPage() {
   }, [user, loading])
 
   const submitGuess = useCallback(async () => {
-<<<<<<< HEAD
-=======
-
-    
-
->>>>>>> cdb9605 (juegos)
     if (!currentPlayer || gameCompleted || hasPlayed) return
 
     const newGuesses = [...guesses, currentGuess]
@@ -94,20 +65,8 @@ export default function JugadorPage() {
       setLastGameWon(won)
 
       let awarded = false
-<<<<<<< HEAD
       if (won && user) {
         awarded = await awardPoints("jugador")
-=======
-      let earnedPoints = 0
-      
-      if (won && user) {
-        // Calcular puntos basado en el número de intentos
-        earnedPoints = calculatePoints(newGuesses.length)
-        setPointsEarned(earnedPoints)
-        
-        // Otorgar los puntos calculados
-        awarded = await awardPoints("jugador", earnedPoints)
->>>>>>> cdb9605 (juegos)
         setPointsAwarded(awarded)
       }
 
@@ -118,10 +77,6 @@ export default function JugadorPage() {
         gameWon: won,
         gameCompleted: true,
         pointsAwarded: awarded,
-<<<<<<< HEAD
-=======
-        pointsEarned: earnedPoints,
->>>>>>> cdb9605 (juegos)
         hasPlayed: true,
         lastGameWon: won,
       })
@@ -193,10 +148,6 @@ export default function JugadorPage() {
           setGameWon(parsed.gameWon || false)
           setGameCompleted(parsed.gameCompleted || false)
           setPointsAwarded(parsed.pointsAwarded || false)
-<<<<<<< HEAD
-=======
-          setPointsEarned(parsed.pointsEarned || 0)
->>>>>>> cdb9605 (juegos)
           setHasPlayed(parsed.hasPlayed || false)
           setLastGameWon(parsed.lastGameWon ?? null)
         } else {
@@ -227,29 +178,14 @@ export default function JugadorPage() {
       gameWon,
       gameCompleted,
       pointsAwarded,
-<<<<<<< HEAD
-=======
-      pointsEarned,
->>>>>>> cdb9605 (juegos)
       hasPlayed,
       lastGameWon,
     }
     localStorage.setItem("futfactos-jugador-game-state", JSON.stringify(state))
-<<<<<<< HEAD
   }, [guesses, currentGuess, currentRow, gameWon, gameCompleted, pointsAwarded, hasPlayed, lastGameWon, loading, currentPlayer])
 
   if (loading) {
     return <div className="min-h-screen bg-black flex items-center justify-center"><div className="w-8 h-8 border-2 border-red-600 border-t-transparent rounded-full animate-spin" /></div>
-=======
-  }, [guesses, currentGuess, currentRow, gameWon, gameCompleted, pointsAwarded, pointsEarned, hasPlayed, lastGameWon, loading, currentPlayer])
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
-      </div>
-    )
->>>>>>> cdb9605 (juegos)
   }
 
   return (
@@ -262,7 +198,6 @@ export default function JugadorPage() {
             Volver al menú
           </Link>
         </div>
-<<<<<<< HEAD
         <div className="space-y-8">
           <div className="text-center">
             <h2 className="text-3xl md:text-4xl font-bold text-orange-500 mb-2">JUGADOR DEL DÍA</h2>
@@ -275,111 +210,23 @@ export default function JugadorPage() {
             <>
               <WordleGrid targetWord={currentPlayer!.apellido} guesses={guesses} currentGuess={currentGuess} currentRow={currentRow} maxGuesses={MAX_GUESSES} />
               <WordleKeyboard onKeyPress={handleKeyPress} guesses={guesses} targetWord={currentPlayer!.apellido} disabled={true} />
-=======
-        
-        <div className="space-y-8">
-          <div className="text-center">
-            <h2 className="text-3xl md:text-4xl font-bold text-orange-500 mb-2">JUGADOR DEL DÍA</h2>
-            <p className="text-gray-300 text-lg mb-4">Adiviná el apellido del jugador en 5 intentos</p>
-            
-            {/* Sistema de puntos visible */}
-            <div className="bg-gray-800/50 rounded-lg p-4 inline-block border border-gray-700">
-              <h3 className="text-sm font-semibold text-orange-400 mb-3">🏆 Sistema de Puntos</h3>
-              <div className="grid grid-cols-5 gap-3 text-xs">
-                <div className="text-center">
-                  <div className="bg-green-600 text-white px-2 py-1 rounded font-bold">50</div>
-                  <div className="text-gray-300 mt-1">1er intento</div>
-                </div>
-                <div className="text-center">
-                  <div className="bg-blue-600 text-white px-2 py-1 rounded font-bold">40</div>
-                  <div className="text-gray-300 mt-1">2do intento</div>
-                </div>
-                <div className="text-center">
-                  <div className="bg-purple-600 text-white px-2 py-1 rounded font-bold">30</div>
-                  <div className="text-gray-300 mt-1">3er intento</div>
-                </div>
-                <div className="text-center">
-                  <div className="bg-orange-600 text-white px-2 py-1 rounded font-bold">20</div>
-                  <div className="text-gray-300 mt-1">4to intento</div>
-                </div>
-                <div className="text-center">
-                  <div className="bg-red-600 text-white px-2 py-1 rounded font-bold">10</div>
-                  <div className="text-gray-300 mt-1">5to intento</div>
-                </div>
-              </div>
-            </div>
-
-            {!user && (
-              <GuestWarningModal 
-                isOpen={showGuestWarning} 
-                onClose={handleCloseWarning} 
-                onLogin={handleLogin} 
-              />
-            )}
-          </div>
-
-          {gameCompleted ? (
-            <>
-              <WordleGrid 
-                targetWord={currentPlayer!.apellido} 
-                guesses={guesses} 
-                currentGuess={currentGuess} 
-                currentRow={currentRow} 
-                maxGuesses={MAX_GUESSES} 
-              />
-              <WordleKeyboard 
-                onKeyPress={handleKeyPress} 
-                guesses={guesses} 
-                targetWord={currentPlayer!.apellido} 
-                disabled={true} 
-              />
->>>>>>> cdb9605 (juegos)
               <WordleCompletedMessage 
                 gameWon={gameWon} 
                 targetWord={currentPlayer!.apellido} 
                 playerName={currentPlayer!.nombre} 
                 attempts={guesses.length} 
                 maxAttempts={MAX_GUESSES} 
-<<<<<<< HEAD
                 pointsAwarded={pointsAwarded} 
-=======
-                pointsAwarded={pointsAwarded}
-                pointsEarned={pointsEarned}
->>>>>>> cdb9605 (juegos)
                 userLoggedIn={!!user}
                 playerImageUrl={currentPlayer!.imageUrl}
               />
             </>
           ) : hasPlayed ? (
-<<<<<<< HEAD
             <AlreadyPlayedMessage onPlayAgain={handlePlayAgain} gameType="jugador" playedToday={true} lastGameWon={lastGameWon} />
           ) : (
             <>
               <WordleGrid targetWord={currentPlayer!.apellido} guesses={guesses} currentGuess={currentGuess} currentRow={currentRow} maxGuesses={MAX_GUESSES} />
               <WordleKeyboard onKeyPress={handleKeyPress} guesses={guesses} targetWord={currentPlayer!.apellido} disabled={false} />
-=======
-            <AlreadyPlayedMessage 
-              onPlayAgain={handlePlayAgain} 
-              gameType="jugador" 
-              playedToday={true} 
-              lastGameWon={lastGameWon} 
-            />
-          ) : (
-            <>
-              <WordleGrid 
-                targetWord={currentPlayer!.apellido} 
-                guesses={guesses} 
-                currentGuess={currentGuess} 
-                currentRow={currentRow} 
-                maxGuesses={MAX_GUESSES} 
-              />
-              <WordleKeyboard 
-                onKeyPress={handleKeyPress} 
-                guesses={guesses} 
-                targetWord={currentPlayer!.apellido} 
-                disabled={false} 
-              />
->>>>>>> cdb9605 (juegos)
             </>
           )}
         </div>

@@ -20,13 +20,6 @@ export function getGameDateString(): string {
   const day = getPart("day")
   const hour = parseInt(getPart("hour"))
 
-  // Obtener partes bien separadas
-  const parts = formatter.formatToParts(now)
-  const getPart = (type: string) => parts.find((p) => p.type === type)?.value || "00"
-  const year = getPart("year")
-  const month = getPart("month")
-  const day = getPart("day")
-  const hour = Number.parseInt(getPart("hour"))
   // Crear la fecha base
   const gameDate = new Date(`${year}-${month}-${day}T00:00:00`)
   if (hour >= 23) {
@@ -38,10 +31,6 @@ export function getGameDateString(): string {
   return dateStr
 }
 
-
-  const dateStr = gameDate.toISOString().split("T")[0]
-  return dateStr
-}
 
 // Función auxiliar para obtener la fecha real de hoy
 export function getTodayAsString(): string {
@@ -58,9 +47,6 @@ export const GAME_TYPES = {
   
 } as const
 
-  EQUIPO: "equipo",
-  TRAYECTORIA: "trayectoria",
-} as const
 export type GameType = (typeof GAME_TYPES)[keyof typeof GAME_TYPES]
 
 // Función para verificar si se ha jugado hoy (usa la fecha de juego que cambia a las 23:00)
@@ -87,11 +73,6 @@ export function canPlayAgain(gameType: GameType): boolean {
   // Comparar las cadenas de fecha directamente
   const result = gameDateString > lastPlayedDateString
   
-  if (!lastPlayedDateString) {
-    return true // Si no hay registro, puede jugar
-  }
-  // Comparar las cadenas de fecha directamente
-  const result = gameDateString > lastPlayedDateString
   return result
 }
 
