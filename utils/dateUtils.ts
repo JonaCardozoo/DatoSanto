@@ -54,6 +54,8 @@ export const GAME_TYPES = {
   TRIVIA: "trivia",
   JUGADOR: "jugador",
   VIDEO: "video",
+  EQUIPO: "equipo",
+  
 } as const
 
   EQUIPO: "equipo",

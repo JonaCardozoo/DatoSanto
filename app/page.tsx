@@ -39,15 +39,13 @@ const games = [
     difficulty: "Fácil",
   }, 
   {
-<<<<<<< HEAD
     id: "proximo1",
     title: "Próximamente",
     description: "Nuevo juego en desarrollo",
     icon: Trophy,
     color: "from-gray-600 to-gray-800",
-    href: "#",
-    difficulty: "Pronto",
-    disabled: true,
+    href: "/equipo-del-dia",
+    difficulty: "Dificil",
   },
   {
     id: "proximo2",
@@ -57,14 +55,6 @@ const games = [
     color: "from-gray-600 to-gray-800",
     href: "#",
     difficulty: "Pronto",
-=======
-    id: "once",
-    title: "Equipo del Día",
-    description: "Arma el once",
-    icon: Trophy,
-    color: "from-gray-600 to-gray-800",
-    href: "/equipo-del-dia",
-    difficulty: "Dificil",
   },
   {
     id: "trayectoria",
@@ -74,7 +64,6 @@ const games = [
     color: "from-gray-600 to-gray-800",
     href: "/trayectoria-del-dia",
     difficulty: "Intermedio",
->>>>>>> cdb9605 (juegos)
     disabled: true,
   },
 ]
