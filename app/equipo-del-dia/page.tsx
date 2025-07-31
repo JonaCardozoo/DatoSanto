@@ -17,13 +17,8 @@ import {
   type GameState,
 } from "@/lib/data/players"
 import { GAME_TYPES, getTimeUntilReset, getGameDateString } from "@/utils/dateUtils"
-<<<<<<< HEAD
 import { markAsPlayedToday, awardPoints } from "@/utils/gameUtils"
 import { getCurrentUser } from "@/utils/jwt-auth"
-=======
-import { markAsPlayedToday, awardPoints } from "@/utils/gameUtils" // Asegúrate de que la ruta sea correcta
-import { getCurrentUser } from "@/utils/jwt-auth" // Asegúrate de que la ruta sea correcta
->>>>>>> origin/Jona
 import GameHeader from "../../components/GameHeader"
 
 const GAME_TYPE_EQUIPO = GAME_TYPES.EQUIPO
@@ -55,10 +50,6 @@ export default function FootballGame() {
   const [flippingPlayer, setFlippingPlayer] = React.useState<string | null>(null)
 
   const isFirstRender = useRef(true)
-<<<<<<< HEAD
-=======
-  // dailyClubChallenges se inicializará desde localStorage o se generará
->>>>>>> origin/Jona
   const dailyClubChallenges = useRef<ClubChallenge[]>([])
 
   // Función para verificar si el usuario está logueado
@@ -72,7 +63,6 @@ export default function FootballGame() {
 
   // Efecto para cargar el estado del juego al inicio
   React.useEffect(() => {
-<<<<<<< HEAD
   setCurrentFormation(getDailyFormation())
   checkUserAuthentication()
 
@@ -159,99 +149,6 @@ export default function FootballGame() {
   return () => clearInterval(interval)
 }, [])
 
-=======
-    setCurrentFormation(getDailyFormation())
-    checkUserAuthentication()
-
-    if (typeof window === "undefined") return // Asegurarse de que se ejecuta solo en el cliente
-
-    const gameDate = getGameDateString()
-    const savedStateString = localStorage.getItem(GAME_STATE_KEY)
-
-    let loadedState: GameState | null = null
-    if (savedStateString) {
-      try {
-        loadedState = JSON.parse(savedStateString)
-      } catch (e) {
-        console.error("Error al parsear el estado del juego de localStorage, se tratará como nuevo juego.", e)
-        // Si el parseo falla, loadedState permanece null
-      }
-    }
-
-    // --- DEBUGGING LOGS ---
-    console.log("--- INICIO DE CARGA DE ESTADO ---")
-    console.log("DEBUG: gameDate (actual):", gameDate)
-    console.log("DEBUG: savedStateString (raw from localStorage):", savedStateString)
-    console.log("DEBUG: loadedState (parsed):", loadedState)
-    console.log("DEBUG: loadedState?.dailyChallenges?.length:", loadedState?.dailyChallenges?.length)
-    console.log("DEBUG: loadedState?.date === gameDate:", loadedState?.date === gameDate)
-    // --- FIN DEBUGGING LOGS ---
-
-    // Determinar si debemos cargar un juego existente o iniciar uno nuevo
-    const shouldLoadExistingGame =
-      loadedState && // Hay un estado parseado
-      loadedState.dailyChallenges &&
-      loadedState.dailyChallenges.length > 0 && // Tiene desafíos válidos
-      loadedState.date === gameDate // Y es para el día de juego actual
-
-    console.log("DEBUG: shouldLoadExistingGame will be:", shouldLoadExistingGame)
-
-    let currentDailyChallenges: ClubChallenge[] = []
-    let currentChallengeIndexValue = 0
-    let currentGuessedPlayers: Array<{ player: Player; assignedSlotId: string }> = []
-    let currentHintsUsed = 0
-    let currentGameCompletedToday = false
-    let currentGameOutcome: "win" | "lose" | null = null
-    let currentPointsAwarded = false
-
-    if (shouldLoadExistingGame) {
-      console.log("DEBUG: shouldLoadExistingGame es TRUE. Cargando estado existente.")
-      currentDailyChallenges = loadedState!.dailyChallenges // Usamos '!' porque shouldLoadExistingGame ya verificó que no es null
-      currentChallengeIndexValue = loadedState!.currentChallengeIndex
-      currentGuessedPlayers = loadedState!.guessedPlayers
-      currentHintsUsed = loadedState!.hintsUsed
-      currentGameCompletedToday = loadedState!.gameCompletedToday
-      currentGameOutcome = loadedState!.gameOutcome
-      currentPointsAwarded = loadedState!.pointsAwarded
-      setMessage(
-        currentGameCompletedToday
-          ? `¡Ya jugaste hoy! Vuelve en ${getTimeUntilReset()} para un nuevo desafío.`
-          : "¡Bienvenido de nuevo! Continúa tu desafío.",
-      )
-    } else {
-      console.log("DEBUG: shouldLoadExistingGame es FALSE. Iniciando un nuevo juego.")
-      currentDailyChallenges = getDailyRandomClubChallenges()
-      currentChallengeIndexValue = 0
-      currentGuessedPlayers = []
-      currentHintsUsed = 0
-      currentGameCompletedToday = false
-      currentGameOutcome = null
-      currentPointsAwarded = false
-      setMessage("¡Nuevo día! Comienza un nuevo desafío.")
-      // NO ELIMINAR localStorage aquí. El siguiente useEffect lo sobrescribirá.
-    }
-
-    // Establecer el valor del useRef y los estados de React
-    dailyClubChallenges.current = currentDailyChallenges
-    console.log("DEBUG: dailyClubChallenges.current after init:", dailyClubChallenges.current)
-    setGuessedPlayers(currentGuessedPlayers)
-    setCurrentChallengeIndex(currentChallengeIndexValue)
-    setGameCompletedToday(currentGameCompletedToday)
-    setGameOutcome(currentGameOutcome)
-    setHintsUsed(currentHintsUsed)
-    setPointsAwarded(currentPointsAwarded)
-
-    console.log("--- FIN DE CARGA DE ESTADO ---")
-
-    const interval = setInterval(() => {
-      setTimeToReset(getTimeUntilReset())
-    }, 60 * 1000)
-
-    setTimeToReset(getTimeUntilReset())
-
-    return () => clearInterval(interval)
-  }, []) // Array de dependencias vacío para que se ejecute solo en la carga inicial
->>>>>>> origin/Jona
 
   // Efecto para guardar el estado del juego cada vez que cambie
   React.useEffect(() => {
@@ -268,20 +165,9 @@ export default function FootballGame() {
         gameOutcome,
         hintsUsed,
         pointsAwarded,
-<<<<<<< HEAD
         dailyChallenges: dailyClubChallenges.current,
       }
       localStorage.setItem(GAME_STATE_KEY, JSON.stringify(gameState))
-=======
-        dailyChallenges: dailyClubChallenges.current, // GUARDAR LOS DESAFÍOS DIARIOS
-        date: getGameDateString(), // Asegurarse de guardar la fecha del juego
-      }
-      console.log("--- INTENTANDO GUARDAR ESTADO ---")
-      console.log("Estado a guardar:", gameState)
-      localStorage.setItem(GAME_STATE_KEY, JSON.stringify(gameState))
-      console.log("Estado guardado en localStorage (después de setItem):", localStorage.getItem(GAME_STATE_KEY))
-      console.log("--- FIN INTENTO DE GUARDADO ---")
->>>>>>> origin/Jona
     }
   }, [guessedPlayers, currentChallengeIndex, gameCompletedToday, gameOutcome, hintsUsed, pointsAwarded])
 
@@ -329,14 +215,6 @@ export default function FootballGame() {
       return true
     })
 
-<<<<<<< HEAD
-=======
-    console.log(
-      "Valid players found:",
-      validPlayers.map((p) => ({ name: p.name, position: p.position })),
-    )
-
->>>>>>> origin/Jona
     if (validPlayers.length === 0) {
       // Verificar qué condición específica falló para dar un mensaje más preciso
       const anyPlayerFound = foundPlayers.find((player) => {
@@ -366,10 +244,6 @@ export default function FootballGame() {
 
     // Si hay múltiples jugadores válidos, mostrar selector
     if (validPlayers.length > 1) {
-<<<<<<< HEAD
-=======
-      console.log("Showing player selection with players:", validPlayers)
->>>>>>> origin/Jona
       setMultiplePlayersFound(validPlayers)
       setSearchedName(playerName)
       setShowPlayerSelection(true)
@@ -381,11 +255,7 @@ export default function FootballGame() {
     processPlayerSelection(validPlayers[0])
   }
 
-<<<<<<< HEAD
   const processPlayerSelection = (selectedPlayer: Player) => {
-=======
-  const processPlayerSelection = async (selectedPlayer: Player) => {
->>>>>>> origin/Jona
     // Encontrar slot disponible para el jugador seleccionado
     const matchingSlots = currentFormation.filter((p) => p.positionKey === selectedPlayer.position)
     const occupiedSlotIds = guessedPlayers.map((gp) => gp.assignedSlotId)
@@ -408,10 +278,6 @@ export default function FootballGame() {
       setFlippingPlayer(null)
     }, 700) // Un poco más de tiempo para que se vea bien
 
-<<<<<<< HEAD
-=======
-    console.log("Estado de guessedPlayers después de setGuessedPlayers:", newGuessedPlayers)
->>>>>>> origin/Jona
     setMessage(`¡Correcto! ${selectedPlayer.name} ha sido colocado en el campo como ${selectedPlayer.position}.`)
 
     // Cerrar selector si estaba abierto
@@ -425,7 +291,6 @@ export default function FootballGame() {
       setGameCompletedToday(true)
       setGameOutcome("win")
 
-<<<<<<< HEAD
       // PRIMERO: Marcar como jugado en localStorage (método original)
       const gameDate = getGameDateString()
       localStorage.setItem(`lastPlayed_${GAME_TYPE_EQUIPO}`, gameDate)
@@ -440,22 +305,6 @@ export default function FootballGame() {
       }
 
       // TERCERO: Guardar en Supabase (opcional, no bloquea el juego)
-=======
-      // Intentar otorgar puntos usando las nuevas utilidades
-      if (userLoggedIn && !pointsAwarded) {
-        awardPoints(GAME_TYPE_EQUIPO).then((pointsGranted) => {
-          // Usar .then() para manejar la promesa
-          if (pointsGranted) {
-            setPointsAwarded(true)
-            console.log("Puntos otorgados exitosamente")
-          } else {
-            console.log("No se pudieron otorgar puntos (ya otorgados o usuario no logueado)")
-          }
-        })
-      }
-
-      // Guardar en Supabase y marcar como jugado (esto también setea lastPlayed_equipo)
->>>>>>> origin/Jona
       markAsPlayedToday(GAME_TYPE_EQUIPO, true, {
         guessedPlayers: newGuessedPlayers,
         currentChallengeIndex,
@@ -472,10 +321,6 @@ export default function FootballGame() {
     setTimeout(() => {
       const nextIndex = (currentChallengeIndex + 1) % dailyClubChallenges.current.length
       setCurrentChallengeIndex(nextIndex)
-<<<<<<< HEAD
-=======
-      console.log("currentChallengeIndex después de setTimeout:", nextIndex)
->>>>>>> origin/Jona
       setMessage(
         `¡Nuevo desafío! Adivina un jugador para ${dailyClubChallenges.current[nextIndex].primaryClubName} y ${secondaryClubName}.`,
       )
@@ -493,11 +338,7 @@ export default function FootballGame() {
     setMessage("Selección cancelada. Intenta con otro nombre.")
   }
 
-<<<<<<< HEAD
   const handleGiveUp = () => {
-=======
-  const handleGiveUp = async () => {
->>>>>>> origin/Jona
     if (gameCompletedToday) {
       setMessage(`¡Ya jugaste hoy! Vuelve en ${getTimeUntilReset()} para un nuevo desafío.`)
       return
@@ -506,15 +347,11 @@ export default function FootballGame() {
     setGameCompletedToday(true)
     setGameOutcome("lose")
 
-<<<<<<< HEAD
     // PRIMERO: Marcar como jugado en localStorage (método original)
     const gameDate = getGameDateString()
     localStorage.setItem(`lastPlayed_${GAME_TYPE_EQUIPO}`, gameDate)
 
     // SEGUNDO: Guardar en Supabase (opcional, no bloquea el juego)
-=======
-    // Guardar en Supabase y marcar como jugado (esto también setea lastPlayed_equipo)
->>>>>>> origin/Jona
     markAsPlayedToday(GAME_TYPE_EQUIPO, false, {
       guessedPlayers,
       currentChallengeIndex,
@@ -571,17 +408,9 @@ export default function FootballGame() {
   }
 
   const handleResetGame = () => {
-<<<<<<< HEAD
     if (typeof window !== "undefined") {
       localStorage.removeItem(GAME_STATE_KEY)
       localStorage.removeItem(`lastPlayed_${GAME_TYPE_EQUIPO}`)
-=======
-    console.log("--- Reiniciando juego manualmente ---")
-    if (typeof window !== "undefined") {
-      localStorage.removeItem(GAME_STATE_KEY)
-      localStorage.removeItem(`lastPlayed_${GAME_TYPE_EQUIPO}`)
-      console.log("Juego reiniciado. localStorage limpiado.")
->>>>>>> origin/Jona
     }
     setGuessedPlayers([])
     setCurrentChallengeIndex(0)
@@ -594,11 +423,6 @@ export default function FootballGame() {
     setHintsUsed(0)
     setPointsAwarded(false)
     setFlippingPlayer(null)
-<<<<<<< HEAD
-=======
-    // Regenerar los desafíos diarios al reiniciar manualmente
-    dailyClubChallenges.current = getDailyRandomClubChallenges()
->>>>>>> origin/Jona
     setMessage("¡Juego reiniciado! Adivina un nuevo jugador.")
   }
 
@@ -670,11 +494,6 @@ export default function FootballGame() {
           )}
         </div>
       )}
-<<<<<<< HEAD
-=======
-
-      
->>>>>>> origin/Jona
     </div>
   )
 }

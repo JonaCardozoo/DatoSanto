@@ -82,10 +82,7 @@ export function storeAuth(session: any): void {
 
   try {
     localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(authData))
-<<<<<<< HEAD
     console.log("✅ Auth guardada correctamente")
-=======
->>>>>>> cdb9605 (juegos)
   } catch (error) {
     console.error("❌ Error guardando auth:", error)
   }
@@ -107,10 +104,7 @@ export function getStoredAuth(): StoredAuth | null {
 
     // Verificar si el token está expirado
     if (isTokenExpired(authData.accessToken)) {
-<<<<<<< HEAD
       console.log("🔄 Token expirado, limpiando storage")
-=======
->>>>>>> cdb9605 (juegos)
       clearStoredAuth()
       return null
     }
@@ -131,10 +125,7 @@ export function clearStoredAuth(): void {
 
   try {
     localStorage.removeItem(AUTH_STORAGE_KEY)
-<<<<<<< HEAD
     console.log("🧹 Auth limpiada del storage")
-=======
->>>>>>> cdb9605 (juegos)
   } catch (error) {
     console.error("❌ Error limpiando auth:", error)
   }

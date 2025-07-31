@@ -31,7 +31,6 @@ export default function TriviaPage() {
       // Definición de initializeGame movida dentro de useEffect
       clearPreviousDayData()
 
-<<<<<<< HEAD
       console.log("🚀 Inicializando juego de Trivia del Día...")
       const currentUser = getCurrentUser()
       setUser(currentUser)
@@ -40,13 +39,6 @@ export default function TriviaPage() {
       const todayTrivia = getTriviaForToday()
       setCurrentTrivia(todayTrivia)
       console.log("❓ Trivia del día:", todayTrivia?.pregunta)
-=======
-      const currentUser = getCurrentUser()
-      setUser(currentUser)
-
-      const todayTrivia = getTriviaForToday()
-      setCurrentTrivia(todayTrivia)
->>>>>>> cdb9605 (juegos)
 
       let playedTodayFromSource = false
       let wonFromSource: boolean | null = null
@@ -70,22 +62,15 @@ export default function TriviaPage() {
             console.error("❌ Error al obtener resultado de la última partida para Trivia:", error)
           } else if (data) {
             wonFromSource = data.won
-<<<<<<< HEAD
             console.log("✅ Resultado de la última partida de Trivia (de BD):", wonFromSource ? "Ganada" : "Perdida")
           } else {
             console.log("⚠️ No se encontró sesión de juego para hoy en BD, a pesar de hasPlayed=true.")
-=======
-          } else {
->>>>>>> cdb9605 (juegos)
           }
         }
 
       } else {
         playedTodayFromSource = await hasPlayedToday("trivia")
-<<<<<<< HEAD
         console.log(`DEBUG app/trivia/page.tsx: hasPlayedGameToday("trivia") (LS) returned ${playedTodayFromSource}`)
-=======
->>>>>>> cdb9605 (juegos)
       }
 
       setHasPlayed(playedTodayFromSource)
@@ -106,15 +91,10 @@ if (savedState) {
       if (gameState.gameCompleted) setGameCompleted(true)
       setHasPlayed(true)
       setLastGameWon(gameState.isCorrect)
-<<<<<<< HEAD
       console.log("💾 Estado cargado desde LS")
     } else {
       // Aún no jugó según BD, pero hay estado local
       console.log("⚠️ Estado local indica juego pero BD no. Manteniendo local hasta que se confirme.")
-=======
-    } else {
-      // Aún no jugó según BD, pero hay estado local
->>>>>>> cdb9605 (juegos)
       setSelectedAnswer(gameState.selectedAnswer)
       setIsCorrect(gameState.isCorrect)
       setPointsAwarded(gameState.pointsAwarded || false)
@@ -126,10 +106,7 @@ if (savedState) {
     // Estado local viejo
     localStorage.removeItem("futfactos-trivia-game-state")
     setGameCompleted(false)
-<<<<<<< HEAD
     console.log("🧹 Estado viejo eliminado")
-=======
->>>>>>> cdb9605 (juegos)
   }
 } else {
   // No hay estado local
@@ -138,10 +115,7 @@ if (savedState) {
 
 
       setLoading(false)
-<<<<<<< HEAD
       console.log("🏁 Inicialización de Trivia del Día completa.")
-=======
->>>>>>> cdb9605 (juegos)
     }
 
     initializeGame() // Llamar a la función interna
@@ -159,7 +133,6 @@ if (savedState) {
       setHasPlayed(true)
       setLastGameWon(correct)
 
-<<<<<<< HEAD
       console.log(`🎯 Respuesta ${correct ? "correcta" : "incorrecta"} seleccionada`)
 
       let awarded = false
@@ -171,23 +144,11 @@ if (savedState) {
           console.log("✅ ¡Puntos otorgados exitosamente!")
         } else {
           console.log("❌ No se pudieron otorgar puntos")
-=======
-
-      let awarded = false
-      if (correct && user) {
-        awarded = await awardPoints("trivia")
-        setPointsAwarded(awarded)
-        if (awarded) {
-        } else {
->>>>>>> cdb9605 (juegos)
         }
       }
 
       await markAsPlayedToday("trivia", correct)
-<<<<<<< HEAD
       console.log("💾 Estado del juego guardado en localStorage y BD (si logueado).")
-=======
->>>>>>> cdb9605 (juegos)
 
       const today = getTodayAsString()
       localStorage.setItem(
@@ -200,19 +161,13 @@ if (savedState) {
           gameCompleted: true,
         }),
       )
-<<<<<<< HEAD
       console.log("💾 Estado final del juego de trivia guardado en localStorage.")
-=======
->>>>>>> cdb9605 (juegos)
     },
     [hasPlayed, gameCompleted, currentTrivia, user],
   )
 
   const handlePlayAgain = useCallback(() => {
-<<<<<<< HEAD
     console.log("🔄 Reiniciando juego para nuevo desafío...")
-=======
->>>>>>> cdb9605 (juegos)
     localStorage.removeItem("futfactos-trivia-game-state")
     window.location.reload()
   }, [])
@@ -265,10 +220,6 @@ if (savedState) {
                 correctAnswer={currentTrivia!.opciones[currentTrivia!.respuestaCorrecta]}
                 pointsAwarded={pointsAwarded}
                 userLoggedIn={!!user}
-<<<<<<< HEAD
-=======
-                
->>>>>>> cdb9605 (juegos)
               />
             </div>
           ) : hasPlayed ? (

@@ -70,10 +70,7 @@ export function hasPlayedToday(gameType: GameType): boolean {
   const storageKey = `lastPlayed_${gameType}`
   const lastPlayed = localStorage.getItem(storageKey)
   const result = lastPlayed === gameDate
-<<<<<<< HEAD
 
-=======
->>>>>>> cdb9605 (juegos)
   return result
 }
 
@@ -82,7 +79,6 @@ export function canPlayAgain(gameType: GameType): boolean {
   if (typeof window === "undefined") return false
   const lastPlayedDateString = localStorage.getItem(`lastPlayed_${gameType}`)
   const gameDateString = getGameDateString()
-<<<<<<< HEAD
 
   if (!lastPlayedDateString) {
     return true // Si no hay registro, puede jugar
@@ -91,13 +87,11 @@ export function canPlayAgain(gameType: GameType): boolean {
   // Comparar las cadenas de fecha directamente
   const result = gameDateString > lastPlayedDateString
   
-=======
   if (!lastPlayedDateString) {
     return true // Si no hay registro, puede jugar
   }
   // Comparar las cadenas de fecha directamente
   const result = gameDateString > lastPlayedDateString
->>>>>>> cdb9605 (juegos)
   return result
 }
 
@@ -108,7 +102,6 @@ export function markAsPlayed(gameType: GameType): void {
   localStorage.setItem(`lastPlayed_${gameType}`, gameDateString)
 }
 
-<<<<<<< HEAD
 export function clearPreviousDayData(): void {
   const gameDate = getGameDateString()
   // Lista de todos los gameTypes para limpiar
@@ -121,20 +114,6 @@ export function clearPreviousDayData(): void {
     const lastPlayed = localStorage.getItem(lastPlayedKey)
     if (lastPlayed && lastPlayed !== gameDate) {
       localStorage.removeItem(gameStateKey)
-=======
-// Función para limpiar los datos del día anterior
-export function clearPreviousDayData(): void {
-  if (typeof window === "undefined") return
-  const gameDate = getGameDateString()
-  const allGameTypes: GameType[] = [GAME_TYPES.TRIVIA, GAME_TYPES.JUGADOR, GAME_TYPES.VIDEO, GAME_TYPES.TRAYECTORIA]
-  allGameTypes.forEach((gameType) => {
-    const lastPlayedKey = `lastPlayed_${gameType}`
-    const gameStateKey = `futfactos-${gameType}-game-state`
-    const lastPlayed = localStorage.getItem(lastPlayedKey)
-    if (lastPlayed && lastPlayed !== gameDate) {
-      localStorage.removeItem(gameStateKey)
-      localStorage.removeItem(lastPlayedKey)
->>>>>>> cdb9605 (juegos)
     }
   })
 }
@@ -143,11 +122,7 @@ export function clearPreviousDayData(): void {
 export function getTimeUntilReset(): string {
   const now = new Date()
   const nextReset = new Date()
-<<<<<<< HEAD
   
-=======
-
->>>>>>> cdb9605 (juegos)
   // Si son antes de las 23:00, el próximo reset es hoy a las 23:00
   // Si son las 23:00 o después, el próximo reset es mañana a las 23:00
   if (now.getHours() < 23) {
@@ -156,11 +131,7 @@ export function getTimeUntilReset(): string {
     nextReset.setDate(nextReset.getDate() + 1)
     nextReset.setHours(23, 0, 0, 0)
   }
-<<<<<<< HEAD
   
-=======
-
->>>>>>> cdb9605 (juegos)
   const diff = nextReset.getTime() - now.getTime()
   const hours = Math.floor(diff / (1000 * 60 * 60))
   const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
@@ -170,8 +141,4 @@ export function getTimeUntilReset(): string {
 // Función alternativa si quieres mantener getTimeUntilMidnight para compatibilidad
 export function getTimeUntilMidnight(): string {
   return getTimeUntilReset()
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> cdb9605 (juegos)
