@@ -514,14 +514,7 @@ export default function FootballGame() {
         </div>
       )}
 
-      {/* Botón de reset manual - solo visible durante el juego */}
-      {!gameCompletedToday && (
-        <div className="absolute bottom-4 right-4">
-          <Button onClick={handleResetGame} variant="secondary" className="bg-gray-700 text-white hover:bg-gray-600">
-            Reiniciar Juego
-          </Button>
-        </div>
-      )}
+      
     </div>
   )
 }
