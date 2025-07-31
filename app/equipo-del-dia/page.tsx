@@ -29,7 +29,7 @@ import router from "next/router"
 
 const GAME_TYPE_EQUIPO = GAME_TYPES.EQUIPO
 const GAME_STATE_KEY = `futfactos-${GAME_TYPE_EQUIPO}-game-state`
-const MAX_HINTS = 3 // Máximo de pistas permitidas
+const MAX_HINTS = 11 // Máximo de pistas permitidas
 
 export default function FootballGame() {
   const [guessedPlayers, setGuessedPlayers] = React.useState<Array<{ player: Player; assignedSlotId: string }>>([])

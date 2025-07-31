@@ -31,33 +31,81 @@ export const players: Player[] = [
   },
   {
     name: "Alan Sosa",
-    clubs: ["Union", "Tigre","Patronato"],
+    clubs: ["Union", "Tigre", "Patronato"],
     position: "PO",
     image: "https://img.a.transfermarkt.technology/portrait/header/545408-1727448128.jpg?lm=1",
   },
   {
     name: "Ian Escobar",
-    clubs: ["Chacarita", "Talleres", "San Martin (SJ)", "Patronato","Godoy Cruz","Aldosivi","Banfield"],
+    clubs: ["Chacarita", "Talleres", "San Martin (SJ)", "Patronato", "Godoy Cruz", "Aldosivi", "Banfield"],
     position: "ED",
     image: "https://img.a.transfermarkt.technology/portrait/header/440164-1730308249.jpg?lm=1",
   },
   {
     name: "Santiago Galucci",
-    clubs: ["San Martin (T)", "Patronato","Central Cordoba"],
+    clubs: ["San Martin (T)", "Patronato", "Central Cordoba"],
     position: "MC",
     image: "https://img.a.transfermarkt.technology/portrait/header/113129-1690407139.JPG?lm=1",
   },
   {
     name: "Marcos Enrique",
-    clubs: ["Patronato","Quilmes","Instituto","Velez Sarsfield"],
+    clubs: ["Patronato", "Quilmes", "Instituto", "Velez Sarsfield"],
     position: "MC",
     image: "https://imagecache.365scores.com/image/upload/f_png,w_250,h_250,c_limit,q_auto:eco,d_Athletes:default.png,r_max,c_thumb,g_face,z_0.65/Athletes/74348",
   },
-    {
-    name: "Marcos Enrique",
-    clubs: ["Patronato","Quilmes","Instituto","Velez Sarsfield"],
+  {
+    name: "Alan Sombra",
+    clubs: ["Patronato", "Chaco For Ever", "Huracan"],
+    position: "EI",
+    image: "https://lh4.googleusercontent.com/proxy/rK5EpgNXbbCnEKztjqx5-LnFVkaoB4ZYQDCHiY2fnb429vChxGhZ1k3Buuw7GNXNEFEJUEQqpr5NlHu0anrw6i1KRE8FdelyD2JS03klaLTpzLjQY3rI0fH5hsFIFx8QcRi3p5sSowBOgr1zG1id62Hkp5zXYpXyFeLb",
+  },
+  {
+    name: "Emanuel Moreno",
+    clubs: ["Patronato", "Agropecuario", "Quilmes", "Guillermo Brown", "Union de Santa Fe", "Los Andes", "Douglas Haig"],
     position: "MC",
-    image: "https://imagecache.365scores.com/image/upload/f_png,w_250,h_250,c_limit,q_auto:eco,d_Athletes:default.png,r_max,c_thumb,g_face,z_0.65/Athletes/74348",
+    image: "https://cdn.soccerwiki.org/images/player/131869.png",
+  },
+  {
+    name: "Walter Rueda",
+    clubs: ["Patronato", "Almagro", "Atlanta"],
+    position: "MC",
+    image: "https://cdn.soccerwiki.org/images/player/131869.png",
+  },
+  {
+    name: "Julian Marcioni",
+    clubs: ["Patronato", "Newells", "Independiente Rivadavia", "Atlanta", "Platense", "Agropecuario"],
+    position: "ED",
+    image: "https://img.a.transfermarkt.technology/portrait/header/633041-1710508658.JPG?lm=1",
+  },
+  {
+    name: "Matias Pardo",
+    clubs: ["Patronato", "Moron", "San Martin (T)", "Atletico Rafaela"],
+    position: "ED",
+    image: "https://img.a.transfermarkt.technology/portrait/header/537093-1636335478.JPG?lm=1",
+  },
+   {
+    name: "Federico Castro",
+    clubs: ["Sarmiento de Junin", "Independiente Rivadavia", "Patronato"],
+    position: "DC",
+    image: "https://img.a.transfermarkt.technology/portrait/header/359042-1724873850.jpg?lm=1",
+  },
+  {
+    name: "Patricio Pablo Perez",
+    clubs: ["Velez Sarsfield", "Patronato", "Chacarita", "San Martin (T)","Defensa y Justicia"],
+    position: "MC",
+    image: "https://www.zerozero.com.ar/img/jogadores/74/73374_med_patricio_perez.jpg",
+  },
+   {
+    name: "Leandro Becerra",
+    clubs: ["Belgrano", "San Martin (SJ)", "Atletico Tucuman","Defensa y Justicia","Central Cordoba"],
+    position: "MC",
+    image: "https://alchetron.com/cdn/leandro-becerra-09751ebb-a625-46de-ac57-bb5f5b97e2b-resize-750.jpeg",
+  },
+     {
+    name: "Fernando Fayart",
+    clubs: ["Sarmiento de Junin","Defensa y Justicia"],
+    position: "DC",
+    image: "https://www.zerozero.com.ar/img/jogadores/46/36846_med_fernando_fayart.gif",
   },
   {
     name: "Gabriel Avalos",
@@ -96,12 +144,7 @@ export const players: Player[] = [
     position: "MC",
     image: "/placeholder.svg?height=80&width=80&text=Gudino",
   },
-  {
-    name: "Lautaro Comas",
-    clubs: ["Patronato", "Estudiantes (LP)", "Defensa y Justicia"],
-    position: "EI",
-    image: "/placeholder.svg?height=80&width=80&text=Comas",
-  },
+
   {
     name: "Damián Lemos",
     clubs: ["Patronato", "Nueva Chicago", "Aldosivi", "Lanús"],
@@ -260,7 +303,7 @@ export const players: Player[] = [
   },
   {
     name: "German Berterame",
-    clubs: ["Talleres", "Arsenal", "Racing Club", "Patronato", "Defensa y Justicia",],
+    clubs: ["Talleres", "Arsenal", "Racing Club", "Patronato"],
     position: "DC",
     image: "https://cdn.soccerwiki.org/images/player/37440.png",
   },
