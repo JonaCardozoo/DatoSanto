@@ -29,7 +29,7 @@ import router from "next/router"
 
 const GAME_TYPE_EQUIPO = GAME_TYPES.EQUIPO
 const GAME_STATE_KEY = `futfactos-${GAME_TYPE_EQUIPO}-game-state`
-const MAX_HINTS = 11 // Máximo de pistas permitidas
+const MAX_HINTS = 12 // Máximo de pistas permitidas
 
 export default function FootballGame() {
   const [guessedPlayers, setGuessedPlayers] = React.useState<Array<{ player: Player; assignedSlotId: string }>>([])
@@ -68,6 +68,7 @@ export default function FootballGame() {
     setCurrentUser(user)
     return isLoggedIn
   }
+  
   const handleLogin = () => {
     router.push("/auth")
     setShowGuestWarning(false)
@@ -76,6 +77,7 @@ export default function FootballGame() {
   const handleCloseWarning = () => {
     setShowGuestWarning(false)
   }
+
   // Efecto para cargar el estado del juego al inicio
   React.useEffect(() => {
     setCurrentFormation(getDailyFormation())
@@ -86,7 +88,6 @@ export default function FootballGame() {
       const savedStateString = localStorage.getItem(GAME_STATE_KEY)
       const lastPlayedDateFromStorage = localStorage.getItem(`lastPlayed_${GAME_TYPE_EQUIPO}`)
       const savedChallengesString = localStorage.getItem(`dailyChallenges_${gameDate}`)
-
 
       // Cargar o generar desafíos diarios
       if (savedChallengesString) {
@@ -152,7 +153,6 @@ export default function FootballGame() {
       setGameOutcome(initialState.gameOutcome ?? null)
       setHintsUsed(initialState.hintsUsed)
       setPointsAwarded(initialState.pointsAwarded || false)
-
     }
 
     const interval = setInterval(() => {
@@ -163,7 +163,6 @@ export default function FootballGame() {
 
     return () => clearInterval(interval)
   }, [])
-
 
   // Efecto para guardar el estado del juego cada vez que cambie
   React.useEffect(() => {
@@ -221,13 +220,21 @@ export default function FootballGame() {
       const playedForSecondaryClub = player.clubs.includes(secondaryClubName)
       if (!playedForPrimaryClub || !playedForSecondaryClub) return false
 
-      // 3. Debe haber una posición disponible para él
-      const matchingSlots = currentFormation.filter((p) => p.positionKey === player.position)
+      // 3. Verificar si hay una posición disponible para él
       const occupiedSlotIds = guessedPlayers.map((gp) => gp.assignedSlotId)
-      const hasAvailableSlot = matchingSlots.some((slot) => !occupiedSlotIds.includes(slot.id))
-      if (!hasAvailableSlot) return false
+      
+      // PRIMERA OPCIÓN: Buscar slot exacto de su posición
+      const exactMatchingSlots = currentFormation.filter((p) => p.positionKey === player.position)
+      const hasExactAvailableSlot = exactMatchingSlots.some((slot) => !occupiedSlotIds.includes(slot.id))
+      
+      if (hasExactAvailableSlot) {
+        return true
+      }
 
-      return true
+      // SEGUNDA OPCIÓN: Si no hay slot exacto, buscar CUALQUIER slot disponible (jugador comodín)
+      const anyAvailableSlot = currentFormation.filter((p) => p.type === "player").some((slot) => !occupiedSlotIds.includes(slot.id))
+      
+      return anyAvailableSlot
     })
 
     if (validPlayers.length === 0) {
@@ -251,7 +258,7 @@ export default function FootballGame() {
             `${foundPlayers[0].name} no jugó en ${currentPrimaryClubName} y ${secondaryClubName} simultáneamente. Intenta de nuevo.`,
           )
         } else {
-          setMessage(`Todas las posiciones para ${foundPlayers[0].name} ya están ocupadas en esta formación.`)
+          setMessage(`No hay posiciones disponibles en esta formación.`)
         }
       }
       return
@@ -271,29 +278,50 @@ export default function FootballGame() {
   }
 
   const processPlayerSelection = (selectedPlayer: Player) => {
-    // Encontrar slot disponible para el jugador seleccionado
-    const matchingSlots = currentFormation.filter((p) => p.positionKey === selectedPlayer.position)
     const occupiedSlotIds = guessedPlayers.map((gp) => gp.assignedSlotId)
-    const availableSlot = matchingSlots.find((slot) => !occupiedSlotIds.includes(slot.id))
+    
+    // PRIMERA OPCIÓN: Buscar slot exacto de su posición
+    const exactMatchingSlots = currentFormation.filter((p) => p.positionKey === selectedPlayer.position)
+    const exactAvailableSlot = exactMatchingSlots.find((slot) => !occupiedSlotIds.includes(slot.id))
+    
+    let assignedSlot = exactAvailableSlot
+    let isWildcard = false
 
-    if (!availableSlot) {
-      setMessage(`Todas las posiciones de ${selectedPlayer.position} ya están ocupadas en esta formación.`)
+    // SEGUNDA OPCIÓN: Si no hay slot exacto, usar cualquier slot disponible (comodín)
+    if (!assignedSlot) {
+      const anyAvailableSlot = currentFormation
+        .filter((p) => p.type === "player")
+        .find((slot) => !occupiedSlotIds.includes(slot.id))
+      
+      if (anyAvailableSlot) {
+        assignedSlot = anyAvailableSlot
+        isWildcard = true
+      }
+    }
+
+    if (!assignedSlot) {
+      setMessage(`No hay posiciones disponibles en esta formación.`)
       return
     }
 
     // PRIMERO: Agregar el jugador al estado
-    const newGuessedPlayers = [...guessedPlayers, { player: selectedPlayer, assignedSlotId: availableSlot.id }]
+    const newGuessedPlayers = [...guessedPlayers, { player: selectedPlayer, assignedSlotId: assignedSlot.id }]
     setGuessedPlayers(newGuessedPlayers)
 
     // SEGUNDO: Iniciar animación de voltear
-    setFlippingPlayer(availableSlot.id)
+    setFlippingPlayer(assignedSlot.id)
 
     // TERCERO: Limpiar la animación después de que termine
     setTimeout(() => {
       setFlippingPlayer(null)
-    }, 700) // Un poco más de tiempo para que se vea bien
+    }, 700)
 
-    setMessage(`¡Correcto! ${selectedPlayer.name} ha sido colocado en el campo como ${selectedPlayer.position}.`)
+    // Mensaje diferente para jugadores comodín
+    if (isWildcard) {
+      setMessage(`¡Correcto! ${selectedPlayer.name} (${selectedPlayer.position}) ha sido colocado como comodín en posición de ${assignedSlot.positionKey}.`)
+    } else {
+      setMessage(`¡Correcto! ${selectedPlayer.name} ha sido colocado en el campo como ${selectedPlayer.position}.`)
+    }
 
     // Cerrar selector si estaba abierto
     setShowPlayerSelection(false)
@@ -315,7 +343,6 @@ export default function FootballGame() {
         const pointsGranted = awardPoints(GAME_TYPE_EQUIPO, 50)
         if (pointsGranted) {
           setPointsAwarded(true)
-        } else {
         }
       }
 
@@ -326,7 +353,6 @@ export default function FootballGame() {
         hintsUsed,
       }).catch((error) => {
         console.error("Error al guardar en Supabase:", error)
-        // El juego continúa funcionando aunque falle Supabase
       })
 
       return
@@ -358,6 +384,7 @@ export default function FootballGame() {
       setMessage(`¡Ya jugaste hoy! Vuelve en ${getTimeUntilReset()} para un nuevo desafío.`)
       return
     }
+    
     setMessage(`Te has rendido para ${currentPrimaryClubName} y ${secondaryClubName}. ¡Mejor suerte la próxima vez!`)
     setGameCompletedToday(true)
     setGameOutcome("lose")
@@ -373,7 +400,6 @@ export default function FootballGame() {
       hintsUsed,
     }).catch((error) => {
       console.error("Error al guardar en Supabase:", error)
-      // El juego continúa funcionando aunque falle Supabase
     })
 
     setTimeout(() => {
@@ -391,28 +417,42 @@ export default function FootballGame() {
       return
     }
 
-    // Solo verificar si ya se alcanzó el límite total de pistas
     if (hintsUsed >= MAX_HINTS) {
       setMessage(`Ya usaste todas las pistas disponibles (${MAX_HINTS}/${MAX_HINTS}).`)
       return
     }
 
+    const occupiedSlotIds = guessedPlayers.map((gp) => gp.assignedSlotId)
+    
     const potentialHints = players.filter((p) => {
       const playedForPrimaryClub = p.clubs.includes(currentPrimaryClubName)
       const playedForSecondaryClub = p.clubs.includes(secondaryClubName)
       const alreadyGuessed = guessedPlayers.some((gp) => gp.player.name === p.name)
 
-      const matchingSlots = currentFormation.filter((pos) => pos.positionKey === p.position)
-      const occupiedSlotIds = guessedPlayers.map((gp) => gp.assignedSlotId)
-      const hasAvailableSlot = matchingSlots.some((slot) => !occupiedSlotIds.includes(slot.id))
+      if (!playedForPrimaryClub || !playedForSecondaryClub || alreadyGuessed) {
+        return false
+      }
 
-      return playedForPrimaryClub && playedForSecondaryClub && !alreadyGuessed && hasAvailableSlot
+      // Verificar si hay slot exacto disponible
+      const exactMatchingSlots = currentFormation.filter((pos) => pos.positionKey === p.position)
+      const hasExactAvailableSlot = exactMatchingSlots.some((slot) => !occupiedSlotIds.includes(slot.id))
+      
+      if (hasExactAvailableSlot) {
+        return true
+      }
+
+      // Verificar si hay CUALQUIER slot disponible (comodín)
+      const anyAvailableSlot = currentFormation
+        .filter((pos) => pos.type === "player")
+        .some((slot) => !occupiedSlotIds.includes(slot.id))
+      
+      return anyAvailableSlot
     })
 
     if (potentialHints.length > 0) {
       const hint = potentialHints[Math.floor(Math.random() * potentialHints.length)]
       setHintedPlayerName(hint.name)
-      setHintsUsed(hintsUsed + 1) // Incrementar contador de pistas
+      setHintsUsed(hintsUsed + 1)
       const remainingHints = MAX_HINTS - (hintsUsed + 1)
       setMessage(
         `Pista: ¡Podría ser ${hint.name}! Intenta ingresarlo. (Pistas restantes: ${remainingHints}/${MAX_HINTS})`,
