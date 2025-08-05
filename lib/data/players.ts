@@ -31,7 +31,7 @@ export const players: Player[] = [
   },
   {
     name: "Alan Sosa",
-    clubs: ["Union", "Tigre", "Patronato"],
+    clubs: ["Unión", "Tigre", "Patronato"],
     position: "PO",
     image: "https://img.a.transfermarkt.technology/portrait/header/545408-1727448128.jpg?lm=1",
   },
@@ -327,7 +327,7 @@ export const players: Player[] = [
   },
   {
     name: "Tiago Banega",
-    clubs: ["Patronato", "Racing Club", "Arsenal", "Union"],
+    clubs: ["Patronato", "Racing Club", "Arsenal", "Unión"],
     position: "MC",
     image: "https://copaargentina.s3.amazonaws.com/images/m111417_crop169014_1024x576_proportional_16671869618DF1.jpeg",
   },
