@@ -470,7 +470,7 @@ export const players: Player[] = [
   },
   {
     name: "Cristian Tarragona",
-    clubs: ["Patronato", "Arsenal", "Gimnasia y Esgrima (LP)", "Independiente Rivadavia", "Platense", "Velez Sarsfield", "San Lorenzo", "Talleres", "Union"],
+    clubs: ["Patronato", "Arsenal", "Gimnasia y Esgrima (LP)", "Independiente Rivadavia", "Platense", "Velez Sarsfield", "San Lorenzo", "Talleres", "Unión"],
     position: "DC",
     image: "https://img.a.transfermarkt.technology/portrait/header/422698-1699915095.jpg?lm=1",
   },
