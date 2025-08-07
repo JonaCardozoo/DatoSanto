@@ -30,7 +30,7 @@ export default function OnceCompletedMessage({
         <h3 className="text-2xl md:text-3xl font-bold">{isCorrect ? "¡Excelente!" : "¡Casi!"}</h3>
 
         <p className="text-lg">
-          {isCorrect ? "" : `La respuesta correcta era: ${correctAnswer}`}
+          {isCorrect ? "" : `No pudiste realizar el 11 de hoy ${correctAnswer}`}
         </p>
 
         {/* Mensaje de puntos */}
@@ -48,7 +48,7 @@ export default function OnceCompletedMessage({
           <div className="bg-blue-900/30 border border-blue-500 rounded-lg p-4 mt-4">
             <div className="flex items-center justify-center space-x-2">
               <User className="w-6 h-6 text-blue-400" />
-              <span className="text-blue-300 font-bold text-lg">¡Respuesta correctaa!</span>
+              <span className="text-blue-300 font-bold text-lg">¡Once armado correctamente!</span>
             </div>
             <p className="text-blue-200 text-sm mt-2">
               <Link href="/auth" className="underline hover:text-blue-100">

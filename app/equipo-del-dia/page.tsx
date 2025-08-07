@@ -21,11 +21,12 @@ import { GAME_TYPES, getTimeUntilReset, getGameDateString } from "@/utils/dateUt
 import { markAsPlayedToday, awardPoints } from "@/utils/gameUtils"
 import { getCurrentUser } from "@/utils/jwt-auth"
 import GameHeader from "../../components/GameHeader"
-import { ArrowLeft, Play } from "lucide-react"
+import { ArrowLeft, Clock, HelpCircle, Play } from "lucide-react"
 import Link from "next/link"
 import { useState } from "react"
 import GuestWarningModal from "@/components/GuestWarningModal"
 import router from "next/router"
+import OnceCompletedMessage from "@/components/OnceCompletedMessage"
 
 const GAME_TYPE_EQUIPO = GAME_TYPES.EQUIPO
 const GAME_STATE_KEY = `futfactos-${GAME_TYPE_EQUIPO}-game-state`
@@ -68,7 +69,7 @@ export default function FootballGame() {
     setCurrentUser(user)
     return isLoggedIn
   }
-  
+
   const handleLogin = () => {
     router.push("/auth")
     setShowGuestWarning(false)
@@ -222,18 +223,18 @@ export default function FootballGame() {
 
       // 3. Verificar si hay una posición disponible para él
       const occupiedSlotIds = guessedPlayers.map((gp) => gp.assignedSlotId)
-      
+
       // PRIMERA OPCIÓN: Buscar slot exacto de su posición
       const exactMatchingSlots = currentFormation.filter((p) => p.positionKey === player.position)
       const hasExactAvailableSlot = exactMatchingSlots.some((slot) => !occupiedSlotIds.includes(slot.id))
-      
+
       if (hasExactAvailableSlot) {
         return true
       }
 
       // SEGUNDA OPCIÓN: Si no hay slot exacto, buscar CUALQUIER slot disponible (jugador comodín)
       const anyAvailableSlot = currentFormation.filter((p) => p.type === "player").some((slot) => !occupiedSlotIds.includes(slot.id))
-      
+
       return anyAvailableSlot
     })
 
@@ -279,11 +280,11 @@ export default function FootballGame() {
 
   const processPlayerSelection = (selectedPlayer: Player) => {
     const occupiedSlotIds = guessedPlayers.map((gp) => gp.assignedSlotId)
-    
+
     // PRIMERA OPCIÓN: Buscar slot exacto de su posición
     const exactMatchingSlots = currentFormation.filter((p) => p.positionKey === selectedPlayer.position)
     const exactAvailableSlot = exactMatchingSlots.find((slot) => !occupiedSlotIds.includes(slot.id))
-    
+
     let assignedSlot = exactAvailableSlot
     let isWildcard = false
 
@@ -292,7 +293,7 @@ export default function FootballGame() {
       const anyAvailableSlot = currentFormation
         .filter((p) => p.type === "player")
         .find((slot) => !occupiedSlotIds.includes(slot.id))
-      
+
       if (anyAvailableSlot) {
         assignedSlot = anyAvailableSlot
         isWildcard = true
@@ -384,7 +385,7 @@ export default function FootballGame() {
       setMessage(`¡Ya jugaste hoy! Vuelve en ${getTimeUntilReset()} para un nuevo desafío.`)
       return
     }
-    
+
     setMessage(`Te has rendido para ${currentPrimaryClubName} y ${secondaryClubName}. ¡Mejor suerte la próxima vez!`)
     setGameCompletedToday(true)
     setGameOutcome("lose")
@@ -423,7 +424,7 @@ export default function FootballGame() {
     }
 
     const occupiedSlotIds = guessedPlayers.map((gp) => gp.assignedSlotId)
-    
+
     const potentialHints = players.filter((p) => {
       const playedForPrimaryClub = p.clubs.includes(currentPrimaryClubName)
       const playedForSecondaryClub = p.clubs.includes(secondaryClubName)
@@ -436,7 +437,7 @@ export default function FootballGame() {
       // Verificar si hay slot exacto disponible
       const exactMatchingSlots = currentFormation.filter((pos) => pos.positionKey === p.position)
       const hasExactAvailableSlot = exactMatchingSlots.some((slot) => !occupiedSlotIds.includes(slot.id))
-      
+
       if (hasExactAvailableSlot) {
         return true
       }
@@ -445,7 +446,7 @@ export default function FootballGame() {
       const anyAvailableSlot = currentFormation
         .filter((pos) => pos.type === "player")
         .some((slot) => !occupiedSlotIds.includes(slot.id))
-      
+
       return anyAvailableSlot
     })
 
@@ -508,6 +509,19 @@ export default function FootballGame() {
                 para ganar puntos y aparecer en el ranking
               </p>
             )}
+            <div className="flex flex-col items-center justify-center gap-8">
+              <div className="mt-8 bg-gray-800/50 border border-gray-600 rounded-xl p-6">
+                <h3 className="text-lg font-semibold text-white mb-4 flex items-center justify-center">
+                  <HelpCircle className="w-5 h-5 mr-2 text-purple-400" />
+                  Ayuda
+                </h3>
+                    <p className="flex items-center justify-center">
+                      si no hay un jugador en la posición pedida (por ejemplo, un arquero que haya jugado en Patronato y Defensa),<br />
+          podés usar a otro que haya pasado por ambos clubes, aunque juegue en otra posición.
+                    </p>
+              </div>
+            </div>
+
           </div>
           {!user && (
             <GuestWarningModal isOpen={showGuestWarning} onClose={handleCloseWarning} onLogin={handleLogin} />
@@ -526,7 +540,7 @@ export default function FootballGame() {
                 flippingPlayer={flippingPlayer}
               />
             </div>
-            <GameCompletedMessage
+            <OnceCompletedMessage
               isCorrect={gameOutcome === "win"}
               correctAnswer=""
               pointsAwarded={pointsAwarded && userLoggedIn}
