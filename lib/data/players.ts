@@ -1134,6 +1134,8 @@ export function getDailyRandomClubChallenges(): ClubChallenge[] {
   return shuffleArray(clubChallenges)
 }
 
+
+
 export function getDailyFormation(): PitchPosition[] {
   const gameDateString = getGameDateString()
   const date = new Date(gameDateString)
@@ -1141,6 +1143,7 @@ export function getDailyFormation(): PitchPosition[] {
   const formationIndex = (dayOfMonth - 1) % formations.length
   return formations[formationIndex]
 }
+
 
 export interface GameState {
   guessedPlayers: { player: Player; assignedSlotId: string }[]
@@ -1150,4 +1153,24 @@ export interface GameState {
   hintsUsed: number // Solo mantenemos el contador total de pistas
   pointsAwarded: boolean
   dailyChallenges: ClubChallenge[]
+  gameDate: string
+}
+
+export function checkAndResetIfNewDay(gameState: GameState): GameState {
+  const currentDate = getGameDateString();
+  
+  if (!gameState.gameDate || gameState.gameDate !== currentDate) {
+    // Es un nuevo día, reset completo
+    return {
+      guessedPlayers: [],
+      currentChallengeIndex: 0,
+      gameCompletedToday: false,
+      gameOutcome: null,
+      hintsUsed: 0,
+      pointsAwarded: false,
+      dailyChallenges: getDailyRandomClubChallenges(),
+      gameDate: currentDate
+    };
+  }
+  return gameState;
 }

@@ -12,6 +12,7 @@ import {
   fixedSecondaryClubName,
   getDailyFormation,
   getDailyRandomClubChallenges,
+  checkAndResetIfNewDay,
   type Player,
   type ClubChallenge,
   type PitchPosition,
@@ -81,51 +82,61 @@ export default function FootballGame() {
 
   // Efecto para cargar el estado del juego al inicio
   React.useEffect(() => {
-    setCurrentFormation(getDailyFormation())
-    checkUserAuthentication()
+  setCurrentFormation(getDailyFormation())
+  checkUserAuthentication()
 
-    if (typeof window !== "undefined") {
-      const gameDate = getGameDateString()
-      const savedStateString = localStorage.getItem(GAME_STATE_KEY)
-      const lastPlayedDateFromStorage = localStorage.getItem(`lastPlayed_${GAME_TYPE_EQUIPO}`)
-      const savedChallengesString = localStorage.getItem(`dailyChallenges_${gameDate}`)
-
-      // Cargar o generar desafíos diarios
-      if (savedChallengesString) {
-        try {
-          dailyClubChallenges.current = JSON.parse(savedChallengesString)
-        } catch (e) {
-          console.error("Error al parsear desafíos guardados. Generando nuevos.")
-          dailyClubChallenges.current = getDailyRandomClubChallenges()
-          localStorage.setItem(`dailyChallenges_${gameDate}`, JSON.stringify(dailyClubChallenges.current))
-        }
-      } else {
+  if (typeof window !== "undefined") {
+    const gameDate = getGameDateString()
+    const savedStateString = localStorage.getItem(GAME_STATE_KEY)
+    
+    // Cargar o generar desafíos diarios
+    const savedChallengesString = localStorage.getItem(`dailyChallenges_${gameDate}`)
+    if (savedChallengesString) {
+      try {
+        dailyClubChallenges.current = JSON.parse(savedChallengesString)
+      } catch (e) {
+        console.error("Error al parsear desafíos guardados. Generando nuevos.")
         dailyClubChallenges.current = getDailyRandomClubChallenges()
         localStorage.setItem(`dailyChallenges_${gameDate}`, JSON.stringify(dailyClubChallenges.current))
       }
+    } else {
+      dailyClubChallenges.current = getDailyRandomClubChallenges()
+      localStorage.setItem(`dailyChallenges_${gameDate}`, JSON.stringify(dailyClubChallenges.current))
+    }
 
-      // Estado inicial por defecto
-      let initialState: GameState = {
-        guessedPlayers: [],
-        currentChallengeIndex: 0,
-        gameCompletedToday: false,
-        gameOutcome: null,
-        hintsUsed: 0,
-        pointsAwarded: false,
-      }
+    // Estado inicial por defecto
+    let initialState: GameState = {
+      guessedPlayers: [],
+      currentChallengeIndex: 0,
+      gameCompletedToday: false,
+      gameOutcome: null,
+      hintsUsed: 0,
+      pointsAwarded: false,
+      gameDate: gameDate, // ← IMPORTANTE: Asignar fecha actual
+      dailyChallenges: dailyClubChallenges.current,
+    }
 
-      // Evaluar estado guardado
-      if (lastPlayedDateFromStorage && lastPlayedDateFromStorage !== gameDate) {
-        localStorage.removeItem(GAME_STATE_KEY)
-        localStorage.removeItem(`lastPlayed_${GAME_TYPE_EQUIPO}`)
-        setMessage("¡Nuevo día! Comienza un nuevo desafío.")
-      } else if (savedStateString) {
-        try {
-          const parsedState: GameState = JSON.parse(savedStateString)
+    // Evaluar estado guardado y verificar cambio de día
+    if (savedStateString) {
+      try {
+        const parsedState: GameState = JSON.parse(savedStateString)
+        
+        // ← AQUÍ ESTÁ LA NUEVA LÓGICA: Verificar cambio de día
+        const checkedState = checkAndResetIfNewDay(parsedState)
+        
+        if (checkedState !== parsedState) {
+          // Hubo un reset por cambio de día
+          initialState = checkedState
+          localStorage.removeItem(GAME_STATE_KEY) // Limpiar estado viejo
+          localStorage.removeItem(`lastPlayed_${GAME_TYPE_EQUIPO}`) // Limpiar marcador de juego
+          setMessage("¡Nuevo día! Comienza un nuevo desafío.")
+        } else {
+          // Mismo día, cargar estado guardado
           initialState = {
             ...parsedState,
             hintsUsed: parsedState.hintsUsed || 0,
             pointsAwarded: parsedState.pointsAwarded || false,
+            gameDate: parsedState.gameDate || gameDate, // Asegurar que tenga fecha
           }
 
           if (parsedState.gameCompletedToday) {
@@ -133,58 +144,63 @@ export default function FootballGame() {
           } else {
             setMessage("¡Bienvenido de nuevo! Continúa tu desafío.")
           }
-        } catch (e) {
-          console.error("Error al parsear estado del juego. Reiniciando.")
-          localStorage.removeItem(GAME_STATE_KEY)
-          localStorage.removeItem(`lastPlayed_${GAME_TYPE_EQUIPO}`)
-          setMessage("Error al cargar el juego. Se ha reiniciado.")
         }
-      } else if (lastPlayedDateFromStorage === gameDate) {
+      } catch (e) {
+        console.error("Error al parsear estado del juego. Reiniciando.")
+        localStorage.removeItem(GAME_STATE_KEY)
+        localStorage.removeItem(`lastPlayed_${GAME_TYPE_EQUIPO}`)
+        setMessage("Error al cargar el juego. Se ha reiniciado.")
+      }
+    } else {
+      // No hay estado guardado, verificar si ya jugó hoy
+      const lastPlayedDateFromStorage = localStorage.getItem(`lastPlayed_${GAME_TYPE_EQUIPO}`)
+      if (lastPlayedDateFromStorage === gameDate) {
         initialState.gameCompletedToday = true
         initialState.gameOutcome = "lose"
         setMessage(`¡Ya jugaste hoy! Vuelve en ${getTimeUntilReset()} para un nuevo desafío.`)
       } else {
         setMessage("¡Bienvenido! Adivina el jugador del día.")
       }
-
-      // Aplicar estado inicial
-      setGuessedPlayers(initialState.guessedPlayers)
-      setCurrentChallengeIndex(initialState.currentChallengeIndex)
-      setGameCompletedToday(initialState.gameCompletedToday)
-      setGameOutcome(initialState.gameOutcome ?? null)
-      setHintsUsed(initialState.hintsUsed)
-      setPointsAwarded(initialState.pointsAwarded || false)
     }
 
-    const interval = setInterval(() => {
-      setTimeToReset(getTimeUntilReset())
-    }, 60 * 1000)
+    // Aplicar estado inicial
+    setGuessedPlayers(initialState.guessedPlayers)
+    setCurrentChallengeIndex(initialState.currentChallengeIndex)
+    setGameCompletedToday(initialState.gameCompletedToday)
+    setGameOutcome(initialState.gameOutcome ?? null)
+    setHintsUsed(initialState.hintsUsed)
+    setPointsAwarded(initialState.pointsAwarded || false)
+  }
 
+  const interval = setInterval(() => {
     setTimeToReset(getTimeUntilReset())
+  }, 60 * 1000)
 
-    return () => clearInterval(interval)
-  }, [])
+  setTimeToReset(getTimeUntilReset())
 
-  // Efecto para guardar el estado del juego cada vez que cambie
-  React.useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false
-      return
+  return () => clearInterval(interval)
+}, [])
+
+React.useEffect(() => {
+  if (isFirstRender.current) {
+    isFirstRender.current = false
+    return
+  }
+
+  if (typeof window !== "undefined") {
+    const gameState: GameState = {
+      guessedPlayers,
+      currentChallengeIndex,
+      gameCompletedToday,
+      gameOutcome,
+      hintsUsed,
+      pointsAwarded,
+      dailyChallenges: dailyClubChallenges.current,
+      gameDate: getGameDateString() // ← AGREGAR ESTA LÍNEA
     }
-
-    if (typeof window !== "undefined") {
-      const gameState: GameState = {
-        guessedPlayers,
-        currentChallengeIndex,
-        gameCompletedToday,
-        gameOutcome,
-        hintsUsed,
-        pointsAwarded,
-        dailyChallenges: dailyClubChallenges.current,
-      }
-      localStorage.setItem(GAME_STATE_KEY, JSON.stringify(gameState))
-    }
-  }, [guessedPlayers, currentChallengeIndex, gameCompletedToday, gameOutcome, hintsUsed, pointsAwarded])
+    localStorage.setItem(GAME_STATE_KEY, JSON.stringify(gameState))
+  }
+}, [guessedPlayers, currentChallengeIndex, gameCompletedToday, gameOutcome, hintsUsed, pointsAwarded])
 
   // Usar la lista de desafíos aleatoria diaria
   const currentChallenge: ClubChallenge = dailyClubChallenges.current[currentChallengeIndex]
