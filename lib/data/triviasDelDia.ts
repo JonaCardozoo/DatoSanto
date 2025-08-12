@@ -56,7 +56,7 @@ export const triviasDelDia: Trivia[] = [
   opciones: [
     "Tigre, Boca, River",
     "Banfield, River, Colón",
-    "Gimnasia, Boca, River",
+    "Gimnasia y Esgrima (LP), Boca, River",
     "Huracán, Vélez, Lanús"
   ],
   respuestaCorrecta: 2 // Gimnasia, River, Boca

@@ -579,15 +579,6 @@ export const jugadoresDelDia: Player[] = [
     imageUrl: "/images/jugadores/nicolas_franco.png",
   },
   {
-    id: "64",
-    fecha: "2025-01-27",
-    nombre: "Sebastian",
-    apellido: "SOSA SANCHEZ",
-    equipo: "Patronato",
-    posicion: "Delantero",
-    imageUrl: "/images/jugadores/sebastian_sosa_sanchez.png",
-  },
-  {
     id: "65",
     fecha: "2025-01-27",
     nombre: "Neri",

@@ -38,7 +38,7 @@ export const players: Player[] = [
   {
     name: "Ian Escobar",
     clubs: ["Chacarita", "Talleres", "San Martin (SJ)", "Patronato", "Godoy Cruz", "Aldosivi", "Banfield"],
-    position: "ED",
+    position: "LI",
     image: "https://img.a.transfermarkt.technology/portrait/header/440164-1730308249.jpg?lm=1",
   },
   {
@@ -49,19 +49,19 @@ export const players: Player[] = [
   },
   {
     name: "Marcos Enrique",
-    clubs: ["Patronato", "Quilmes", "Instituto", "Velez Sarsfield"],
+    clubs: ["Patronato", "Quilmes", "Instituto", "Vélez Sarsfield"],
     position: "MC",
     image: "https://imagecache.365scores.com/image/upload/f_png,w_250,h_250,c_limit,q_auto:eco,d_Athletes:default.png,r_max,c_thumb,g_face,z_0.65/Athletes/74348",
   },
   {
     name: "Alan Sombra",
-    clubs: ["Patronato", "Chaco For Ever", "Huracan"],
+    clubs: ["Patronato", "Chaco For Ever", "Huracán"],
     position: "EI",
     image: "https://lh4.googleusercontent.com/proxy/rK5EpgNXbbCnEKztjqx5-LnFVkaoB4ZYQDCHiY2fnb429vChxGhZ1k3Buuw7GNXNEFEJUEQqpr5NlHu0anrw6i1KRE8FdelyD2JS03klaLTpzLjQY3rI0fH5hsFIFx8QcRi3p5sSowBOgr1zG1id62Hkp5zXYpXyFeLb",
   },
   {
     name: "Emanuel Moreno",
-    clubs: ["Patronato", "Agropecuario", "Quilmes", "Guillermo Brown", "Union de Santa Fe", "Los Andes", "Douglas Haig"],
+    clubs: ["Patronato", "Agropecuario", "Quilmes", "Guillermo Brown", "Unión", "Los Andes", "Douglas Haig"],
     position: "MC",
     image: "https://cdn.soccerwiki.org/images/player/131869.png",
   },
@@ -73,7 +73,7 @@ export const players: Player[] = [
   },
   {
     name: "Julian Marcioni",
-    clubs: ["Patronato", "Newells", "Independiente Rivadavia", "Atlanta", "Platense", "Agropecuario"],
+    clubs: ["Patronato", "Newell's Old Boys", "Independiente Rivadavia", "Atlanta", "Platense", "Agropecuario"],
     position: "ED",
     image: "https://img.a.transfermarkt.technology/portrait/header/633041-1710508658.JPG?lm=1",
   },
@@ -175,13 +175,13 @@ export const players: Player[] = [
   },
   {
     name: "Lautaro Geminiani",
-    clubs: ["Patronato", "Sarmiento"],
+    clubs: ["Patronato", "Sarmiento de Junin"],
     position: "MC",
     image: "https://img.a.transfermarkt.technology/portrait/header/267747-1734023502.jpg?lm=1",
   },
   {
     name: "Fabio Vazquez",
-    clubs: ["Patronato", "Argentinos Juniors", "Sarmiento", "Instituto"],
+    clubs: ["Patronato", "Argentinos Juniors", "Sarmiento de Junin", "Instituto"],
     position: "MC",
     image: "https://img.a.transfermarkt.technology/portrait/header/230072-1636335351.JPG?lm=1",
   },
@@ -193,25 +193,25 @@ export const players: Player[] = [
   },
   {
     name: "Jorge Valdez Chamorro",
-    clubs: ["Patronato", "Lanus", "Gimnasia",],
+    clubs: ["Patronato", "Lanús", "Gimnasia y Esgrima (LP)",],
     position: "MC",
     image: "https://img.a.transfermarkt.technology/portrait/header/189456-1717085156.png?lm=1",
   },
   {
     name: "Damián Arce",
-    clubs: ["Patronato", "Union", "Instituto"],
+    clubs: ["Patronato", "Unión", "Instituto"],
     position: "MC",
     image: "https://img.a.transfermarkt.technology/portrait/header/423708-1722978604.jpg?lm=1",
   },
   {
     name: "Juan Cruz Esquivel",
-    clubs: ["Patronato", "Talleres", "Platense", "Tigre", "Gimnasia"],
+    clubs: ["Patronato", "Talleres", "Platense", "Tigre", "Gimnasia y Esgrima (LP)"],
     position: "EI",
     image: "https://img.a.transfermarkt.technology/portrait/header/654819-1747071889.png?lm=1",
   },
   {
     name: "Nazareno Solis",
-    clubs: ["Patronato", "Talleres", "Boca Juniors", "Aldosivi", "Huracan", "San Martin (SJ)"],
+    clubs: ["Patronato", "Talleres", "Boca Juniors", "Aldosivi", "Huracán", "San Martin (SJ)"],
     position: "EI",
     image: "https://img.a.transfermarkt.technology/portrait/header/419660-1749136095.JPG?lm=1",
   },
@@ -229,19 +229,19 @@ export const players: Player[] = [
   },
   {
     name: "Matías Mansilla",
-    clubs: ["Patronato", "Estudiantes", "Central Cordoba",],
+    clubs: ["Patronato", "Estudiantes", "Central Cordoba", "Atletico Tucuman"],
     position: "PO",
     image: "https://img.a.transfermarkt.technology/portrait/header/731722-1739826308.jpg?lm=1",
   },
   {
     name: "Carlos Quintana",
-    clubs: ["Patronato", "Lanus", "Huracan", "Talleres", "Argentinos Juniors", "Rosario Central"],
+    clubs: ["Patronato", "Lanús", "Huracán", "Talleres", "Argentinos Juniors", "Rosario Central"],
     position: "CB",
     image: "https://img.a.transfermarkt.technology/portrait/header/54596-1742570498.png?lm=1",
   },
   {
     name: "Oliver Benitez",
-    clubs: ["Patronato", "Gimnasia", "Tigre"],
+    clubs: ["Patronato", "Gimnasia y Esgrima (LP)", "Tigre"],
     position: "CB",
     image: "https://img.a.transfermarkt.technology/portrait/header/107529-1678299989.jpg?lm=1",
   },
@@ -259,25 +259,25 @@ export const players: Player[] = [
   },
   {
     name: "Juan Cruz Guasone",
-    clubs: ["Patronato", "Estudiantes", "Sarmiento"],
+    clubs: ["Patronato", "Estudiantes", "Sarmiento de Junin"],
     position: "CB",
     image: "https://img.a.transfermarkt.technology/portrait/header/832977-1638747305.JPG?lm=1",
   },
   {
     name: "Raúl Lozano",
-    clubs: ["Patronato", "Huracan", "Platense"],
+    clubs: ["Patronato", "Huracán", "Platense"],
     position: "LD",
     image: "https://img.a.transfermarkt.technology/portrait/header/613093-1724876914.jpg?lm=1",
   },
   {
     name: "Franco Leys",
-    clubs: ["Patronato", "Colon", "Sarmiento"],
+    clubs: ["Patronato", "Colón", "Sarmiento de Junin"],
     position: "MC",
     image: "https://img.a.transfermarkt.technology/portrait/header/300272-1638747535.JPG?lm=1",
   },
   {
     name: "Nicolás Castro",
-    clubs: ["Patronato", "Sarmiento", "Arsenal", "Platense", "Atletico Tucuman"],
+    clubs: ["Patronato", "Sarmiento de Junin", "Arsenal", "Platense", "Atletico Tucuman"],
     position: "MC",
     image: "https://img.a.transfermarkt.technology/portrait/header/441160-1724864251.jpg?lm=1",
   },
@@ -302,13 +302,13 @@ export const players: Player[] = [
 
   {
     name: "Jonás Acevedo",
-    clubs: ["Patronato", "Instituto", "Huracan"],
+    clubs: ["Patronato", "Instituto", "Huracán"],
     position: "EI",
     image: "https://img.a.transfermarkt.technology/portrait/header/538530-1717079459.jpeg?lm=1",
   },
   {
     name: "José Barreto",
-    clubs: ["Patronato", "Colon"],
+    clubs: ["Patronato", "Colón"],
     position: "EI",
     image: "https://www.zerozero.com.ar/img/jogadores/05/736605_med__20201228224100_jose_barreto.png",
   },
@@ -326,7 +326,7 @@ export const players: Player[] = [
   },
   {
     name: "Axel Rodriguez",
-    clubs: ["Patronato", "Instituto", "Atletico Tucuman", "Colon"],
+    clubs: ["Patronato", "Instituto", "Atletico Tucuman", "Colón"],
     position: "DC",
     image: "https://img.a.transfermarkt.technology/portrait/header/397218-1748531368.jpg?lm=1",
   },
@@ -338,7 +338,7 @@ export const players: Player[] = [
   },
   {
     name: "Rolando Garcia Guerreño",
-    clubs: ["Patronato", "Defensa y Justicia", "Godoy Cruz", "Union", "Lanús"],
+    clubs: ["Patronato", "Defensa y Justicia", "Godoy Cruz", "Unión", "Lanús"],
     position: "CB",
     image: "https://img.a.transfermarkt.technology/portrait/header/127819-1636333807.JPG?lm=1",
   },
@@ -350,7 +350,7 @@ export const players: Player[] = [
   },
   {
     name: "Gustavo Canto",
-    clubs: ["Patronato", "Sarmiento", "Banfield", "Arsenal", "Central Cordoba", "Gimnasia y Esgrima (LP)"],
+    clubs: ["Patronato", "Sarmiento de Junin", "Banfield", "Arsenal", "Central Cordoba", "Gimnasia y Esgrima (LP)"],
     position: "CB",
     image: "https://img.a.transfermarkt.technology/portrait/header/359970-1637344054.JPG?lm=1",
   },
@@ -362,7 +362,7 @@ export const players: Player[] = [
   },
   {
     name: "Hector Canteros",
-    clubs: ["Patronato", "Platense", "Velez Sarsfield"],
+    clubs: ["Patronato", "Platense", "Vélez Sarsfield"],
     position: "MC",
     image: "https://img.a.transfermarkt.technology/portrait/header/96255-1636335419.JPG?lm=1",
   },
@@ -380,7 +380,7 @@ export const players: Player[] = [
   },
   {
     name: "Nicolas Delgadillo",
-    clubs: ["Patronato", "Velez Sarsfield", "Platense", "Colon"],
+    clubs: ["Patronato", "Vélez Sarsfield", "Platense", "Colón"],
     position: "EI",
     image: "https://img.a.transfermarkt.technology/portrait/header/372163-1740100691.jpg?lm=1",
   },
@@ -398,7 +398,7 @@ export const players: Player[] = [
   },
   {
     name: "Sebastian Sosa Sanchez",
-    clubs: ["Patronato", "Velez Sarfield", "Banfield"],
+    clubs: ["Patronato", "Vélez Sarsfield", "Banfield"],
     position: "DC",
     image: "https://img.a.transfermarkt.technology/portrait/header/198851-1636335556.JPG?lm=1",
   },
@@ -434,7 +434,7 @@ export const players: Player[] = [
   },
   {
     name: "Cristian Chimino",
-    clubs: ["Patronato", "Arsenal", "Aldosivi", "Huracan"],
+    clubs: ["Patronato", "Arsenal", "Aldosivi", "Huracán"],
     position: "LD",
     image: "https://img.a.transfermarkt.technology/portrait/header/143951-1639159603.JPG?lm=1",
   },
@@ -470,7 +470,7 @@ export const players: Player[] = [
   },
   {
     name: "Cristian Tarragona",
-    clubs: ["Patronato", "Arsenal", "Gimnasia y Esgrima (LP)", "Independiente Rivadavia", "Platense", "Velez Sarsfield", "San Lorenzo", "Talleres", "Unión"],
+    clubs: ["Patronato", "Arsenal", "Gimnasia y Esgrima (LP)", "Independiente Rivadavia", "Platense", "Vélez Sarsfield", "San Lorenzo", "Talleres", "Unión"],
     position: "DC",
     image: "https://img.a.transfermarkt.technology/portrait/header/422698-1699915095.jpg?lm=1",
   },
@@ -482,7 +482,7 @@ export const players: Player[] = [
   },
   {
     name: "Agustín Sandona",
-    clubs: ["Patronato", "Union"],
+    clubs: ["Patronato", "Unión"],
     position: "CB",
     image: "https://img.a.transfermarkt.technology/portrait/header/360339-1746286604.jpg?lm=1",
   },
@@ -494,13 +494,13 @@ export const players: Player[] = [
   },
   {
     name: "Renzo Vera",
-    clubs: ["Patronato", "Tigre", "Union", "San Martin (SJ)", "Independiente Rivadavia",],
+    clubs: ["Patronato", "Tigre", "Unión", "San Martin (SJ)", "Independiente Rivadavia",],
     position: "CB",
     image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQbz75uzR0fqjrkp7YfIg14ilI01gxJhuteeQ&s",
   },
   {
     name: "Lucas Ceballos",
-    clubs: ["Patronato", "Colon", "Godoy Cruz"],
+    clubs: ["Patronato", "Colón", "Godoy Cruz"],
     position: "CB",
     image: "https://img.vavel.com/lucas-ceballos-resumen-tdt-2016-3381771547.jpg",
   },
@@ -518,19 +518,19 @@ export const players: Player[] = [
   },
   {
     name: "Jacobo Mansilla",
-    clubs: ["Patronato", "Tigre", "Newell's Old Boys", "Colon"],
+    clubs: ["Patronato", "Tigre", "Newell's Old Boys", "Colón"],
     position: "MC",
     image: "https://img.a.transfermarkt.technology/portrait/header/55928-1722283765.jpg?lm=1",
   },
   {
     name: "Gabriel Carabajal",
-    clubs: ["Patronato", "Talleres", "Godoy Cruz", "San Martin (SJ)", "Union", "Argentinos Juniors", "Newell's Old Boys", "Sarmiento de Junin"],
+    clubs: ["Patronato", "Talleres", "Godoy Cruz", "San Martin (SJ)", "Unión", "Argentinos Juniors", "Newell's Old Boys", "Sarmiento de Junin"],
     position: "MC",
     image: "https://img.a.transfermarkt.technology/portrait/header/280157-1742329166.jpg?lm=1",
   },
   {
     name: "Mauricio Sperduti",
-    clubs: ["Patronato", "Newell's Old Boys", "Arsenal", "Colon", "Banfield", "Independiente Rivadavia"],
+    clubs: ["Patronato", "Newell's Old Boys", "Arsenal", "Colón", "Banfield", "Independiente Rivadavia"],
     position: "ED",
     image: "https://img.a.transfermarkt.technology/portrait/header/55892-1496828124.jpg?lm=1",
   },
@@ -554,13 +554,13 @@ export const players: Player[] = [
   },
   {
     name: "Ezequiel Rescaldani",
-    clubs: ["Patronato", "Velez Sarsfield", "Talleres", "Arsenal", "San Martin (SJ)"],
+    clubs: ["Patronato", "Vélez Sarsfield", "Talleres", "Arsenal", "San Martin (SJ)"],
     position: "DC",
     image: "https://img.a.transfermarkt.technology/portrait/header/164477-1468574035.jpg?lm=1",
   },
   {
     name: "Luca Sosa",
-    clubs: ["Patronato", "Huracan", "Talleres", "Newell's Old Boys",],
+    clubs: ["Patronato", "Huracán", "Talleres", "Newell's Old Boys",],
     position: "CB",
     image: "https://img.a.transfermarkt.technology/portrait/header/421718-1717333991.jpg?lm=1",
   },
@@ -572,7 +572,7 @@ export const players: Player[] = [
   },
   {
     name: "Martín Rivero",
-    clubs: ["Patronato", "Rosario Central", "Aldosivi", "Union", "Belgrano", "San Martin (SJ)"],
+    clubs: ["Patronato", "Rosario Central", "Aldosivi", "Unión", "Belgrano", "San Martin (SJ)"],
     position: "MC",
     image: "https://img.a.transfermarkt.technology/portrait/header/77131-1710508239.JPG?lm=1",
   },
@@ -614,7 +614,7 @@ export const players: Player[] = [
   },
   {
     name: "Adrián Balboa",
-    clubs: ["Patronato", "Sarmiento de Junin", "Belgrano", "Union", "Racing Club"],
+    clubs: ["Patronato", "Sarmiento de Junin", "Belgrano", "Unión", "Racing Club"],
     position: "DC",
     image: "https://img.a.transfermarkt.technology/portrait/header/252209-1721144343.png?lm=1",
   },
@@ -626,7 +626,7 @@ export const players: Player[] = [
   },
   {
     name: "Matías Quiroga",
-    clubs: ["Patronato", "Talleres", "Union", "Gimnasia y Esgrima (LP)", "Independiente Rivadavia"],
+    clubs: ["Patronato", "Talleres", "Unión", "Gimnasia y Esgrima (LP)", "Independiente Rivadavia"],
     position: "DC",
     image: "https://img.a.transfermarkt.technology/portrait/header/103456-1729199910.JPG?lm=1",
   },
@@ -644,25 +644,25 @@ export const players: Player[] = [
   },
   {
     name: "Alejandro Gagliardi",
-    clubs: ["Patronato", "Instituto","Rosario Central","Union"],
+    clubs: ["Patronato", "Instituto", "Rosario Central", "Unión"],
     position: "DC",
     image: "https://img.a.transfermarkt.technology/portrait/header/88071-1710508704.JPG?lm=1",
   },
-    {
+  {
     name: "Fernando Telechea",
-    clubs: ["Patronato", "Aldosivi","Tigre","Colon"],
+    clubs: ["Patronato", "Aldosivi", "Tigre", "Colón"],
     position: "DC",
     image: "https://tmssl.akamaized.net/images/foto/galerie/telechea-fernando-quilmes-2013-1722282554-143742.jpg",
   },
   {
     name: "Jonathan Ferrari",
-    clubs: ["Patronato", "San Lorenzo","Rosario Central"],
+    clubs: ["Patronato", "San Lorenzo", "Rosario Central"],
     position: "CB",
     image: "https://img.a.transfermarkt.technology/portrait/header/87339-1690406726.JPG?lm=1",
   },
   {
     name: "Ezequiel Garre",
-    clubs: ["Patronato", "Argentinos Juniors", "Huracan", "Tigre"],
+    clubs: ["Patronato", "Argentinos Juniors", "Huracán", "Tigre"],
     position: "LI",
     image: "https://www.zerozero.com.ar/img/jogadores/83/248083_med_ezequiel_garre.jpg",
   },
@@ -672,33 +672,33 @@ export const players: Player[] = [
     position: "MC",
     image: "https://www.sentimientopopular.cl/wp-content/uploads/2020/01/8F87E48C-4C97-4DE5-905F-68DA9521FF38.jpeg",
   },
-   {
+  {
     name: "Marcos Quiroga",
-    clubs: ["Patronato","Intituto"],
+    clubs: ["Patronato", "Intituto"],
     position: "MC",
     image: "https://www.lavoz.com.ar/resizer/v2/ZDGYKJJE3JFKXLVKSNBANX5LAQ.jpg?auth=dc0490cf80d249f39c984c9f8230da9c850460fd2e99751442f0b55b18b70233&auth=dc0490cf80d249f39c984c9f8230da9c850460fd2e99751442f0b55b18b70233&quality=75&smart=true&width=980&height=551",
   },
   {
     name: "Diego Jara",
-    clubs: ["Patronato","Union","Atletico Tucuman","Central Cordoba"],
+    clubs: ["Patronato", "Unión", "Atletico Tucuman", "Central Cordoba"],
     position: "DC",
     image: "https://media.elentrerios.com/concordia/fotos/2015/11/26/o_1448536581.jpg",
   },
-   {
+  {
     name: "Ignacio Boggino",
-    clubs: ["Patronato","Rosario Central"],
+    clubs: ["Patronato", "Rosario Central"],
     position: "CB",
     image: "https://img.a.transfermarkt.technology/portrait/header/82463-1646344312.JPG?lm=1",
   },
   {
     name: "Lucas Mancinelli",
-    clubs: ["Patronato", "Lanus"],
+    clubs: ["Patronato", "Lanús"],
     position: "ED",
     image: "https://img.a.transfermarkt.technology/portrait/header/202761-1740588015.png",
   },
   {
     name: "Patricio Pablo Perez",
-    clubs: ["Velez Sarsfield", "Patronato", "Chacarita", "San Martin (T)", "Defensa y Justicia"],
+    clubs: ["Veléz Sarsfield", "Patronato", "Chacarita", "San Martin (T)", "Defensa y Justicia"],
     position: "MC",
     image: "https://www.zerozero.com.ar/img/jogadores/74/73374_med_patricio_perez.jpg",
   },
@@ -735,7 +735,7 @@ export const players: Player[] = [
   },
   {
     name: "Federico Bravo",
-    clubs: ["Patronato", "Boca Juniors", "Atletico Tucuman", "Sarmiento de Junin", "San Martin de Tucuman"],
+    clubs: ["Patronato", "Boca Juniors", "Atletico Tucuman", "Sarmiento de Junin", "San Martin (T)"],
     position: "MC",
     image: "https://img.a.transfermarkt.technology/portrait/header/266775-1734109629.jpg?lm=1",
   },
@@ -767,7 +767,7 @@ export const players: Player[] = [
   },
   {
     name: "Gaston Machin",
-    clubs: ["Argentinos Juniors", "Independiente", "Newell's Old Boys", "Huracan", "Patronato", "Instituto"],
+    clubs: ["Argentinos Juniors", "Independiente", "Newell's Old Boys", "Huracán", "Patronato", "Instituto"],
     position: "MC",
     image: "https://media.pilaradiario.com/p/688f5218237c9d189c05b77628fc96c8/adjuntos/352/imagenes/100/005/0100005760/1200x675/smart/machin-jugo-12-partidos-patronato-8-titular-y-entro-4-veces-el-banco.jpg",
   },
@@ -779,13 +779,13 @@ export const players: Player[] = [
   },
   {
     name: "Juan José Arraya",
-    clubs: ["Huracan", "Patronato"],
+    clubs: ["Huracán", "Patronato"],
     position: "MC",
     image: "https://img.lagaceta.com.ar/fotos/notas/2014/01/05/600x400_574600_20140105153120.webp",
   },
   {
     name: "Christian Norberto Corrales",
-    clubs: ["Huracan", "Patronato", "Godoy Cruz", "Indepediente Rivadavia"],
+    clubs: ["Huracán", "Patronato", "Godoy Cruz", "Indepediente Rivadavia"],
     position: "PO",
     image: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjLfJ-SR5cCOewobiqsE7SgImgUnWJWO1pDZfKgBJnIlg2sCRax0YRv4AytjjE5KxnAPOM0j3HOy88jfLiN5CHuFYQftULAixDcJMsu7MqDYsA1Y480jMAFcCkilFjfr1SJWE4u9OkBgmoQ/s400/Corrales+Christian+1.jpg",
   },
@@ -821,7 +821,7 @@ export const players: Player[] = [
   },
   {
     name: "Julian Chicco",
-    clubs: ["Patronato", "Boca Juniors", "Sarmiento", "Colón", "Sarmiento de Junin"],
+    clubs: ["Patronato", "Boca Juniors", "Colón", "Sarmiento de Junin"],
     position: "MC",
     image: "https://www.laradio1029.com.ar/wp-content/uploads/2021/03/julichicco.jpg",
   },
@@ -881,7 +881,7 @@ export const players: Player[] = [
   },
   {
     name: "Gabriel Graciani",
-    clubs: ["Patronato", "Estudiantes", "Sarmiento de Junin", "Instituto","Independiente"],
+    clubs: ["Patronato", "Estudiantes", "Sarmiento de Junin", "Instituto", "Independiente"],
     position: "DC",
     image: "https://img.a.transfermarkt.technology/portrait/header/43491-1679324786.JPG?lm=1",
   },
@@ -911,13 +911,13 @@ export const players: Player[] = [
   },
   {
     name: "Nicolas Bertocchi",
-    clubs: ["San lorenzo", "Aldosivi", "Union", "Defensa y Justicia", "Patronato", "Tigre", "San Martin de SJ"],
+    clubs: ["San lorenzo", "Aldosivi", "Unión", "Defensa y Justicia", "Patronato", "Tigre", "San Martin (SJ)"],
     position: "MC",
     image: "https://upload.wikimedia.org/wikipedia/commons/1/11/Palestino_-_Deportes_Temuco%2C_2018-08-11_-_Nicol%C3%A1s_Bertochi_-_01.jpg",
   },
   {
     name: "Jonathan Herrera",
-    clubs: ["Riestra", "San Lorenzo", "Independiente", "Patronato"],
+    clubs: ["Riestra", "San Lorenzo", "Independiente", "Patronato","Central Cordoba"],
     position: "DC",
     image: "https://imagecache.365scores.com/image/upload/f_png,w_250,h_250,c_limit,q_auto:eco,d_Athletes:default.png,r_max,c_thumb,g_face,z_0.65/Athletes/59623",
   },
@@ -947,7 +947,7 @@ export const players: Player[] = [
   },
   {
     name: "Sebastián Blazquez",
-    clubs: ["Patronato", "Vélez Sarsfield", "Colón", "Huracan", "Belgrano"],
+    clubs: ["Patronato", "Vélez Sarsfield", "Colón", "Huracán", "Belgrano"],
     position: "PO",
     image: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Sebasti%C3%A1n_Bl%C3%A1zquez_2015.jpg/640px-Sebasti%C3%A1n_Bl%C3%A1zquez_2015.jpg",
   },
@@ -1056,6 +1056,41 @@ export const clubChallenges: ClubChallenge[] = [
     primaryClubLogo:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Escudo_del_Club_Atl%C3%A9tico_Tigre.svg/1667px-Escudo_del_Club_Atl%C3%A9tico_Tigre.svg.png",
   },
+  {
+    primaryClubName: "Belgrano",
+    primaryClubLogo:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/8/85/Escudo_Oficial_del_Club_Atl%C3%A9tico_Belgrano.png/250px-Escudo_Oficial_del_Club_Atl%C3%A9tico_Belgrano.png",
+  },
+  {
+    primaryClubName: "San Martin (SJ)",
+    primaryClubLogo:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/San_Mart%C3%ADn_de_San_Juan.png/250px-San_Mart%C3%ADn_de_San_Juan.png",
+  },
+  {
+    primaryClubName: "Atletico Tucuman",
+    primaryClubLogo: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/92/Atletico_tucuman_nuevo2.svg/250px-Atletico_tucuman_nuevo2.svg.png"
+  },
+  {
+    primaryClubName: "Aldosivi",
+    primaryClubLogo: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Captura_de_pantalla_2025-02-08_201254.png/160px-Captura_de_pantalla_2025-02-08_201254.png"
+  },
+  {
+    primaryClubName: "Sarmiento de Junin",
+    primaryClubLogo: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/92/Escudo_del_Club_Atl%C3%A9tico_Sarmiento_de_Jun%C3%ADn.svg/250px-Escudo_del_Club_Atl%C3%A9tico_Sarmiento_de_Jun%C3%ADn.svg.png"
+  },
+  {
+    primaryClubName: "Central Cordoba",
+    primaryClubLogo: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/92/Central_Cordoba_SdE_crest_%282025%29.svg/250px-Central_Cordoba_SdE_crest_%282025%29.svg.png"
+  },
+  {
+    primaryClubName: "Platense",
+    primaryClubLogo: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/db/Club_Alt%C3%A9tico_Platense_crest_%282025%29.svg/120px-Club_Alt%C3%A9tico_Platense_crest_%282025%29.svg.png"
+  },
+  {
+    primaryClubName: "Independiente Rivadavia",
+    primaryClubLogo: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/Escudo_del_Club_Independiente_Rivadavia.svg/250px-Escudo_del_Club_Independiente_Rivadavia.svg.png"
+  },
+
 ]
 
 export const fixedSecondaryClubName = "Patronato"
@@ -1158,7 +1193,7 @@ export interface GameState {
 
 export function checkAndResetIfNewDay(gameState: GameState): GameState {
   const currentDate = getGameDateString();
-  
+
   if (!gameState.gameDate || gameState.gameDate !== currentDate) {
     // Es un nuevo día, reset completo
     return {
